@@ -3,6 +3,6 @@ import org.gradle.kotlin.dsl.project
 
 object Projects {
 
-    inline val DependencyHandlerScope.marklandCore get() = project(":markland.core")
+    inline val DependencyHandlerScope.agoraCore get() = project(":agora.core")
 
 }

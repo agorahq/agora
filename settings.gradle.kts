@@ -1,6 +1,6 @@
 enableFeaturePreview("GRADLE_METADATA")
 
-rootProject.name = "markland"
+rootProject.name = "agora"
 
-include(":markland.core")
-include(":markland.post")
+include(":agora.core")
+include(":agora.post")

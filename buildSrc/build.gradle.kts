@@ -3,7 +3,18 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral() {
+        metadataSources {
+            gradleMetadata()
+            mavenPom()
+        }
+    }
+    jcenter() {
+        metadataSources {
+            gradleMetadata()
+            mavenPom()
+        }
+    }
 }
 
 dependencies {
