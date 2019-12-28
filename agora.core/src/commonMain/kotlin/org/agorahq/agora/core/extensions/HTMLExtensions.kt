@@ -1,49 +1,59 @@
-package org.agorahq.markland.core.extensions
+package org.agorahq.agora.core.extensions
 
-import kotlinx.html.*
-import org.agorahq.markland.core.collection.DocumentMetadata
-import org.agorahq.markland.core.template.Template
+import kotlinx.html.FlowContent
+import kotlinx.html.HTML
+import kotlinx.html.HTMLTag
+import kotlinx.html.TagConsumer
+import kotlinx.html.unsafe
+import org.agorahq.agora.core.domain.Document
+import org.agorahq.agora.core.platform.MarkdownRendererFactory
+import org.agorahq.agora.core.template.Template
 
-fun <T> TagConsumer<*>.include(template: Template<T>, ctx: T) {
+/**
+ * Renders the given [template] at the current position in the HTML document.
+ */
+fun <C> TagConsumer<*>.include(template: Template<C, String>, ctx: C) {
     doInclude(template, this, ctx)
 }
 
-fun TagConsumer<*>.include(template: Template<Unit>) {
-    doInclude(template, this)
-}
-
-fun <T> FlowContent.include(template: Template<T>, ctx: T) {
+/**
+ * Renders the given [template] at the current position in the HTML document.
+ */
+fun <C> FlowContent.include(template: Template<C, String>, ctx: C) {
     doInclude(template, consumer, ctx)
 }
 
-fun FlowContent.include(template: Template<Unit>) {
-    doInclude(template, consumer)
-}
-
-fun HTML.include(template: Template<Unit>) {
-    doInclude(template, consumer)
-}
-
-fun <T> HTML.include(template: Template<T>, data: T) {
+/**
+ * Renders the given [template] at the current position in the HTML document.
+ */
+fun <D> HTML.include(template: Template<D, String>, data: D) {
     doInclude(template, consumer, data)
 }
 
-fun HTMLTag.content(documentMetadata: DocumentMetadata) {
+/**
+ * Renders the given [document] at the current position in the HTML document.
+ */
+fun HTMLTag.content(document: Document) {
     unsafe {
-        +documentMetadata.markdownContent
+        +MarkdownRendererFactory.createRenderer().render(document.markdownContent)
     }
 }
 
-fun <T> HTMLTag.content(layout: Template<T>, data: T) {
-    doInclude(layout, consumer, data)
+fun <D> HTMLTag.content(data: D, template: Template<D, String>) {
+    unsafe {
+        +template.render(data)
+    }
 }
 
-private fun doInclude(template: Template<Unit>, consumer: TagConsumer<*>) {
+private fun doInclude(template: Template<Unit, String>,
+                      consumer: TagConsumer<*>) {
     doInclude(template, consumer, Unit)
 }
 
-private fun <T> doInclude(template: Template<T>, consumer: TagConsumer<*>, data: T) {
+private fun <D> doInclude(template: Template<D, String>,
+                          consumer: TagConsumer<*>,
+                          data: D) {
     consumer.onTagContentUnsafe {
-        +template.build(data)
+        +template.render(data)
     }
 }

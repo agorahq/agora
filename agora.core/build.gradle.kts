@@ -22,9 +22,11 @@ kotlin {
             commonMainApi(kotlinReflect)
             commonMainApi(kotlinxHtmlCommon)
             commonMainApi(cobaltDatatypes)
+            commonMainApi(ktorServerCore)
 
             jvmMainApi(kotlinStdLibJdk8)
             jvmMainApi(kotlinxHtmlJvm)
+            jvmMainApi(flexmark)
 
             jsMainApi(kotlinStdLibJs)
             jsMainApi(kotlinxHtmlJs)

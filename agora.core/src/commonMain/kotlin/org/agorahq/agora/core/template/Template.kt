@@ -1,11 +1,14 @@
-package org.agorahq.markland.core.template
+package org.agorahq.agora.core.template
 
-interface Template<T> {
+/**
+ * A [Template] is a blueprint for a document which can be rendered using the supplied
+ * [D] into a format of type [R].
+ */
+interface Template<D, R> {
 
     /**
-     * Combines the given [data] to create the final textual
-     * representation of this [Template].
+     * Renders this [Template] using the given [data] and returns it.
      */
-    fun build(data: T): String
+    fun render(data: D): R
 
 }

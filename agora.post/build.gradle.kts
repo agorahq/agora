@@ -16,18 +16,20 @@ kotlin {
 
     dependencies {
 
+        with(Projects) {
+            commonMainApi(agoraComment)
+        }
+
         with(Libs) {
-            commonMainApi(kotlinStdLibCommon)
-            commonMainApi(kotlinxCoroutines)
-            commonMainApi(kotlinReflect)
-            jvmMainApi(kotlinStdLibJdk8)
-            jsMainApi(kotlinStdLibJs)
+            jvmMainApi(ktorLocations)
         }
 
         with(TestLibs) {
             commonTestApi(kotlinTestCommon)
             commonTestApi(kotlinTestAnnotationsCommon)
+
             jvmTestApi(kotlinTestJunit)
+
             jsTestApi(kotlinTestJs)
         }
     }

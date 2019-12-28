@@ -1,17 +1,20 @@
 import Versions.cobaltVersion
+import Versions.flexmarkVersion
 import Versions.kotlinVersion
 import Versions.kotlinxCollectionsImmutableVersion
 import Versions.kotlinxCoroutinesVersion
 import Versions.kotlinxHtmlVersion
+import Versions.ktorVersion
 import Versions.logbackVersion
 import Versions.slf4jVersion
 
 object Libs {
 
     const val kotlinStdLibCommon = "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
-    const val kotlinStdLibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    const val kotlinStdLibJs = "org.jetbrains.kotlin:kotlin-stdlib-js"
-    const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect"
+    const val kotlinStdLibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    const val kotlinStdLibJs = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+    const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    const val kotlinCssJvm = "org.jetbrains:kotlin-css-jvm:1.0.0-pre.89-kotlin-1.3.60"
 
     const val kotlinxHtmlCommon = "org.jetbrains.kotlinx:kotlinx-html-common:$kotlinxHtmlVersion"
     const val kotlinxHtmlJvm = "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinxHtmlVersion"
@@ -22,6 +25,14 @@ object Libs {
 
     const val cobaltDatatypes = "org.hexworks.cobalt:cobalt.datatypes:$cobaltVersion"
 
+    const val ktorServerNetty = "io.ktor:ktor-server-netty:$ktorVersion"
+    const val ktorServerCore = "io.ktor:ktor-server-core:$ktorVersion"
+    const val ktorLocations = "io.ktor:ktor-locations:$ktorVersion"
+    const val ktorHtmlBuilder = "io.ktor:ktor-html-builder:$ktorVersion"
+    const val ktorServerTests = "io.ktor:ktor-server-tests:$ktorVersion"
+
+    const val flexmark = "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
     const val slf4jApi = "org.slf4j:slf4j-api:$slf4jVersion"
     const val logbackClassic = "ch.qos.logback:logback-classic:$logbackVersion"
+
 }

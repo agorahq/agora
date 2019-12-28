@@ -1,6 +1,7 @@
-package org.agorahq.markland.core.extensions
+package org.agorahq.agora.core.extensions
 
-import org.agorahq.markland.core.template.LayoutContext
-import org.agorahq.markland.core.template.Template
+import org.agorahq.agora.core.domain.DomainObject
+import org.agorahq.agora.core.module.Module
+import org.agorahq.agora.core.module.ServerContext
 
-typealias Layout<T> = Template<LayoutContext<T>>
+typealias AnyModule = Module<out DomainObject, out ServerContext>

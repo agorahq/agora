@@ -1,68 +1,75 @@
-package org.agorahq.markland.core.template
+package org.agorahq.agora.core.template
 
-import kotlinx.html.*
-import org.agorahq.markland.core.collection.DocumentMetadata
-import org.agorahq.markland.core.collection.Site
-import org.agorahq.markland.core.extensions.content
-import org.agorahq.markland.core.extensions.include
-import org.hexworks.cobalt.Identifier
+import kotlinx.html.body
+import kotlinx.html.div
+import kotlinx.html.footer
+import kotlinx.html.h1
+import kotlinx.html.head
+import kotlinx.html.html
+import kotlinx.html.title
+import org.agorahq.agora.core.domain.Site
+import org.agorahq.agora.core.extensions.content
+import org.agorahq.agora.core.extensions.include
+import org.agorahq.agora.core.service.impl.DefaultModuleRegistry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TemplateTest {
 
     @Test
-    fun should_properly_render_test_layout() {
-        val actualRenderedLayout = testLayout.build(LayoutContext(
-                documentMetadata = DocumentMetadata(
-                        id = Identifier.randomIdentifier(),
-                        title = "title",
-                        tldr = "excerpt",
-                        createdAt = 1,
-                        markdownContent = "content",
-                        permalink = "/",
-                        shortDescription = "Short description"),
-                site = Site(
-                        title = "site title",
-                        collections = listOf(),
-                        email = "test@test.com",
-                        description = "description",
-                        host = "example.com",
-                        port = 80,
-                        baseUrl = "/"),
-                data = Unit))
+    fun should_properly_render_simple_layout() {
+        val actualRenderedLayout = POST_TEMPLATE.render(PostData(POST, SITE))
 
-        assertEquals(expectedRenderedLayout, actualRenderedLayout)
+        assertEquals(EXPECTED_RENDERED_POST_TEMPLATE, actualRenderedLayout)
     }
 
     companion object {
 
-        private const val expectedRenderedLayout = "<html><head><title>site title</title></head><body><div class=\"container\"><h1>title</h1><div>content</div></div><footer>Copyright site title</footer></body></html>"
+        private const val EXPECTED_RENDERED_POST_TEMPLATE = "<html><head><title>Christmas is coming</title></head><body><div class=\"container\"><h1>Christmas is coming</h1><div><p>Better get prepared.</p>\n" +
+                "</div></div><footer>Copyright Test site. Contact: test@test.com</footer></body></html>"
 
-        private val head = template<Site> { site ->
+        private const val POST_COLLECTION_NAME = "Posts"
+        private val POST = Post(
+                title = "Christmas is coming",
+                date = "2019-12-21",
+                excerpt = "Christmas is here soon.",
+                shortDescription = "Christmas is here soon, so we better buy presents.",
+                markdownContent = "Better get prepared.")
+
+        private val HEAD = template<String> { title ->
             head {
-                title(site.title)
+                title(title)
             }
         }
 
-        private val testLayout = layout { ctx ->
-            val (document, site) = ctx
+        private val POST_TEMPLATE = template<PostData> { (post, site) ->
             html {
-                include(head, ctx.site)
+                include(HEAD, post.title)
                 body {
                     div("container") {
-                        h1 { text(document.title) }
+                        h1 {
+                            +post.title
+                        }
                         div {
-                            content(document)
+                            content(post)
                         }
                     }
                     footer {
-                        text("Copyright ${site.title}")
+                        text("Copyright ${site.title}. Contact: ${site.email}")
                     }
                 }
             }
         }
-    }
 
+        private val SITE = Site(
+                title = "Test site",
+                email = "test@test.com",
+                description = "description",
+                host = "example.com",
+                port = 80,
+                baseUrl = "/",
+                moduleRegistry = DefaultModuleRegistry())
+
+    }
 
 }

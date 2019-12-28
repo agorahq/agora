@@ -1,25 +1,17 @@
 allprojects {
     repositories {
         mavenLocal() {
-            metadataSources {
-                gradleMetadata()
-                mavenPom()
-            }
+//            metadataSources {
+//                gradleMetadata()
+//                mavenPom()
+//            }
         }
-        mavenCentral() {
-            metadataSources {
-                gradleMetadata()
-                mavenPom()
-            }
-        }
-        jcenter() {
-            metadataSources {
-                gradleMetadata()
-                mavenPom()
-            }
-        }
+        mavenCentral()
+        jcenter()
         kotlinx()
         jitpack()
+        maven { url = uri("https://kotlin.bintray.com/ktor") }
+        maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
     }
 }
 

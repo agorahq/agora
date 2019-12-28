@@ -7,6 +7,8 @@ object Versions {
 
     const val cobaltVersion = "2019.2.3-PREVIEW"
 
+    const val ktorVersion = "1.3.0-rc"
+    const val flexmarkVersion = "0.50.46"
     const val slf4jVersion = "1.7.25"
     const val logbackVersion = "1.2.3"
 }
