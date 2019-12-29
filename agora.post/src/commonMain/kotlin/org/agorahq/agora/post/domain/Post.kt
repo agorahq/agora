@@ -11,7 +11,7 @@ class Post(
         override val markdownContent: String,
         val shortDescription: String,
         val tldr: String = shortDescription,
-        override val permalink: String = PostPermalink(date, title).generatePermalink(),
+        override val permalink: PostPermalink = PostPermalink(date, title),
         override val id: Identifier = Identifier.randomIdentifier(),
         override val createdAtMs: Long = SystemUtils.currentTimeMillis(),
         override val updatedAtMs: Long = createdAtMs

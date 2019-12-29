@@ -12,7 +12,7 @@ val POST_CARD = template<Post> { post ->
             div("card") {
                 div("card-body") {
                     p { +post.shortDescription }
-                    a(href = post.permalink) { +"Read more" }
+                    a(href = post.permalink.generatePermalink()) { +"Read more" }
                 }
             }
         }

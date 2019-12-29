@@ -7,9 +7,9 @@ interface Document : DomainObject {
     override val id: Identifier
     override val createdAtMs: Long
     override val updatedAtMs: Long
-    
+
     val markdownContent: String
-    val permalink: String
+    val permalink: Permalink<out Document>
 
     companion object
 }

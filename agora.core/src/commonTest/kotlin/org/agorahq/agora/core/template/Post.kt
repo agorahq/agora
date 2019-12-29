@@ -11,7 +11,7 @@ class Post(
         val shortDescription: String,
         override val id: Identifier = Identifier.randomIdentifier(),
         override val markdownContent: String,
-        override val permalink: String = "/post/$date-$title.html",
+        override val permalink: PostPermalink = PostPermalink(date, title),
         override val createdAtMs: Long = SystemUtils.currentTimeMillis(),
         override val updatedAtMs: Long = createdAtMs
 ) : Document
