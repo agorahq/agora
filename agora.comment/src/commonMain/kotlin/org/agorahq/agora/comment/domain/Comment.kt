@@ -4,7 +4,7 @@ import org.agorahq.agora.core.domain.FeatureObject
 import org.agorahq.agora.core.platform.SystemUtils
 import org.hexworks.cobalt.Identifier
 
-class Comment(
+data class Comment(
         val markdownContent: String,
         val author: String,
         override val parentId: Identifier,

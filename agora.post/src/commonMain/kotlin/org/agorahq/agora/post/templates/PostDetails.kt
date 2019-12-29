@@ -29,7 +29,7 @@ val POST_DETAILS = template<Pair<Post, Site>> { (post, site) ->
                 div {
                     documentContent(post)
                 }
-                hr {  }
+                hr { }
                 div {
                     site.forEachModuleWithFacet<DocumentFeatureListing> { (_, facet) ->
                         htmlContent(facet.renderListingFor(post))

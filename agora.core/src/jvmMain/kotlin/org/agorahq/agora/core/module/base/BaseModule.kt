@@ -16,6 +16,10 @@ abstract class BaseModule<D : DomainObject>(
         it::class to it
     }.toMap().toMutableMap()
 
+    final override fun containsFacet(facet: Facet): Boolean {
+        return facets.any { it.value === facet }
+    }
+
     final override fun hasFacet(facetType: KClass<out Facet>): Boolean {
         return facets.filterKeys {
             facetType.isSuperclassOf(it)

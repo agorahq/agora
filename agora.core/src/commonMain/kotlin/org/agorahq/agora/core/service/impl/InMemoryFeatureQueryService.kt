@@ -1,29 +1,21 @@
-package org.agorahq.agora.core.service
+package org.agorahq.agora.core.service.impl
 
 import org.agorahq.agora.core.domain.DomainObject
 import org.agorahq.agora.core.domain.FeatureObject
+import org.agorahq.agora.core.service.FeatureQueryService
 import org.hexworks.cobalt.Identifier
 import org.hexworks.cobalt.datatypes.Maybe
-import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryFeatureQueryService<F : FeatureObject>(
-        objects: Sequence<F>
+        private val objects: MutableMap<Identifier, F>
 ) : FeatureQueryService<F> {
 
-    private val lookup = ConcurrentHashMap<Identifier, F>()
+    override fun findAll() = objects.values.asSequence()
 
-    init {
-        objects.forEach {
-            lookup[it.id] = it
-        }
-    }
-
-    override fun findAll() = lookup.values.asSequence()
-
-    override fun findById(id: Identifier) = Maybe.ofNullable(lookup[id])
+    override fun findById(id: Identifier) = Maybe.ofNullable(objects[id])
 
     override fun findByParent(parent: DomainObject): Sequence<F> {
-        return lookup.asSequence()
+        return objects.asSequence()
                 .filter { it.value.parentId == parent.id }
                 .map { it.value }
     }

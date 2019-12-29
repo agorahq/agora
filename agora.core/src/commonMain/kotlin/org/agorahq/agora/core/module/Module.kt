@@ -10,6 +10,8 @@ interface Module<D : DomainObject> {
 
     fun hasFacet(facetType: KClass<out Facet>): Boolean
 
+    fun containsFacet(facet: Facet): Boolean
+
     fun <T : Facet> findFacet(facetType: KClass<T>): Maybe<T>
 
     fun <T : Facet> filterFacets(facetType: KClass<T>): Iterable<T>

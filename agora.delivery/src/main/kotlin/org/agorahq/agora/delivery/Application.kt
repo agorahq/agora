@@ -4,29 +4,37 @@ package org.agorahq.agora.delivery
 
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.request.receiveParameters
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.agorahq.agora.comment.domain.Comment
+import org.agorahq.agora.comment.facets.CommentCreating
 import org.agorahq.agora.comment.facets.CommentListing
 import org.agorahq.agora.comment.module.CommentModule
 import org.agorahq.agora.core.domain.Permalink
 import org.agorahq.agora.core.domain.Site
 import org.agorahq.agora.core.extensions.AnyDocumentDetails
+import org.agorahq.agora.core.extensions.AnyDocumentFeatureCreating
 import org.agorahq.agora.core.extensions.whenHasFacet
 import org.agorahq.agora.core.module.facet.DocumentListing
 import org.agorahq.agora.core.service.DefaultModuleRegistry
-import org.agorahq.agora.core.service.InMemoryDocumentQueryService
-import org.agorahq.agora.core.service.InMemoryFeatureQueryService
+import org.agorahq.agora.core.service.impl.InMemoryDocumentQueryService
+import org.agorahq.agora.core.service.impl.InMemoryFeatureQueryService
+import org.agorahq.agora.core.service.impl.InMemoryStorageService
 import org.agorahq.agora.core.shared.templates.HOMEPAGE
 import org.agorahq.agora.delivery.extensions.create
+import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.facets.PostDocumentDetails
 import org.agorahq.agora.post.facets.PostDocumentListing
 import org.agorahq.agora.post.module.PostModule
 import org.hexworks.cobalt.Identifier
+import java.util.concurrent.ConcurrentHashMap
 
 val POST_A_ID = Identifier.randomIdentifier()
 val POST_B_ID = Identifier.randomIdentifier()
@@ -69,14 +77,22 @@ val COMMENT_B_1 = Comment(
         author = "Frank",
         parentId = POST_B_ID)
 
-val POSTS = sequenceOf(POST_A, POST_B)
-val COMMENTS = sequenceOf(COMMENT_A_0, COMMENT_B_0, COMMENT_B_1)
+val POSTS = ConcurrentHashMap<Identifier, Post>().apply {
+    put(POST_A_ID, POST_A)
+    put(POST_B_ID, POST_B)
+}
+val COMMENTS = ConcurrentHashMap<Identifier, Comment>().apply {
+    put(COMMENT_A_0.id, COMMENT_A_0)
+    put(COMMENT_B_0.id, COMMENT_B_0)
+    put(COMMENT_B_1.id, COMMENT_B_1)
+}
 
 fun main(args: Array<String>) {
 
     val moduleRegistry = DefaultModuleRegistry()
     val commentQueryService = InMemoryFeatureQueryService(COMMENTS)
     val postQueryService = InMemoryDocumentQueryService(POSTS)
+    val commentStorage = InMemoryStorageService(COMMENTS)
 
     val site = Site(
             title = "Agora",
@@ -97,7 +113,11 @@ fun main(args: Array<String>) {
                     PostDocumentDetails(
                             site = site,
                             postQueryService = postQueryService),
-                    CommentListing(commentQueryService)))
+                    CommentListing(
+                            site = site,
+                            commentQueryService = commentQueryService),
+                    CommentCreating(
+                            commentStorage = commentStorage)))
 
     val commentModule = CommentModule()
 
@@ -117,14 +137,22 @@ fun main(args: Array<String>) {
                                 contentType = ContentType.Text.Html)
                     }
                 }
-                module.whenHasFacet<AnyDocumentDetails> { documentDetails ->
-                    get(documentDetails.route) {
+                module.whenHasFacet<AnyDocumentDetails> { facet ->
+                    get(facet.route) {
                         val permalink = Permalink.create(
-                                klass = documentDetails.permalinkType,
+                                klass = facet.permalinkType,
                                 parameters = call.parameters)
                         call.respondText(
-                                text = documentDetails.renderDocumentBy(permalink),
+                                text = facet.renderDocumentBy(permalink),
                                 contentType = ContentType.Text.Html)
+                    }
+                }
+                module.whenHasFacet<AnyDocumentFeatureCreating> { facet ->
+                    post(facet.route) {
+                        facet.store(call.receiveParameters().mapTo(facet.creates))
+                        call.request.headers["Referer"]?.let { referer ->
+                            call.respondRedirect(referer)
+                        }
                     }
                 }
             }
