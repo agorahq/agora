@@ -33,13 +33,25 @@ fun <D> HTML.include(template: Template<D, String>, data: D) {
 /**
  * Renders the given [document] at the current position in the HTML document.
  */
-fun HTMLTag.content(document: Document) {
+fun HTMLTag.documentContent(document: Document) {
     unsafe {
         +MarkdownRendererFactory.createRenderer().render(document.markdownContent)
     }
 }
 
-fun <D> HTMLTag.content(data: D, template: Template<D, String>) {
+fun HTMLTag.htmlContent(htmlContent: String) {
+    unsafe {
+        +htmlContent
+    }
+}
+
+fun HTMLTag.markdownContent(markdownContent: String) {
+    unsafe {
+        +MarkdownRendererFactory.createRenderer().render(markdownContent)
+    }
+}
+
+fun <D> HTMLTag.templateContent(data: D, template: Template<D, String>) {
     unsafe {
         +template.render(data)
     }

@@ -1,6 +1,5 @@
 package org.agorahq.agora.core.domain
 
-import org.agorahq.agora.core.module.ServerContext
 import org.agorahq.agora.core.service.ModuleRegistry
 
 /**
@@ -14,4 +13,4 @@ class Site(
         val host: String,
         val port: Int,
         val baseUrl: String,
-        val moduleRegistry: ModuleRegistry<out ServerContext>)
+        val moduleRegistry: ModuleRegistry)

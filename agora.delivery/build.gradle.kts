@@ -9,6 +9,12 @@ application {
     mainClassName = "io.ktor.server.netty.EngineMain"
 }
 
+kotlin {
+    target {
+        jvmTarget(JavaVersion.VERSION_1_8)
+    }
+}
+
 dependencies {
 
     with(Projects) {

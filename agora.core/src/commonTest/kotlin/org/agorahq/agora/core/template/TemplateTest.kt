@@ -7,10 +7,14 @@ import kotlinx.html.h1
 import kotlinx.html.head
 import kotlinx.html.html
 import kotlinx.html.title
+import org.agorahq.agora.core.domain.DomainObject
 import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.extensions.content
+import org.agorahq.agora.core.extensions.documentContent
 import org.agorahq.agora.core.extensions.include
-import org.agorahq.agora.core.service.impl.DefaultModuleRegistry
+import org.agorahq.agora.core.module.Module
+import org.agorahq.agora.core.service.ModuleRegistry
+import org.hexworks.cobalt.datatypes.Maybe
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -51,7 +55,7 @@ class TemplateTest {
                             +post.title
                         }
                         div {
-                            content(post)
+                            documentContent(post)
                         }
                     }
                     footer {
@@ -68,7 +72,19 @@ class TemplateTest {
                 host = "example.com",
                 port = 80,
                 baseUrl = "/",
-                moduleRegistry = DefaultModuleRegistry())
+                moduleRegistry = object : ModuleRegistry {
+                    override val modules: Iterable<Module<out DomainObject>>
+                        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+                    override fun <D : DomainObject> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                    override fun register(module: Module<out DomainObject>) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                })
 
     }
 

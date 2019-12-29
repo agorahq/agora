@@ -4,7 +4,7 @@ import org.agorahq.agora.core.domain.DomainObject
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 
-interface Module<D : DomainObject, S : ServerContext> {
+interface Module<D : DomainObject> {
 
     val name: String
 
@@ -12,6 +12,6 @@ interface Module<D : DomainObject, S : ServerContext> {
 
     fun <T : Facet> findFacet(facetType: KClass<T>): Maybe<T>
 
-    fun registerEndpoints(serverContext: S)
+    fun <T : Facet> filterFacets(facetType: KClass<T>): Iterable<T>
 
 }

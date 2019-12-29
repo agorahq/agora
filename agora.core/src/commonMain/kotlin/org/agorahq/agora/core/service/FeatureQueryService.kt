@@ -1,12 +1,10 @@
 package org.agorahq.agora.core.service
 
 import org.agorahq.agora.core.domain.DomainObject
-import org.hexworks.cobalt.Identifier
-import org.hexworks.cobalt.datatypes.Maybe
+import org.agorahq.agora.core.domain.FeatureObject
 
-interface FeatureQueryService<D : DomainObject> {
+interface FeatureQueryService<F : FeatureObject> : QueryService<F> {
 
-    fun findById(id: Identifier): Maybe<D>
+    fun findByParent(parent: DomainObject): Sequence<F>
 
-    fun findByParent(parent: DomainObject): Sequence<D>
 }
