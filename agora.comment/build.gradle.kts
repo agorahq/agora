@@ -1,8 +1,8 @@
 plugins {
-    kotlinMultiplatform
+    kotlin("multiplatform")
+    id("maven-publish")
+    id("signing")
 }
-
-group = "org.agorahq.agora"
 
 kotlin {
 
@@ -33,4 +33,17 @@ kotlin {
             jsTestApi(kotlinTestJs)
         }
     }
+}
+
+publishing {
+    publishWith(
+            project = project,
+            module = "agora.comment",
+            desc = "Comment module for Agora."
+    )
+}
+
+signing {
+    isRequired = false
+    sign(publishing.publications)
 }

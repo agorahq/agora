@@ -5,12 +5,12 @@ import kotlinx.html.InputType
 import kotlinx.html.form
 import kotlinx.html.input
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.facets.CommentCreating
+import org.agorahq.agora.comment.operations.CommentCreator
 import org.agorahq.agora.core.template.template
 
 val COMMENT_FORM = template<String> { parentId ->
-    form(action = CommentCreating.ROUTE, method = FormMethod.post) {
-        input(type = InputType.text, name = Comment::markdownContent.name)
+    form(action = CommentCreator.ROUTE, method = FormMethod.post) {
+        input(type = InputType.text, name = Comment::rawContent.name)
         input(type = InputType.hidden, name = Comment::parentId.name) {
             value = parentId
         }

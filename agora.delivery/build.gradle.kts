@@ -3,8 +3,6 @@ plugins {
     kotlin("jvm")
 }
 
-group = "org.agorahq.agora"
-
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
 }

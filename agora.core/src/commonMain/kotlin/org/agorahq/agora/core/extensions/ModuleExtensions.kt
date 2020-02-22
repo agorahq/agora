@@ -1,14 +1,14 @@
 package org.agorahq.agora.core.extensions
 
 import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.module.Facet
+import org.agorahq.agora.core.module.Operation
 
-inline fun <reified T : Facet> AnyModule.whenHasFacet(noinline fn: (T) -> Unit) {
-    findFacet(T::class).map(fn)
+inline fun <reified T : Operation> AnyModule.whenHasOperation(noinline fn: (T) -> Unit) {
+    findOperation(T::class).map(fn)
 }
 
-inline fun <reified T : Facet> Site.forEachModuleWithFacet(fn: (Pair<AnyModule, T>) -> Unit) {
-    modules.filter { it.hasFacet(T::class) }.map {
-        fn(it to it.findFacet(T::class).get())
+inline fun <reified T : Operation> Site.forEachModuleWithOperation(fn: (Pair<AnyModule, T>) -> Unit) {
+    modules.filter { it.hasOperation(T::class) }.map {
+        fn(it to it.findOperation(T::class).get())
     }
 }

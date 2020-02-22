@@ -5,7 +5,7 @@ object Versions {
     const val kotlinxCollectionsImmutableVersion = "0.3"
     const val kotlinxHtmlVersion = "0.6.10"
 
-    const val cobaltVersion = "2019.2.3-PREVIEW"
+    const val cobaltVersion = "2020.0.15-PREVIEW"
 
     const val ktorVersion = "1.3.0-rc"
     const val flexmarkVersion = "0.50.46"

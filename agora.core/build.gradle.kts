@@ -1,8 +1,8 @@
 plugins {
-    kotlinMultiplatform
+    kotlin("multiplatform")
+    id("maven-publish")
+    id("signing")
 }
-
-group = "org.agorahq.agora"
 
 kotlin {
 
@@ -21,7 +21,7 @@ kotlin {
             commonMainApi(kotlinxCoroutines)
             commonMainApi(kotlinReflect)
             commonMainApi(kotlinxHtmlCommon)
-            commonMainApi(cobaltDatatypes)
+            commonMainApi(cobaltCore)
 
             jvmMainApi(kotlinStdLibJdk8)
             jvmMainApi(kotlinxHtmlJvm)
@@ -40,4 +40,17 @@ kotlin {
             jsTestApi(kotlinTestJs)
         }
     }
+}
+
+publishing {
+    publishWith(
+            project = project,
+            module = "agora.core",
+            desc = "Core components of Agora."
+    )
+}
+
+signing {
+    isRequired = false
+    sign(publishing.publications)
 }

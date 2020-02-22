@@ -1,19 +1,19 @@
 package org.agorahq.agora.core.module
 
-import org.agorahq.agora.core.domain.DomainObject
+import org.agorahq.agora.core.domain.document.DocumentPart
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 
-interface Module<D : DomainObject> {
+interface Module<E : DocumentPart> {
 
     val name: String
 
-    fun hasFacet(facetType: KClass<out Facet>): Boolean
+    fun hasOperation(operationType: KClass<out Operation>): Boolean
 
-    fun containsFacet(facet: Facet): Boolean
+    fun hasOperation(operation: Operation): Boolean = hasOperation(operation::class)
 
-    fun <T : Facet> findFacet(facetType: KClass<T>): Maybe<T>
+    fun <T : Operation> findOperation(operationType: KClass<T>): Maybe<T>
 
-    fun <T : Facet> filterFacets(facetType: KClass<T>): Iterable<T>
+    fun <T : Operation> filterOperations(operationType: KClass<T>): Iterable<T>
 
 }

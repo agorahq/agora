@@ -1,15 +1,15 @@
 package org.agorahq.agora.core.extensions
 
-import org.agorahq.agora.core.domain.Document
-import org.agorahq.agora.core.domain.DomainObject
-import org.agorahq.agora.core.domain.FeatureObject
-import org.agorahq.agora.core.domain.Permalink
+import org.agorahq.agora.core.domain.document.Page
+import org.agorahq.agora.core.domain.document.DocumentElement
+import org.agorahq.agora.core.domain.document.PageURL
+import org.agorahq.agora.core.domain.document.DocumentPart
 import org.agorahq.agora.core.module.Module
-import org.agorahq.agora.core.module.facet.DocumentDetails
-import org.agorahq.agora.core.module.facet.DocumentFeatureCreating
+import org.agorahq.agora.core.module.operations.DocumentDetailsRenderer
+import org.agorahq.agora.core.module.operations.DocumentElementCreator
 
-typealias AnyModule = Module<out DomainObject>
+typealias AnyModule = Module<out DocumentPart>
 
-typealias AnyDocumentDetails = DocumentDetails<out Document, Permalink<out Document>>
+typealias AnyDocumentDetails = DocumentDetailsRenderer<out Page, PageURL<out Page>>
 
-typealias AnyDocumentFeatureCreating = DocumentFeatureCreating<FeatureObject>
+typealias AnyDocumentElementCreating = DocumentElementCreator<DocumentElement>

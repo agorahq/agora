@@ -6,8 +6,8 @@ import kotlinx.html.li
 import kotlinx.html.nav
 import kotlinx.html.ul
 import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.extensions.forEachModuleWithFacet
-import org.agorahq.agora.core.module.facet.DocumentListing
+import org.agorahq.agora.core.extensions.forEachModuleWithOperation
+import org.agorahq.agora.core.module.operations.DocumentListing
 import org.agorahq.agora.core.template.template
 
 val DEFAULT_NAVIGATION = template<Site> { site ->
@@ -18,9 +18,9 @@ val DEFAULT_NAVIGATION = template<Site> { site ->
                     li("nav-item") {
                         a(href = "/", classes = "nav-link") { +"Home" }
                     }
-                    site.forEachModuleWithFacet<DocumentListing> { (module, facet) ->
+                    site.forEachModuleWithOperation<DocumentListing> { (module, listing) ->
                         li("nav-item") {
-                            a(href = facet.path, classes = "nav-link") { +module.name }
+                            a(href = listing.route, classes = "nav-link") { +module.name }
                         }
                     }
                 }

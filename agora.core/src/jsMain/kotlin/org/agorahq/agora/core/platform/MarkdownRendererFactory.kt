@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.platform
 
-import org.agorahq.agora.core.service.MarkdownRenderer
+import org.agorahq.agora.core.services.MarkdownRenderer
 
 actual object MarkdownRendererFactory {
 

@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.domain
 
-import org.agorahq.agora.core.service.ModuleRegistry
+import org.agorahq.agora.core.services.ModuleRegistry
 
 /**
  * [Site] contains metadata about the whole site.

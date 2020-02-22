@@ -1,37 +1,37 @@
 package org.agorahq.agora.core.module.base
 
-import org.agorahq.agora.core.domain.DomainObject
-import org.agorahq.agora.core.module.Facet
+import org.agorahq.agora.core.domain.document.DocumentPart
 import org.agorahq.agora.core.module.Module
+import org.agorahq.agora.core.module.Operation
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseModule<D : DomainObject>(
-        facets: Iterable<Facet>
-) : Module<D> {
+abstract class BaseModule<E : DocumentPart>(
+        operations: Iterable<Operation>
+) : Module<E> {
 
-    private val facets = facets.map {
+    private val operations = operations.map {
         it::class to it
     }.toMap().toMutableMap()
 
-    final override fun containsFacet(facet: Facet): Boolean {
-        return facets.any { it.value === facet }
+    final override fun hasOperation(operation: Operation): Boolean {
+        return operations.any { it.value === operation }
     }
 
-    final override fun hasFacet(facetType: KClass<out Facet>): Boolean {
-        return facets.filterKeys {
-            facetType.isSuperclassOf(it)
+    final override fun hasOperation(operationType: KClass<out Operation>): Boolean {
+        return operations.filterKeys {
+            operationType.isSuperclassOf(it)
         }.isNotEmpty()
     }
 
-    final override fun <T : Facet> findFacet(facetType: KClass<T>): Maybe<T> {
-        return Maybe.ofNullable(filterFacets(facetType).firstOrNull())
+    final override fun <T : Operation> findOperation(operationType: KClass<T>): Maybe<T> {
+        return Maybe.ofNullable(filterOperations(operationType).firstOrNull())
     }
 
-    final override fun <T : Facet> filterFacets(facetType: KClass<T>): Iterable<T> {
-        return facets.filterKeys { facetType.isSuperclassOf(it) }.map { it.value as T }
+    final override fun <T : Operation> filterOperations(operationType: KClass<T>): Iterable<T> {
+        return operations.filterKeys { operationType.isSuperclassOf(it) }.map { it.value as T }
     }
 
 }

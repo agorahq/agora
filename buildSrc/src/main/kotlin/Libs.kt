@@ -23,7 +23,7 @@ object Libs {
     const val kotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     const val kotlinxCollectionsImmutable = "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
 
-    const val cobaltDatatypes = "org.hexworks.cobalt:cobalt.datatypes:$cobaltVersion"
+    const val cobaltCore = "org.hexworks.cobalt:cobalt.core:$cobaltVersion"
 
     const val ktorServerNetty = "io.ktor:ktor-server-netty:$ktorVersion"
     const val ktorServerCore = "io.ktor:ktor-server-core:$ktorVersion"

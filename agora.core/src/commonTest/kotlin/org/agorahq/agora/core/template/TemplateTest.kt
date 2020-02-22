@@ -7,12 +7,12 @@ import kotlinx.html.h1
 import kotlinx.html.head
 import kotlinx.html.html
 import kotlinx.html.title
-import org.agorahq.agora.core.domain.DomainObject
 import org.agorahq.agora.core.domain.Site
+import org.agorahq.agora.core.domain.document.DocumentPart
 import org.agorahq.agora.core.extensions.documentContent
 import org.agorahq.agora.core.extensions.include
 import org.agorahq.agora.core.module.Module
-import org.agorahq.agora.core.service.ModuleRegistry
+import org.agorahq.agora.core.services.ModuleRegistry
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -38,7 +38,7 @@ class TemplateTest {
                 date = "2019-12-21",
                 excerpt = "Christmas is here soon.",
                 shortDescription = "Christmas is here soon, so we better buy presents.",
-                markdownContent = "Better get prepared.")
+                rawContent = "Better get prepared.")
 
         private val HEAD = template<String> { title ->
             head {
@@ -73,14 +73,14 @@ class TemplateTest {
                 port = 80,
                 baseUrl = "/",
                 moduleRegistry = object : ModuleRegistry {
-                    override val modules: Iterable<Module<out DomainObject>>
+                    override val modules: Iterable<Module<out DocumentPart>>
                         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-                    override fun <D : DomainObject> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
+                    override fun <D : DocumentPart> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 
-                    override fun register(module: Module<out DomainObject>) {
+                    override fun register(module: Module<out DocumentPart>) {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 

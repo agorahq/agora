@@ -3,16 +3,13 @@
 package org.agorahq.agora.delivery.extensions
 
 import io.ktor.http.Parameters
-import org.hexworks.cobalt.Identifier
-import org.hexworks.cobalt.impl.DefaultIdentifier
-import java.util.*
+import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
 
-fun <T : Any> Parameters.mapTo(
-        type: KClass<T>): T {
+fun <T : Any> Parameters.mapTo(type: KClass<T>): T {
 
     require(type.isData) {
         "Creating an instance from Parameters is only supported for data classes."
@@ -27,7 +24,7 @@ fun <T : Any> Parameters.mapTo(
         val parameterName = parameter.name!!
         parameters[parameterName]?.let { value ->
             parameter to mapValue(parameter.type.classifier!!, value)
-        } ?: run{
+        } ?: run {
             error("")
         }
     }.toMap()
@@ -41,7 +38,7 @@ private fun mapValue(classifier: KClassifier, value: String): Any {
         Int::class -> value.toInt()
         Long::class -> value.toLong()
         Boolean::class -> value.toBoolean()
-        Identifier::class -> DefaultIdentifier(UUID.fromString(value))
+        UUID::class -> UUID.fromString(value)
         else -> {
             throw UnsupportedOperationException("Can't map value '$value' to type $classifier")
         }

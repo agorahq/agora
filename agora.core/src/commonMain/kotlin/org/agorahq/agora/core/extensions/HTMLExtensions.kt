@@ -5,7 +5,7 @@ import kotlinx.html.HTML
 import kotlinx.html.HTMLTag
 import kotlinx.html.TagConsumer
 import kotlinx.html.unsafe
-import org.agorahq.agora.core.domain.Document
+import org.agorahq.agora.core.domain.document.Page
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
 import org.agorahq.agora.core.template.Template
 
@@ -31,11 +31,11 @@ fun <D> HTML.include(template: Template<D, String>, data: D) {
 }
 
 /**
- * Renders the given [document] at the current position in the HTML document.
+ * Renders the given [page] at the current position in the HTML document.
  */
-fun HTMLTag.documentContent(document: Document) {
+fun HTMLTag.documentContent(page: Page) {
     unsafe {
-        +MarkdownRendererFactory.createRenderer().render(document.markdownContent)
+        +MarkdownRendererFactory.createRenderer().render(page.rawContent)
     }
 }
 

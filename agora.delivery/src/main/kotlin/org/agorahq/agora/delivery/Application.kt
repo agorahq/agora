@@ -13,38 +13,38 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.facets.CommentCreating
-import org.agorahq.agora.comment.facets.CommentListing
 import org.agorahq.agora.comment.module.CommentModule
-import org.agorahq.agora.core.domain.Permalink
+import org.agorahq.agora.comment.operations.CommentCreator
+import org.agorahq.agora.comment.operations.CommentListing
 import org.agorahq.agora.core.domain.Site
+import org.agorahq.agora.core.domain.document.PageURL
 import org.agorahq.agora.core.extensions.AnyDocumentDetails
-import org.agorahq.agora.core.extensions.AnyDocumentFeatureCreating
-import org.agorahq.agora.core.extensions.whenHasFacet
-import org.agorahq.agora.core.module.facet.DocumentListing
-import org.agorahq.agora.core.service.DefaultModuleRegistry
-import org.agorahq.agora.core.service.impl.InMemoryDocumentQueryService
-import org.agorahq.agora.core.service.impl.InMemoryFeatureQueryService
-import org.agorahq.agora.core.service.impl.InMemoryStorageService
+import org.agorahq.agora.core.extensions.AnyDocumentElementCreating
+import org.agorahq.agora.core.extensions.whenHasOperation
+import org.agorahq.agora.core.module.operations.DocumentListing
+import org.agorahq.agora.core.services.DefaultModuleRegistry
+import org.agorahq.agora.core.services.impl.InMemoryDocumentElementQueryService
+import org.agorahq.agora.core.services.impl.InMemoryDocumentQueryService
+import org.agorahq.agora.core.services.impl.InMemoryStorageService
 import org.agorahq.agora.core.shared.templates.HOMEPAGE
 import org.agorahq.agora.delivery.extensions.create
 import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.post.domain.Post
-import org.agorahq.agora.post.facets.PostDocumentDetails
-import org.agorahq.agora.post.facets.PostDocumentListing
 import org.agorahq.agora.post.module.PostModule
-import org.hexworks.cobalt.Identifier
+import org.agorahq.agora.post.operations.PostDocumentDetailsRenderer
+import org.agorahq.agora.post.operations.PostDocumentListing
+import org.hexworks.cobalt.core.api.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-val POST_A_ID = Identifier.randomIdentifier()
-val POST_B_ID = Identifier.randomIdentifier()
+val POST_A_ID = UUID.randomUUID()
+val POST_B_ID = UUID.randomUUID()
 
 val POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
         date = "2019-12-28",
         shortDescription = "Agora is planned to launch in early Q2.",
-        markdownContent = """
+        rawContent = """
             After half a year of active development Agora is planned to launch in closed beta.
             
             A few groups will be chosen to participate in it and the devs will use the feedback to
@@ -56,32 +56,32 @@ val POST_B = Post(
         title = "Agora is using Ktor",
         date = "2019-12-29",
         shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
-        markdownContent = """
+        rawContent = """
             After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.
             
             We've checked a lot of other tools like *Spring* and *vert.x* but in the end this looked the most promising.
         """.trimIndent())
 
 val COMMENT_A_0 = Comment(
-        markdownContent = "**Wow**, that's great!",
+        rawContent = "**Wow**, that's great!",
         author = "Jack",
         parentId = POST_A_ID)
 
 val COMMENT_B_0 = Comment(
-        markdownContent = "I *can't wait*!",
+        rawContent = "I *can't wait*!",
         author = "Jenna",
         parentId = POST_B_ID)
 
 val COMMENT_B_1 = Comment(
-        markdownContent = "I've been using *Ktor* for a while now and I'm happy to report that this was a great choice!",
+        rawContent = "I've been using *Ktor* for a while now and I'm happy to report that this was a great choice!",
         author = "Frank",
         parentId = POST_B_ID)
 
-val POSTS = ConcurrentHashMap<Identifier, Post>().apply {
+val POSTS = ConcurrentHashMap<UUID, Post>().apply {
     put(POST_A_ID, POST_A)
     put(POST_B_ID, POST_B)
 }
-val COMMENTS = ConcurrentHashMap<Identifier, Comment>().apply {
+val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_A_0.id, COMMENT_A_0)
     put(COMMENT_B_0.id, COMMENT_B_0)
     put(COMMENT_B_1.id, COMMENT_B_1)
@@ -90,7 +90,7 @@ val COMMENTS = ConcurrentHashMap<Identifier, Comment>().apply {
 fun main(args: Array<String>) {
 
     val moduleRegistry = DefaultModuleRegistry()
-    val commentQueryService = InMemoryFeatureQueryService(COMMENTS)
+    val commentQueryService = InMemoryDocumentElementQueryService(COMMENTS)
     val postQueryService = InMemoryDocumentQueryService(POSTS)
     val commentStorage = InMemoryStorageService(COMMENTS)
 
@@ -106,17 +106,17 @@ fun main(args: Array<String>) {
     val postModule = PostModule(
             site = site,
             postQueryService = postQueryService,
-            facets = listOf(
+            operations = listOf(
                     PostDocumentListing(
                             site = site,
                             postQueryService = postQueryService),
-                    PostDocumentDetails(
+                    PostDocumentDetailsRenderer(
                             site = site,
                             postQueryService = postQueryService),
                     CommentListing(
                             site = site,
                             commentQueryService = commentQueryService),
-                    CommentCreating(
+                    CommentCreator(
                             commentStorage = commentStorage)))
 
     val commentModule = CommentModule()
@@ -124,32 +124,32 @@ fun main(args: Array<String>) {
     moduleRegistry.register(postModule)
     moduleRegistry.register(commentModule)
 
-    val server = embeddedServer(Netty, port = site.port) {
+    val server = embeddedServer(Netty, port = site.port, host = "localhost") {
         routing {
             get(site.baseUrl) {
                 call.respondText(HOMEPAGE.render(site), ContentType.Text.Html)
             }
             moduleRegistry.modules.forEach { module ->
-                module.whenHasFacet<DocumentListing> { documentListing ->
-                    get(documentListing.path) {
+                module.whenHasOperation<DocumentListing> { documentListing ->
+                    get(documentListing.route) {
                         call.respondText(
                                 text = documentListing.renderListing(),
                                 contentType = ContentType.Text.Html)
                     }
                 }
-                module.whenHasFacet<AnyDocumentDetails> { facet ->
-                    get(facet.route) {
-                        val permalink = Permalink.create(
-                                klass = facet.permalinkType,
+                module.whenHasOperation<AnyDocumentDetails> { operation ->
+                    get(operation.route) {
+                        val permalink = PageURL.create(
+                                klass = operation.permalinkType,
                                 parameters = call.parameters)
                         call.respondText(
-                                text = facet.renderDocumentBy(permalink),
+                                text = operation.renderDocumentBy(permalink),
                                 contentType = ContentType.Text.Html)
                     }
                 }
-                module.whenHasFacet<AnyDocumentFeatureCreating> { facet ->
-                    post(facet.route) {
-                        facet.store(call.receiveParameters().mapTo(facet.creates))
+                module.whenHasOperation<AnyDocumentElementCreating> { elementCreator ->
+                    post(elementCreator.route) {
+                        elementCreator.store(call.receiveParameters().mapTo(elementCreator.creates))
                         call.request.headers["Referer"]?.let { referer ->
                             call.respondRedirect(referer)
                         }

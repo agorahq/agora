@@ -1,14 +1,14 @@
 package org.agorahq.agora.comment.domain
 
-import org.agorahq.agora.core.domain.FeatureObject
-import org.agorahq.agora.core.platform.SystemUtils
-import org.hexworks.cobalt.Identifier
+import org.agorahq.agora.core.domain.document.BuiltInDocumentContentFormat.MARKDOWN
+import org.agorahq.agora.core.domain.document.DocumentContentFormat
+import org.agorahq.agora.core.domain.document.DocumentElement
+import org.hexworks.cobalt.core.api.UUID
 
 data class Comment(
-        val markdownContent: String,
         val author: String,
-        override val parentId: Identifier,
-        override val id: Identifier = Identifier.randomIdentifier(),
-        override val createdAtMs: Long = SystemUtils.currentTimeMillis(),
-        override val updatedAtMs: Long = createdAtMs
-) : FeatureObject
+        override val rawContent: String,
+        override val format: DocumentContentFormat = MARKDOWN,
+        override val parentId: UUID,
+        override val id: UUID = UUID.randomUUID()
+) : DocumentElement
