@@ -6,22 +6,23 @@ import kotlinx.html.h1
 import kotlinx.html.hr
 import kotlinx.html.html
 import org.agorahq.agora.core.domain.Site
+import org.agorahq.agora.core.domain.User
 import org.agorahq.agora.core.extensions.documentContent
 import org.agorahq.agora.core.extensions.forEachModuleWithOperation
 import org.agorahq.agora.core.extensions.htmlContent
 import org.agorahq.agora.core.extensions.include
-import org.agorahq.agora.core.module.operations.DocumentElementListing
+import org.agorahq.agora.core.module.operations.PageContentLister
 import org.agorahq.agora.core.shared.templates.DEFAULT_FOOTER
 import org.agorahq.agora.core.shared.templates.DEFAULT_HEAD
 import org.agorahq.agora.core.shared.templates.DEFAULT_NAVIGATION
 import org.agorahq.agora.core.template.template
 import org.agorahq.agora.post.domain.Post
 
-val POST_DETAILS = template<Pair<Post, Site>> { (post, site) ->
+val POST_DETAILS = template<Triple<Post, Site, User?>> { (post, site, user) ->
     html {
         include(DEFAULT_HEAD, post.title)
         body {
-            include(DEFAULT_NAVIGATION, site)
+            include(DEFAULT_NAVIGATION, site to user)
             div("container") {
                 h1 {
                     +post.title
@@ -31,7 +32,7 @@ val POST_DETAILS = template<Pair<Post, Site>> { (post, site) ->
                 }
                 hr { }
                 div {
-                    site.forEachModuleWithOperation<DocumentElementListing> { (_, operation) ->
+                    site.forEachModuleWithOperation<PageContentLister> { (_, operation) ->
                         htmlContent(operation.renderListingFor(post))
                     }
                 }

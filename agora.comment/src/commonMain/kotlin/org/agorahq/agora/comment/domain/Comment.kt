@@ -2,7 +2,7 @@ package org.agorahq.agora.comment.domain
 
 import org.agorahq.agora.core.domain.document.BuiltInDocumentContentFormat.MARKDOWN
 import org.agorahq.agora.core.domain.document.DocumentContentFormat
-import org.agorahq.agora.core.domain.document.DocumentElement
+import org.agorahq.agora.core.domain.document.PageContent
 import org.hexworks.cobalt.core.api.UUID
 
 data class Comment(
@@ -11,4 +11,4 @@ data class Comment(
         override val format: DocumentContentFormat = MARKDOWN,
         override val parentId: UUID,
         override val id: UUID = UUID.randomUUID()
-) : DocumentElement
+) : PageContent

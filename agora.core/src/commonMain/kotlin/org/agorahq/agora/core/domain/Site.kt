@@ -13,4 +13,5 @@ class Site(
         val host: String,
         val port: Int,
         val baseUrl: String,
-        val moduleRegistry: ModuleRegistry)
+        val moduleRegistry: ModuleRegistry
+)

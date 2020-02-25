@@ -1,11 +1,14 @@
+@file:Suppress("UnstableApiUsage")
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-    application
     kotlin("jvm")
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
-application {
-    mainClassName = "io.ktor.server.netty.EngineMain"
-}
+val mainClassName = "io.ktor.server.netty.EngineMain"
+
 
 kotlin {
     target {
@@ -22,13 +25,30 @@ dependencies {
     with(Libs) {
         implementation(kotlinStdLibJdk8)
 
-        implementation(ktorServerNetty)
         implementation(ktorServerCore)
+        implementation(ktorServerNetty)
         implementation(ktorHtmlBuilder)
+        implementation(ktorAuth)
+        implementation(ktorClient)
+        implementation(ktorServerSessions)
+        implementation(ktorJackson)
 
         implementation(logbackClassic)
         implementation(kotlinCssJvm)
 
         testImplementation(ktorServerTests)
+    }
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveFileName.set("agora.delivery.jar")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to mainClassName))
+        }
+    }
+    build {
+        dependsOn(shadowJar)
     }
 }

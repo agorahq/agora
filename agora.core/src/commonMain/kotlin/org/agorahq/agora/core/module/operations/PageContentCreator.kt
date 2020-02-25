@@ -1,11 +1,11 @@
 package org.agorahq.agora.core.module.operations
 
 import org.agorahq.agora.core.domain.document.Page
-import org.agorahq.agora.core.domain.document.DocumentElement
+import org.agorahq.agora.core.domain.document.PageContent
 import org.agorahq.agora.core.module.Operation
 import kotlin.reflect.KClass
 
-interface DocumentElementCreator<F : DocumentElement> : Operation {
+interface PageContentCreator<F : PageContent> : Operation {
 
     val creates: KClass<F>
 
@@ -13,6 +13,6 @@ interface DocumentElementCreator<F : DocumentElement> : Operation {
 
     fun renderFormFor(parent: Page): String
 
-    fun store(documentElement: F)
+    fun save(documentElement: F)
 
 }

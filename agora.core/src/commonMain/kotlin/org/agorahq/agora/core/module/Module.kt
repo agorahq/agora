@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.module
 
-import org.agorahq.agora.core.domain.document.DocumentPart
+import org.agorahq.agora.core.domain.document.Content
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 
-interface Module<E : DocumentPart> {
+interface Module<E : Content> {
 
     val name: String
 

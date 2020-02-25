@@ -2,7 +2,7 @@ package org.agorahq.agora.core.module.operations
 
 import org.agorahq.agora.core.module.Operation
 
-interface DocumentListing : Operation {
+interface PageLister : Operation {
 
     val route: String
 

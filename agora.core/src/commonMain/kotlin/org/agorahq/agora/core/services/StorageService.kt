@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.services
 
-import org.agorahq.agora.core.domain.document.DocumentPart
+import org.agorahq.agora.core.domain.document.Content
 
-interface StorageService<E : DocumentPart> {
+interface StorageService<E : Content> {
 
     fun store(entity: E)
 

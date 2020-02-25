@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.services.impl
 
-import org.agorahq.agora.core.domain.document.DocumentPart
+import org.agorahq.agora.core.domain.document.Content
 import org.agorahq.agora.core.services.StorageService
 import org.hexworks.cobalt.core.api.UUID
 
-class InMemoryStorageService<E : DocumentPart>(
+class InMemoryStorageService<E : Content>(
         private val objects: MutableMap<UUID, E>
 ) : StorageService<E> {
 

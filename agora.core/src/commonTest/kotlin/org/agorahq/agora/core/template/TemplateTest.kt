@@ -8,7 +8,7 @@ import kotlinx.html.head
 import kotlinx.html.html
 import kotlinx.html.title
 import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.domain.document.DocumentPart
+import org.agorahq.agora.core.domain.document.Content
 import org.agorahq.agora.core.extensions.documentContent
 import org.agorahq.agora.core.extensions.include
 import org.agorahq.agora.core.module.Module
@@ -73,14 +73,14 @@ class TemplateTest {
                 port = 80,
                 baseUrl = "/",
                 moduleRegistry = object : ModuleRegistry {
-                    override val modules: Iterable<Module<out DocumentPart>>
+                    override val modules: Iterable<Module<out Content>>
                         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-                    override fun <D : DocumentPart> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
+                    override fun <D : Content> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 
-                    override fun register(module: Module<out DocumentPart>) {
+                    override fun register(module: Module<out Content>) {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 

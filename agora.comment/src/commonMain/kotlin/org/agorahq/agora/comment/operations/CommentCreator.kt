@@ -3,12 +3,12 @@ package org.agorahq.agora.comment.operations
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.templates.COMMENT_FORM
 import org.agorahq.agora.core.domain.document.Page
-import org.agorahq.agora.core.module.operations.DocumentElementCreator
+import org.agorahq.agora.core.module.operations.PageContentCreator
 import org.agorahq.agora.core.services.StorageService
 
 class CommentCreator(
         private val commentStorage: StorageService<Comment>
-) : DocumentElementCreator<Comment> {
+) : PageContentCreator<Comment> {
 
     override val creates = Comment::class
     override val route = ROUTE
@@ -17,7 +17,7 @@ class CommentCreator(
         return COMMENT_FORM.render(parent.id.toString())
     }
 
-    override fun store(documentElement: Comment) {
+    override fun save(documentElement: Comment) {
         commentStorage.store(documentElement)
     }
 

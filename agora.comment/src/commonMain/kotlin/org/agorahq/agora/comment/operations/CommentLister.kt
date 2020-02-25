@@ -5,13 +5,13 @@ import org.agorahq.agora.comment.templates.COMMENT_LIST
 import org.agorahq.agora.comment.templates.CommentListParams
 import org.agorahq.agora.core.domain.document.Page
 import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.module.operations.DocumentElementListing
+import org.agorahq.agora.core.module.operations.PageContentLister
 import org.agorahq.agora.core.services.DocumentElementQueryService
 
-class CommentListing(
+class CommentLister(
         private val site: Site,
         private val commentQueryService: DocumentElementQueryService<Comment>
-) : DocumentElementListing {
+) : PageContentLister {
 
     override fun renderListingFor(page: Page): String {
         return COMMENT_LIST.render(CommentListParams(

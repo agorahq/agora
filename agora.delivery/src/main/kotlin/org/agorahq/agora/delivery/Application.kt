@@ -1,28 +1,59 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("UNCHECKED_CAST", "EXPERIMENTAL_API_USAGE")
 
 package org.agorahq.agora.delivery
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.application.log
+import io.ktor.auth.Authentication
+import io.ktor.auth.OAuthAccessTokenResponse
+import io.ktor.auth.OAuthServerSettings
+import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
+import io.ktor.auth.oauth
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.features.origin
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
+import io.ktor.request.host
+import io.ktor.request.port
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
+import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.routing.route
 import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.netty.EngineMain
+import io.ktor.sessions.SessionTransportTransformerMessageAuthentication
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.clear
+import io.ktor.sessions.cookie
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
+import io.ktor.sessions.set
+import io.ktor.util.hex
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.module.CommentModule
 import org.agorahq.agora.comment.operations.CommentCreator
-import org.agorahq.agora.comment.operations.CommentListing
+import org.agorahq.agora.comment.operations.CommentLister
 import org.agorahq.agora.core.domain.Site
+import org.agorahq.agora.core.domain.User
 import org.agorahq.agora.core.domain.document.PageURL
-import org.agorahq.agora.core.extensions.AnyDocumentDetails
-import org.agorahq.agora.core.extensions.AnyDocumentElementCreating
+import org.agorahq.agora.core.extensions.AnyPageContentCreator
+import org.agorahq.agora.core.extensions.AnyPageRenderer
 import org.agorahq.agora.core.extensions.whenHasOperation
-import org.agorahq.agora.core.module.operations.DocumentListing
+import org.agorahq.agora.core.module.operations.PageLister
 import org.agorahq.agora.core.services.DefaultModuleRegistry
+import org.agorahq.agora.core.services.ModuleRegistry
 import org.agorahq.agora.core.services.impl.InMemoryDocumentElementQueryService
 import org.agorahq.agora.core.services.impl.InMemoryDocumentQueryService
 import org.agorahq.agora.core.services.impl.InMemoryStorageService
@@ -31,9 +62,10 @@ import org.agorahq.agora.delivery.extensions.create
 import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.module.PostModule
-import org.agorahq.agora.post.operations.PostDocumentDetailsRenderer
-import org.agorahq.agora.post.operations.PostDocumentListing
+import org.agorahq.agora.post.operations.PostLister
+import org.agorahq.agora.post.operations.PostRenderer
 import org.hexworks.cobalt.core.api.UUID
+import org.hexworks.cobalt.logging.api.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 val POST_A_ID = UUID.randomUUID()
@@ -87,33 +119,113 @@ val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_B_1.id, COMMENT_B_1)
 }
 
-fun main(args: Array<String>) {
+val CLIENT_ID = System.getenv("AGORA_OAUTH_CLIENT_ID") ?: error("AGORA_OAUTH_CLIENT_ID env variable is missing")
+val CLIENT_SECRET = System.getenv("AGORA_OAUTH_CLIENT_SECRET")
+        ?: error("AGORA_OAUTH_CLIENT_SECRET env variable is missing")
 
-    val moduleRegistry = DefaultModuleRegistry()
+val SITE = Site(
+        title = "Agora",
+        email = "info@agorahq.org",
+        description = "Agora Site",
+        host = "localhost",
+        port = 8080,
+        baseUrl = "/",
+        moduleRegistry = DefaultModuleRegistry())
+
+private val logger = LoggerFactory.getLogger("Application")
+
+private fun ApplicationCall.redirectUrl(path: String): String {
+    val defaultPort = if (request.origin.scheme == "http") 80 else 443
+    val hostPort = request.host() + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
+    val protocol = request.origin.scheme
+    return "$protocol://$hostPort$path"
+}
+
+class AgoraSession(val userId: String,
+                   val userFirstName: String,
+                   val userLastName: String)
+
+fun main(args: Array<String>) {
+    EngineMain.main(args)
+}
+
+fun Application.run() {
+
+    val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+            name = "google",
+            authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
+            accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
+            requestMethod = HttpMethod.Post,
+
+            clientId = CLIENT_ID,
+            clientSecret = CLIENT_SECRET,
+            defaultScopes = listOf("profile", "email")  // no email, but gives full name, picture, and id
+    )
+
+
+    install(Sessions) {
+        cookie<AgoraSession>("oauthSampleSessionId") {
+            val secretSignKey = hex("000102030405060708090a0b0c0d0e0f")
+            transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
+        }
+    }
+    install(Authentication) {
+        oauth("google-oauth") {
+            client = HttpClient(Apache)
+            providerLookup = { googleOauthProvider }
+            urlProvider = { redirectUrl("/login") }
+        }
+    }
+    routing {
+        get("/logout") {
+            call.sessions.clear<AgoraSession>()
+            call.respondRedirect(SITE.baseUrl)
+        }
+        authenticate("google-oauth") {
+            route("/login") {
+                handle {
+                    val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
+                            ?: error("No principal")
+
+                    val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                        header("Authorization", "Bearer ${principal.accessToken}")
+                    }
+
+                    val data = ObjectMapper().readValue<Map<String, Any?>>(json)
+                    val id = data["id"] as String?
+
+                    if (id != null) {
+                        log.info("User data is: $data.")
+                        call.sessions.set(AgoraSession(
+                                userId = id,
+                                userFirstName = data["given_name"]?.toString() ?: "anonymous",
+                                userLastName = data["family_name"]?.toString() ?: "anonymous"))
+                    }
+                    call.respondRedirect(SITE.baseUrl)
+                }
+            }
+        }
+        registerModules(createModules(SITE))
+    }
+}
+
+private fun createModules(site: Site): ModuleRegistry {
+    val moduleRegistry = site.moduleRegistry
     val commentQueryService = InMemoryDocumentElementQueryService(COMMENTS)
     val postQueryService = InMemoryDocumentQueryService(POSTS)
     val commentStorage = InMemoryStorageService(COMMENTS)
-
-    val site = Site(
-            title = "Agora",
-            email = "info@agorahq.org",
-            description = "Agora Site",
-            host = "localhost",
-            port = 8080,
-            baseUrl = "/",
-            moduleRegistry = moduleRegistry)
 
     val postModule = PostModule(
             site = site,
             postQueryService = postQueryService,
             operations = listOf(
-                    PostDocumentListing(
+                    PostLister(
                             site = site,
                             postQueryService = postQueryService),
-                    PostDocumentDetailsRenderer(
+                    PostRenderer(
                             site = site,
                             postQueryService = postQueryService),
-                    CommentListing(
+                    CommentLister(
                             site = site,
                             commentQueryService = commentQueryService),
                     CommentCreator(
@@ -123,40 +235,44 @@ fun main(args: Array<String>) {
 
     moduleRegistry.register(postModule)
     moduleRegistry.register(commentModule)
+    return moduleRegistry
+}
 
-    val server = embeddedServer(Netty, port = site.port, host = "localhost") {
-        routing {
-            get(site.baseUrl) {
-                call.respondText(HOMEPAGE.render(site), ContentType.Text.Html)
+private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
+    get(SITE.baseUrl) {
+        val session = call.sessions.get<AgoraSession>()
+        val user = session?.let { User(it.userId, it.userFirstName, it.userLastName) }
+        call.respondText(HOMEPAGE.render(SITE to user), ContentType.Text.Html)
+    }
+    logger.info("Registering modules...")
+    moduleRegistry.modules.forEach { module ->
+        module.whenHasOperation<PageLister> { documentListing ->
+            logger.info("Registering module ${documentListing::class.simpleName} at ${documentListing.route}")
+            get(documentListing.route) {
+                call.respondText(
+                        text = documentListing.renderListing(),
+                        contentType = ContentType.Text.Html)
             }
-            moduleRegistry.modules.forEach { module ->
-                module.whenHasOperation<DocumentListing> { documentListing ->
-                    get(documentListing.route) {
-                        call.respondText(
-                                text = documentListing.renderListing(),
-                                contentType = ContentType.Text.Html)
-                    }
-                }
-                module.whenHasOperation<AnyDocumentDetails> { operation ->
-                    get(operation.route) {
-                        val permalink = PageURL.create(
-                                klass = operation.permalinkType,
-                                parameters = call.parameters)
-                        call.respondText(
-                                text = operation.renderDocumentBy(permalink),
-                                contentType = ContentType.Text.Html)
-                    }
-                }
-                module.whenHasOperation<AnyDocumentElementCreating> { elementCreator ->
-                    post(elementCreator.route) {
-                        elementCreator.store(call.receiveParameters().mapTo(elementCreator.creates))
-                        call.request.headers["Referer"]?.let { referer ->
-                            call.respondRedirect(referer)
-                        }
-                    }
+        }
+        module.whenHasOperation<AnyPageRenderer> { operation ->
+            logger.info("Registering module ${operation::class.simpleName} at ${operation.route}")
+            get(operation.route) {
+                val permalink = PageURL.create(
+                        klass = operation.permalinkType,
+                        parameters = call.parameters)
+                call.respondText(
+                        text = operation.renderDocumentBy(permalink),
+                        contentType = ContentType.Text.Html)
+            }
+        }
+        module.whenHasOperation<AnyPageContentCreator> { operation ->
+            logger.info("Registering module ${operation::class.simpleName} at ${operation.route}")
+            post(operation.route) {
+                operation.save(call.receiveParameters().mapTo(operation.creates))
+                call.request.headers["Referer"]?.let { referer ->
+                    call.respondRedirect(referer)
                 }
             }
         }
     }
-    server.start(wait = true)
 }

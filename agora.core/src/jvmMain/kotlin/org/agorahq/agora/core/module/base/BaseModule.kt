@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.module.base
 
-import org.agorahq.agora.core.domain.document.DocumentPart
+import org.agorahq.agora.core.domain.document.Content
 import org.agorahq.agora.core.module.Module
 import org.agorahq.agora.core.module.Operation
 import org.hexworks.cobalt.datatypes.Maybe
@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseModule<E : DocumentPart>(
+abstract class BaseModule<E : Content>(
         operations: Iterable<Operation>
 ) : Module<E> {
 

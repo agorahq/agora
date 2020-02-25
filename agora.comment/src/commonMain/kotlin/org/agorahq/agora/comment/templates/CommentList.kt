@@ -7,7 +7,7 @@ import kotlinx.html.dt
 import kotlinx.html.h3
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.operations.CommentCreator
-import org.agorahq.agora.comment.operations.CommentListing
+import org.agorahq.agora.comment.operations.CommentLister
 import org.agorahq.agora.core.domain.Site
 import org.agorahq.agora.core.domain.document.Page
 import org.agorahq.agora.core.extensions.htmlContent
@@ -33,6 +33,6 @@ val COMMENT_LIST = template<CommentListParams> { (parent, operation, site, comme
 
 data class CommentListParams(
         val parent: Page,
-        val operation: CommentListing,
+        val operation: CommentLister,
         val site: Site,
         val comments: Sequence<Comment>)

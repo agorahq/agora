@@ -1,0 +1,42 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: http-lb
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "http"
+spec:
+  type: LoadBalancer
+  selector:
+    app: agora-delivery
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agora-delivery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agora-delivery
+  template:
+    metadata:
+      labels:
+        app: agora-delivery
+    spec:
+      containers:
+        - name: agora-delivery
+          image: addamsson/agora.delivery:v13
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: agora-oauth
+            - secretRef:
+                name: agora-host

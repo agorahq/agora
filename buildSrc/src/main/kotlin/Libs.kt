@@ -26,9 +26,15 @@ object Libs {
     const val cobaltCore = "org.hexworks.cobalt:cobalt.core:$cobaltVersion"
 
     const val ktorServerNetty = "io.ktor:ktor-server-netty:$ktorVersion"
+    const val ktorAuth = "io.ktor:ktor-auth:$ktorVersion"
+    const val ktorClient = "io.ktor:ktor-client-apache:$ktorVersion"
     const val ktorServerCore = "io.ktor:ktor-server-core:$ktorVersion"
-    const val ktorLocations = "io.ktor:ktor-locations:$ktorVersion"
+    const val ktorServerSessions = "io.ktor:ktor-server-sessions:$ktorVersion"
+    const val ktorJackson = "io.ktor:ktor-jackson:$ktorVersion"
     const val ktorHtmlBuilder = "io.ktor:ktor-html-builder:$ktorVersion"
+
+    const val ktorLocations = "io.ktor:ktor-locations:$ktorVersion"
+
     const val ktorServerTests = "io.ktor:ktor-server-tests:$ktorVersion"
 
     const val flexmark = "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
