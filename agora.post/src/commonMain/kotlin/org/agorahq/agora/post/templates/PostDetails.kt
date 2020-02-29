@@ -1,28 +1,25 @@
 package org.agorahq.agora.post.templates
 
-import kotlinx.html.body
-import kotlinx.html.div
-import kotlinx.html.h1
-import kotlinx.html.hr
-import kotlinx.html.html
-import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.domain.User
-import org.agorahq.agora.core.extensions.documentContent
-import org.agorahq.agora.core.extensions.forEachModuleWithOperation
-import org.agorahq.agora.core.extensions.htmlContent
-import org.agorahq.agora.core.extensions.include
-import org.agorahq.agora.core.module.operations.PageContentLister
-import org.agorahq.agora.core.shared.templates.DEFAULT_FOOTER
-import org.agorahq.agora.core.shared.templates.DEFAULT_HEAD
-import org.agorahq.agora.core.shared.templates.DEFAULT_NAVIGATION
-import org.agorahq.agora.core.template.template
+import kotlinx.html.*
+import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.extensions.documentContent
+import org.agorahq.agora.core.api.extensions.forEachModuleWithOperation
+import org.agorahq.agora.core.api.extensions.htmlContent
+import org.agorahq.agora.core.api.extensions.include
+import org.agorahq.agora.core.api.module.context.PageContext
+import org.agorahq.agora.core.api.module.operation.PageContentListRenderer
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_FOOTER
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_HEAD
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_NAVIGATION
+import org.agorahq.agora.core.api.template.template
 import org.agorahq.agora.post.domain.Post
 
-val POST_DETAILS = template<Triple<Post, Site, User?>> { (post, site, user) ->
+val POST_DETAILS = template<PageContext<Post>> { ctx ->
+    val (site, _, post) = ctx
     html {
         include(DEFAULT_HEAD, post.title)
         body {
-            include(DEFAULT_NAVIGATION, site to user)
+            include(DEFAULT_NAVIGATION, ctx)
             div("container") {
                 h1 {
                     +post.title
@@ -32,8 +29,8 @@ val POST_DETAILS = template<Triple<Post, Site, User?>> { (post, site, user) ->
                 }
                 hr { }
                 div {
-                    site.forEachModuleWithOperation<PageContentLister> { (_, operation) ->
-                        htmlContent(operation.renderListingFor(post))
+                    site.forEachModuleWithOperation<PageContentListRenderer<Content>> { (_, operation) ->
+                        htmlContent(operation.render(ctx, post))
                     }
                 }
                 include(DEFAULT_FOOTER, site)

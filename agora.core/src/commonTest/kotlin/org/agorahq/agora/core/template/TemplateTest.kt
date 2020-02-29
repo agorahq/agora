@@ -1,18 +1,14 @@
 package org.agorahq.agora.core.template
 
-import kotlinx.html.body
-import kotlinx.html.div
-import kotlinx.html.footer
-import kotlinx.html.h1
-import kotlinx.html.head
-import kotlinx.html.html
-import kotlinx.html.title
-import org.agorahq.agora.core.domain.Site
-import org.agorahq.agora.core.domain.document.Content
-import org.agorahq.agora.core.extensions.documentContent
-import org.agorahq.agora.core.extensions.include
-import org.agorahq.agora.core.module.Module
-import org.agorahq.agora.core.services.ModuleRegistry
+import kotlinx.html.*
+import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.extensions.documentContent
+import org.agorahq.agora.core.api.extensions.include
+import org.agorahq.agora.core.api.module.Module
+import org.agorahq.agora.core.api.services.ModuleRegistry
+import org.agorahq.agora.core.api.template.template
+import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -38,7 +34,7 @@ class TemplateTest {
                 date = "2019-12-21",
                 excerpt = "Christmas is here soon.",
                 shortDescription = "Christmas is here soon, so we better buy presents.",
-                rawContent = "Better get prepared.")
+                content = "Better get prepared.")
 
         private val HEAD = template<String> { title ->
             head {
@@ -65,12 +61,10 @@ class TemplateTest {
             }
         }
 
-        private val SITE = Site(
+        private val SITE = DefaultSiteMetadata(
                 title = "Test site",
                 email = "test@test.com",
                 description = "description",
-                host = "example.com",
-                port = 80,
                 baseUrl = "/",
                 moduleRegistry = object : ModuleRegistry {
                     override val modules: Iterable<Module<out Content>>

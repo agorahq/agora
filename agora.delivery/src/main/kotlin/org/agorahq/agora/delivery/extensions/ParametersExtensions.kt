@@ -25,7 +25,7 @@ fun <T : Any> Parameters.mapTo(type: KClass<T>): T {
         parameters[parameterName]?.let { value ->
             parameter to mapValue(parameter.type.classifier!!, value)
         } ?: run {
-            error("")
+            error("$parameterName is not found in $parameters")
         }
     }.toMap()
 

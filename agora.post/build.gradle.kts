@@ -21,7 +21,7 @@ kotlin {
         }
 
         with(Libs) {
-            jvmMainApi(ktorLocations)
+            
         }
 
         with(TestLibs) {

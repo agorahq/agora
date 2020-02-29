@@ -1,16 +1,21 @@
 package org.agorahq.agora.core.module.base
 
-import org.agorahq.agora.core.domain.document.Content
-import org.agorahq.agora.core.module.Module
-import org.agorahq.agora.core.module.Operation
+import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.document.Page
+import org.agorahq.agora.core.api.module.Module
+import org.agorahq.agora.core.api.module.Operation
+import org.agorahq.agora.core.api.module.context.ContentListingContext
+import org.agorahq.agora.core.api.module.context.OperationContext
+import org.agorahq.agora.core.api.module.context.PageContext
 import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseModule<E : Content>(
-        operations: Iterable<Operation>
-) : Module<E> {
+abstract class BaseModule<C : Content>(
+        operations: Iterable<Operation>,
+        override val contentClass: KClass<C>
+) : Module<C> {
 
     private val operations = operations.map {
         it::class to it
@@ -24,6 +29,18 @@ abstract class BaseModule<E : Content>(
         return operations.filterKeys {
             operationType.isSuperclassOf(it)
         }.isNotEmpty()
+    }
+
+    override fun supportsContent(content: Content) = content::class === contentClass
+
+    override fun supportsContext(context: OperationContext): Boolean {
+        return when (context) {
+            is PageContext<out Page> -> supportsContent(context.page)
+            is ContentListingContext<out Content> -> context.items.firstOrNull()?.let { item ->
+
+            }
+            else -> false
+        }
     }
 
     final override fun <T : Operation> findOperation(operationType: KClass<T>): Maybe<T> {

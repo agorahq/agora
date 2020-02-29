@@ -1,7 +1,8 @@
 package org.agorahq.agora.core.services
 
-import org.agorahq.agora.core.domain.document.Content
-import org.agorahq.agora.core.module.Module
+import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.module.Module
+import org.agorahq.agora.core.api.services.ModuleRegistry
 import org.hexworks.cobalt.datatypes.Maybe
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass

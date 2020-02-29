@@ -3,7 +3,7 @@ package org.agorahq.agora.post.templates
 import kotlinx.html.a
 import kotlinx.html.div
 import kotlinx.html.p
-import org.agorahq.agora.core.template.template
+import org.agorahq.agora.core.api.template.template
 import org.agorahq.agora.post.domain.Post
 
 val POST_CARD = template<Post> { post ->
