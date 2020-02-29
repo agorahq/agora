@@ -3,16 +3,15 @@
 package org.agorahq.agora.core.api.extensions
 
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.document.ContentResource
 import org.agorahq.agora.core.api.module.Module
-import org.agorahq.agora.core.api.module.Operation
 
-inline fun <reified T : Operation> Module<out Content>.whenHasOperation(noinline fn: (T) -> Unit) {
+inline fun <reified T : AnyContentOperation> Module<out ContentResource>.whenHasOperation(noinline fn: (T) -> Unit) {
     findOperation(T::class).map(fn)
 }
 
-inline fun <reified T : Operation> SiteMetadata.forEachModuleWithOperation(fn: (Pair<AnyModule, T>) -> Unit) {
+inline fun <reified T : AnyContentOperation> SiteMetadata.forEachModuleWithOperation(fn: (Pair<AnyModule, T>) -> Unit) {
     modules.filter { it.hasOperation(T::class) }.map {
-        fn(it as Module<Content> to it.findOperation(T::class).get())
+        fn(it as Module<ContentResource> to it.findOperation(T::class).get())
     }
 }

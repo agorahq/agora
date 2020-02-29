@@ -1,13 +1,14 @@
 package org.agorahq.agora.core.api.module.context
 
 import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.document.ContentResource
 import org.agorahq.agora.core.api.document.Page
-import org.agorahq.agora.core.api.document.PageContent
-import org.agorahq.agora.core.api.user.User
-import org.agorahq.agora.core.internal.module.context.DefaultContentListingContext
+import org.agorahq.agora.core.api.document.ResourceURL
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.module.context.DefaultOperationContext
-import org.agorahq.agora.core.internal.module.context.DefaultPageContentListingContext
 import org.agorahq.agora.core.internal.module.context.DefaultPageContext
+import org.agorahq.agora.core.internal.module.context.DefaultResourceContext
+import org.agorahq.agora.core.internal.module.context.DefaultResourceListingContext
 import kotlin.jvm.JvmStatic
 
 interface OperationContext {
@@ -19,24 +20,23 @@ interface OperationContext {
 
     operator fun component2() = user
 
-    fun <P : Page> toPageContext(page: P): PageContext<P> =
+    fun <R : ContentResource> toResourceContext(resource: R): ResourceContext<R> =
+            DefaultResourceContext(
+                    site = site,
+                    user = user,
+                    resource = resource)
+
+    fun <P : Page> toPageContext(url: ResourceURL<P>): PageContext<P> =
             DefaultPageContext(
                     site = site,
                     user = user,
-                    page = page)
+                    url = url)
 
-    fun <P : Page> toPageListingContext(items: Sequence<P>): ContentListingContext<P> =
-            DefaultContentListingContext(
+    fun <R : ContentResource> toListingContext(items: Sequence<R>): ResourceListingContext<R> =
+            DefaultResourceListingContext(
                     site = site,
                     user = user,
                     items = items)
-
-    fun <C : PageContent, P : Page> toPageContentListingContext(items: Sequence<C>, parent: P): PageContentListingContext<P, C> =
-            DefaultPageContentListingContext(
-                    site = site,
-                    user = user,
-                    items = items,
-                    parent = parent)
 
     companion object {
 

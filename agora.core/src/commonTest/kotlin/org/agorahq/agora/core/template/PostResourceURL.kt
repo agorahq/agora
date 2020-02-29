@@ -1,17 +1,17 @@
 package org.agorahq.agora.core.template
 
-import org.agorahq.agora.core.api.document.PageURL
+import org.agorahq.agora.core.api.document.ResourceURL
 import org.agorahq.agora.core.api.extensions.toSlug
 
-data class PostPageURL(
+data class PostResourceURL(
         val date: String,
         val titleSlug: String
-) : PageURL<Post> {
+) : ResourceURL<TestPost> {
 
     override fun generate() = "/posts/$date/$titleSlug.html"
 
-    override fun matches(page: Post): Boolean {
-        return page.date == date && page.title.toSlug() == titleSlug
+    override fun matches(resource: TestPost): Boolean {
+        return resource.date == date && resource.title.toSlug() == titleSlug
     }
 
     companion object {

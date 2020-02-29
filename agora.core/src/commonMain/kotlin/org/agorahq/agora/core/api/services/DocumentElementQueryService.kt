@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.api.services
 
-import org.agorahq.agora.core.api.document.PageContent
-import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.document.PageContentResource
+import org.agorahq.agora.core.api.document.ContentResource
 
-interface DocumentElementQueryService<E : PageContent> : QueryService<E> {
+interface DocumentElementQueryService<E : PageContentResource> : QueryService<E> {
 
-    fun findByParent(parent: Content): Sequence<E>
+    fun findByParent(parent: ContentResource): Sequence<E>
 
 }

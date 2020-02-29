@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.internal.user
 
-import org.agorahq.agora.core.api.user.Permission
-import org.agorahq.agora.core.api.user.Role
+import org.agorahq.agora.core.api.security.Permission
+import org.agorahq.agora.core.api.security.Role
 
 class DefaultRole(
         override val name: String,

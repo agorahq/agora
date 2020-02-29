@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.internal.user
 
-import org.agorahq.agora.core.api.user.Role
-import org.agorahq.agora.core.api.user.User
+import org.agorahq.agora.core.api.security.Role
+import org.agorahq.agora.core.api.security.User
 import org.hexworks.cobalt.core.api.UUID
 
 class DefaultUser(

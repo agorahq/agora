@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api.document
 
-interface Page : Content {
+interface Page : ContentResource {
 
-    val url: PageURL<out Page>
+    val url: ResourceURL<out Page>
 
     companion object
 }

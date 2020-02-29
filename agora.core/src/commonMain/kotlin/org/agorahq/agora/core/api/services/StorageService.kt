@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.api.services
 
-import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.document.ContentResource
 
-interface StorageService<E : Content> {
+interface StorageService<R : ContentResource> {
 
-    fun store(entity: E)
+    fun create(resource: R)
 
-    fun delete(entity: E)
+    fun delete(resource: R)
 }

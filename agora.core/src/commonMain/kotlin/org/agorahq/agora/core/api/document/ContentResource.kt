@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api.document
 
-import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.resource.Resource
 
-interface Content : Resource {
+interface ContentResource : Resource {
 
     val format: ContentFormat
     val content: String

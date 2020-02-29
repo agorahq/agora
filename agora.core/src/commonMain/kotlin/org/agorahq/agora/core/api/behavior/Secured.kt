@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.behavior
 
-import org.agorahq.agora.core.api.user.Permission
-import org.agorahq.agora.core.api.user.User
+import org.agorahq.agora.core.api.security.Permission
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.behavior.DefaultSecured
 
 /**

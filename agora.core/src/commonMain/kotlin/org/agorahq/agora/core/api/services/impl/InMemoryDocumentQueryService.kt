@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.services.impl
 
 import org.agorahq.agora.core.api.document.Page
-import org.agorahq.agora.core.api.document.PageURL
+import org.agorahq.agora.core.api.document.ResourceURL
 import org.agorahq.agora.core.api.services.DocumentQueryService
 import org.hexworks.cobalt.core.api.UUID
 import org.hexworks.cobalt.datatypes.Maybe
@@ -14,7 +14,7 @@ class InMemoryDocumentQueryService<D : Page>(
 
     override fun findById(id: UUID) = Maybe.ofNullable(objects[id])
 
-    override fun findByUrl(pageURL: PageURL<D>): Maybe<D> {
-        return Maybe.ofNullable(objects.values.firstOrNull { pageURL.matches(it) })
+    override fun findByUrl(resourceURL: ResourceURL<D>): Maybe<D> {
+        return Maybe.ofNullable(objects.values.firstOrNull { resourceURL.matches(it) })
     }
 }

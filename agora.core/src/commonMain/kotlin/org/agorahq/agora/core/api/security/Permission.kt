@@ -1,4 +1,4 @@
-package org.agorahq.agora.core.api.user
+package org.agorahq.agora.core.api.security
 
 import org.agorahq.agora.core.internal.user.DefaultPermission
 

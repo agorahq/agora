@@ -1,7 +1,6 @@
 package org.agorahq.agora.core.api.exception
 
-import org.agorahq.agora.core.api.data.Resource
-import org.hexworks.cobalt.core.api.UUID
+import org.agorahq.agora.core.api.resource.Resource
 import kotlin.reflect.KClass
 
 class ResourceNotFoundException(

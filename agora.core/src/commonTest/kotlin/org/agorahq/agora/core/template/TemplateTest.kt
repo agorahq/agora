@@ -1,8 +1,7 @@
 package org.agorahq.agora.core.template
 
 import kotlinx.html.*
-import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.document.Content
+import org.agorahq.agora.core.api.document.ContentResource
 import org.agorahq.agora.core.api.extensions.documentContent
 import org.agorahq.agora.core.api.extensions.include
 import org.agorahq.agora.core.api.module.Module
@@ -29,9 +28,10 @@ class TemplateTest {
                 "</div></div><footer>Copyright Test site. Contact: test@test.com</footer></body></html>"
 
         private const val POST_COLLECTION_NAME = "Posts"
-        private val POST = Post(
+        private val POST = TestPost(
                 title = "Christmas is coming",
                 date = "2019-12-21",
+                tags = setOf("post", "christmas"),
                 excerpt = "Christmas is here soon.",
                 shortDescription = "Christmas is here soon, so we better buy presents.",
                 content = "Better get prepared.")
@@ -67,14 +67,14 @@ class TemplateTest {
                 description = "description",
                 baseUrl = "/",
                 moduleRegistry = object : ModuleRegistry {
-                    override val modules: Iterable<Module<out Content>>
+                    override val modules: Iterable<Module<out ContentResource>>
                         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-                    override fun <D : Content> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
+                    override fun <D : ContentResource> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 
-                    override fun register(module: Module<out Content>) {
+                    override fun register(module: Module<out ContentResource>) {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 

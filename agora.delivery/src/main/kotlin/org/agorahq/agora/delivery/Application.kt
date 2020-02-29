@@ -29,31 +29,36 @@ import io.ktor.util.hex
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.module.CommentModule
 import org.agorahq.agora.comment.operations.CreateComment
+import org.agorahq.agora.comment.operations.DeleteComment
 import org.agorahq.agora.comment.operations.ListComments
+import org.agorahq.agora.comment.operations.RenderCommentForm
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.data.UserMetadata
-import org.agorahq.agora.core.api.document.Page
-import org.agorahq.agora.core.api.document.PageURL
-import org.agorahq.agora.core.api.extensions.AnyPageContentCreator
+import org.agorahq.agora.core.api.document.ResourceURL
+import org.agorahq.agora.core.api.extensions.AnyContentResourceOperation
 import org.agorahq.agora.core.api.extensions.AnyPageRenderer
+import org.agorahq.agora.core.api.extensions.AnyResourceListRenderer
 import org.agorahq.agora.core.api.extensions.whenHasOperation
 import org.agorahq.agora.core.api.module.context.OperationContext
-import org.agorahq.agora.core.api.module.operation.PageListRenderer
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.services.ModuleRegistry
 import org.agorahq.agora.core.api.services.impl.InMemoryDocumentElementQueryService
 import org.agorahq.agora.core.api.services.impl.InMemoryDocumentQueryService
 import org.agorahq.agora.core.api.services.impl.InMemoryStorageService
 import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
-import org.agorahq.agora.core.api.user.User
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.services.DefaultModuleRegistry
+import org.agorahq.agora.delivery.DefaultRoles.ADMIN
+import org.agorahq.agora.delivery.DefaultRoles.ATTENDEE
 import org.agorahq.agora.delivery.extensions.create
 import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.delivery.extensions.toTimestamp
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.module.PostModule
+import org.agorahq.agora.post.operations.CreatePost
+import org.agorahq.agora.post.operations.DeletePost
 import org.agorahq.agora.post.operations.ListPosts
-import org.agorahq.agora.post.operations.PostRenderer
+import org.agorahq.agora.post.operations.RenderPost
 import org.hexworks.cobalt.core.api.UUID
 import org.hexworks.cobalt.logging.api.LoggerFactory
 import java.time.LocalDate
@@ -65,6 +70,7 @@ val POST_B_ID = UUID.randomUUID()
 val POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
+        tags = setOf("agora", "post"),
         createdAt = LocalDate.of(2019, 12, 28).toTimestamp(),
         shortDescription = "Agora is planned to launch in early Q2.",
         content = """
@@ -77,6 +83,7 @@ val POST_A = Post(
 val POST_B = Post(
         id = POST_B_ID,
         title = "Agora is using Ktor",
+        tags = setOf("agora", "ktor"),
         createdAt = LocalDate.of(2019, 12, 29).toTimestamp(),
         shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
         content = """
@@ -130,15 +137,23 @@ private fun ApplicationCall.redirectUrl(path: String): String {
     return "$protocol://$hostPort$path"
 }
 
+private suspend fun ApplicationCall.tryRedirectToReferrer() {
+    request.headers["Referer"]?.let { referer ->
+        respondRedirect(referer)
+    } ?: respondRedirect(SITE.baseUrl)
+}
+
 class AgoraSession(
         val userId: String,
         val userEmail: String,
-        val userNick: String
+        val userNick: String,
+        val role: String
 ) {
 
     fun toUser(): User = UserMetadata.create(
             email = userEmail,
-            username = userNick).toUser()
+            username = userNick,
+            roles = setOf(DefaultRoles.valueOf(role).role)).toUser()
 }
 
 fun main(args: Array<String>) {
@@ -178,7 +193,7 @@ fun Application.module() {
 
         get("/logout") {
             call.sessions.clear<AgoraSession>()
-            call.respondRedirect(SITE.baseUrl)
+            call.tryRedirectToReferrer()
         }
 
         authenticate("google-oauth") {
@@ -199,9 +214,10 @@ fun Application.module() {
                         call.sessions.set(AgoraSession(
                                 userId = UUID.randomUUID().toString(),
                                 userEmail = it,
-                                userNick = data["given_name"]?.toString() ?: "anonymous"))
+                                userNick = data["given_name"]?.toString() ?: "anonymous",
+                                role = if (it == "arold.adam@gmail.com") ADMIN.name else ATTENDEE.name))
                     } ?: error("An email address is mandatory for a User to log in.")
-                    call.respondRedirect(SITE.baseUrl)
+                    call.tryRedirectToReferrer()
                 }
             }
         }
@@ -214,22 +230,24 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
     val commentQueryService = InMemoryDocumentElementQueryService(COMMENTS)
     val postQueryService = InMemoryDocumentQueryService(POSTS)
     val commentStorage = InMemoryStorageService(COMMENTS)
+    val postStorage = InMemoryStorageService(POSTS)
 
-    val postModule = PostModule(
-            operations = listOf(
-                    ListPosts(
-                            postQueryService = postQueryService),
-                    PostRenderer(
-                            postQueryService = postQueryService),
-                    ListComments(
-                            commentQueryService = commentQueryService),
-                    CreateComment(
-                            commentStorage = commentStorage)))
+    val listPosts = ListPosts(postQueryService)
+    val renderPost = RenderPost(postQueryService)
+    val createPost = CreatePost(postStorage)
+    val deletePost = DeletePost(postStorage)
 
-    val commentModule = CommentModule()
+    val listComments = ListComments(commentQueryService)
+    val renderCommentForm = RenderCommentForm()
+    val createComment = CreateComment(commentStorage)
+    val deleteComment = DeleteComment(commentStorage)
+
+    val postModule = PostModule(listOf(listPosts, renderPost, listComments))
+    val commentModule = CommentModule(listOf(renderCommentForm, createComment))
 
     moduleRegistry.register(postModule)
     moduleRegistry.register(commentModule)
+
     return moduleRegistry
 }
 
@@ -245,33 +263,40 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
     }
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
-        module.whenHasOperation<PageListRenderer<out Page>> { documentListing ->
+
+        module.whenHasOperation<AnyResourceListRenderer> { documentListing ->
             logger.info("Registering module ${documentListing::class.simpleName} at ${documentListing.route}")
             get(documentListing.route) {
                 call.respondText(
-                        text = documentListing.render(call.toOperationContext()),
+                        text = with(documentListing) { call.toOperationContext().execute() },
                         contentType = ContentType.Text.Html)
             }
         }
-        module.whenHasOperation<AnyPageRenderer> { pageRenderer ->
-            logger.info("Registering module ${pageRenderer::class.simpleName} at ${pageRenderer.route}")
-            get(pageRenderer.route) {
-                val permalink = PageURL.create(
-                        klass = pageRenderer.permalinkType,
+
+        module.whenHasOperation<AnyPageRenderer> { renderer ->
+            logger.info("Registering module ${renderer::class.simpleName} at ${renderer.route}")
+            get(renderer.route) {
+                val url = ResourceURL.create(
+                        klass = renderer.urlType,
                         parameters = call.parameters)
+                val ctx = call.toOperationContext().toPageContext(url)
                 call.respondText(
-                        text = pageRenderer.render(call.toOperationContext(), permalink),
+                        text = with(renderer) { ctx.execute() },
                         contentType = ContentType.Text.Html)
             }
         }
-        module.whenHasOperation<AnyPageContentCreator> { operation ->
-            logger.info("Registering module ${operation::class.simpleName} at ${operation.route}")
-            post(operation.route) {
-                operation.save(call.receiveParameters().mapTo(operation.creates))
-                call.request.headers["Referer"]?.let { referer ->
-                    call.respondRedirect(referer)
+
+        module.whenHasOperation<AnyContentResourceOperation> { op ->
+            logger.info("Registering module ${op::class.simpleName} at ${op.route}")
+            post(op.route) {
+                with(op) {
+                    call.toOperationContext()
+                            .toResourceContext(call.receiveParameters().mapTo(op.resourceClass))
+                            .execute()
                 }
+                call.tryRedirectToReferrer()
             }
         }
+
     }
 }
