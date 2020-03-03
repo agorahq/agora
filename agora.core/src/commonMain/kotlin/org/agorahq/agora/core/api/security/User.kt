@@ -6,7 +6,7 @@ interface User : UserMetadata {
 
     val firstName: String
     val lastName: String
-    val roles: Set<Role>
+    val roles: Set<RoleDescriptor>
 
     companion object
 }

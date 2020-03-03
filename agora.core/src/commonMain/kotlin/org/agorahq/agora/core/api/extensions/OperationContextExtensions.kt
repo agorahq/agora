@@ -1,11 +1,23 @@
 package org.agorahq.agora.core.api.extensions
 
-import org.agorahq.agora.core.api.document.ContentResource
-import org.agorahq.agora.core.api.module.Module
+import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.module.context.OperationContext
-import org.hexworks.cobalt.datatypes.Maybe
-import kotlin.reflect.KClass
+import org.agorahq.agora.core.api.module.context.ResourceContext
+import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.internal.module.context.DefaultResourceContext
 
-fun <C : ContentResource> OperationContext.findModule(klass: KClass<Module<C>>): Maybe<Module<C>> {
-    return site.moduleRegistry.findModule(klass)
-}
+fun <R : Resource> R.toResourceContext(context: OperationContext): ResourceContext<out R> =
+        DefaultResourceContext(
+                site = context.site,
+                user = context.user,
+                resource = this,
+                converterService = context.converterService)
+
+fun Result<out Resource, out Exception>.toResourceContext(context: OperationContext): Result<out ResourceContext<Resource>, out Exception> =
+        map {
+            DefaultResourceContext(
+                    site = context.site,
+                    user = context.user,
+                    resource = it,
+                    converterService = context.converterService)
+        }

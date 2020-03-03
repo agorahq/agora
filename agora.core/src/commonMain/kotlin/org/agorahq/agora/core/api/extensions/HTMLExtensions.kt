@@ -5,7 +5,7 @@ import kotlinx.html.HTML
 import kotlinx.html.HTMLTag
 import kotlinx.html.TagConsumer
 import kotlinx.html.unsafe
-import org.agorahq.agora.core.api.document.Page
+import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
 import org.agorahq.agora.core.api.template.Template
 
@@ -42,12 +42,6 @@ fun HTMLTag.documentContent(page: Page) {
 fun HTMLTag.htmlContent(htmlContent: String) {
     unsafe {
         +htmlContent
-    }
-}
-
-fun HTMLTag.markdownContent(markdownContent: String) {
-    unsafe {
-        +MarkdownRendererFactory.createRenderer().render(markdownContent)
     }
 }
 

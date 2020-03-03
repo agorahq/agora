@@ -1,8 +1,9 @@
 package org.agorahq.agora.post.domain
 
 import org.agorahq.agora.core.internal.document.BuiltInContentFormat.MARKDOWN
-import org.agorahq.agora.core.api.document.ContentFormat
-import org.agorahq.agora.core.api.document.Page
+import org.agorahq.agora.core.api.content.ContentFormat
+import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.platform.SystemUtils
 import org.hexworks.cobalt.core.api.UUID
 
@@ -11,6 +12,7 @@ class Post(
         val shortDescription: String,
         val tags: Set<String>,
         val excerpt: String = shortDescription,
+        override val owner: User,
         override val content: String,
         override val format: ContentFormat = MARKDOWN,
         override val createdAt: Long = SystemUtils.currentTimeMillis(),

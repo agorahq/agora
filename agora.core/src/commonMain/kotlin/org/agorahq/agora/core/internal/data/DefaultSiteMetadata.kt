@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.internal.data
 
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.services.ModuleRegistry
+import org.agorahq.agora.core.api.service.ModuleRegistry
 
 class DefaultSiteMetadata(
         override val title: String,

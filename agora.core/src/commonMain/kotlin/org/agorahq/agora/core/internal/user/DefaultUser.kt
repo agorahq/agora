@@ -1,6 +1,7 @@
 package org.agorahq.agora.core.internal.user
 
 import org.agorahq.agora.core.api.security.Role
+import org.agorahq.agora.core.api.security.RoleDescriptor
 import org.agorahq.agora.core.api.security.User
 import org.hexworks.cobalt.core.api.UUID
 
@@ -9,7 +10,7 @@ class DefaultUser(
         override val lastName: String,
         override val email: String,
         override val username: String,
-        override val roles: Set<Role>,
+        override val roles: Set<RoleDescriptor>,
         override val id: UUID
 ) : User {
 

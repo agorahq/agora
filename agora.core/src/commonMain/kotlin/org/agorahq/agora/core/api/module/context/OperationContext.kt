@@ -1,50 +1,59 @@
 package org.agorahq.agora.core.api.module.context
 
+import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.document.ContentResource
-import org.agorahq.agora.core.api.document.Page
-import org.agorahq.agora.core.api.document.ResourceURL
+import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.security.User
+import org.agorahq.agora.core.api.view.ConverterService
+import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.internal.module.context.DefaultOperationContext
-import org.agorahq.agora.core.internal.module.context.DefaultPageContext
+import org.agorahq.agora.core.internal.module.context.DefaultPageRequestContext
 import org.agorahq.agora.core.internal.module.context.DefaultResourceContext
-import org.agorahq.agora.core.internal.module.context.DefaultResourceListingContext
+import org.agorahq.agora.core.internal.module.context.DefaultViewContext
+import org.agorahq.agora.core.internal.module.context.DefaultViewListingContext
 import kotlin.jvm.JvmStatic
 
 interface OperationContext {
 
     val site: SiteMetadata
     val user: User
+    val converterService: ConverterService
 
     operator fun component1() = site
 
     operator fun component2() = user
 
-    fun <R : ContentResource> toResourceContext(resource: R): ResourceContext<R> =
-            DefaultResourceContext(
+    fun <P : Page> ResourceURL<P>.toPageRequestContext(): PageRequestContext<P> =
+            DefaultPageRequestContext(
                     site = site,
                     user = user,
-                    resource = resource)
+                    url = this,
+                    converterService = converterService)
 
-    fun <P : Page> toPageContext(url: ResourceURL<P>): PageContext<P> =
-            DefaultPageContext(
+    fun <M : ViewModel> Result<out Resource, out Exception>.toViewContext(): ViewContext<M> =
+            DefaultViewContext(
                     site = site,
                     user = user,
-                    url = url)
+                    viewModel = converterService.convertToView<M>(get()).get(),
+                    converterService = converterService)
 
-    fun <R : ContentResource> toListingContext(items: Sequence<R>): ResourceListingContext<R> =
-            DefaultResourceListingContext(
+    fun <M : ViewModel> Sequence<Resource>.toViewListingContext(): ViewListingContext<M> =
+            DefaultViewListingContext(
                     site = site,
                     user = user,
-                    items = items)
+                    items = map { converterService.convertToView<M>(it).get() },
+                    converterService = converterService)
 
     companion object {
 
         @JvmStatic
-        fun create(site: SiteMetadata, user: User) =
+        fun create(site: SiteMetadata, user: User, converterService: ConverterService) =
                 DefaultOperationContext(
                         site = site,
-                        user = user)
+                        user = user,
+                        converterService = converterService)
 
     }
 }

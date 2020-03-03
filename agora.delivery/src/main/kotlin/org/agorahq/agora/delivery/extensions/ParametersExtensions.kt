@@ -3,11 +3,20 @@
 package org.agorahq.agora.delivery.extensions
 
 import io.ktor.http.Parameters
+import org.agorahq.agora.core.api.data.Result
+import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.view.ConverterService
+import org.agorahq.agora.core.api.view.ViewModel
 import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
+
+fun <R : Resource> Parameters.toResource(converterService: ConverterService, resourceClass: KClass<R>): Result<out R, out Exception> {
+    val viewClass = converterService.findViewModelClassFor(resourceClass)
+    return converterService.convertToResource<Resource>(mapTo(viewClass)) as Result<out R, out Exception>
+}
 
 fun <T : Any> Parameters.mapTo(type: KClass<T>): T {
 

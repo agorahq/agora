@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.api.data
 
-import org.agorahq.agora.core.api.security.Role
+import org.agorahq.agora.core.api.security.RoleDescriptor
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.user.DefaultUser
 import org.hexworks.cobalt.core.api.UUID
@@ -8,9 +8,8 @@ import org.hexworks.cobalt.core.api.UUID
 /**
  * Contains the *essentials* which are required for every user in the system.
  */
-interface UserMetadata {
+interface UserMetadata : Entity {
 
-    val id: UUID
     val email: String
     val username: String
 
@@ -25,7 +24,7 @@ interface UserMetadata {
         fun create(
                 email: String,
                 username: String,
-                roles: Set<Role> = setOf()): UserMetadata {
+                roles: Set<RoleDescriptor> = setOf()): UserMetadata {
             return DefaultUser(
                     id = UUID.randomUUID(),
                     username = username,

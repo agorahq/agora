@@ -5,14 +5,14 @@ import kotlinx.html.div
 import kotlinx.html.h1
 import kotlinx.html.html
 import org.agorahq.agora.core.api.extensions.include
-import org.agorahq.agora.core.api.module.context.ResourceListingContext
+import org.agorahq.agora.core.api.module.context.ViewListingContext
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_FOOTER
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_HEAD
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_NAVIGATION
 import org.agorahq.agora.core.api.template.template
-import org.agorahq.agora.post.domain.Post
+import org.agorahq.agora.post.viewmodel.PostViewModel
 
-val POST_LIST = template<ResourceListingContext<Post>> { ctx ->
+val POST_LIST = template<ViewListingContext<PostViewModel>> { ctx ->
     val (site, _, posts) = ctx
     html {
         include(DEFAULT_HEAD, "${site.title} | Posts")
@@ -22,8 +22,8 @@ val POST_LIST = template<ResourceListingContext<Post>> { ctx ->
                 h1 {
                     +"Posts"
                 }
-                posts.forEach { post ->
-                    include(POST_CARD, post)
+                posts.forEach { model ->
+                    include(POST_CARD, model)
                 }
                 include(DEFAULT_FOOTER, site)
             }

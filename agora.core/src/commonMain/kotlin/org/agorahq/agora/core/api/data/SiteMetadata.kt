@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.api.data
 
-import org.agorahq.agora.core.api.services.ModuleRegistry
+import org.agorahq.agora.core.api.service.ModuleRegistry
 
 interface SiteMetadata {
     val title: String

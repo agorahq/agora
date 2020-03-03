@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.platform
 
-import org.agorahq.agora.core.services.FlexmarkRenderer
-import org.agorahq.agora.core.api.services.MarkdownRenderer
+import org.agorahq.agora.core.service.FlexmarkRenderer
+import org.agorahq.agora.core.api.service.MarkdownRenderer
 
 actual object MarkdownRendererFactory {
 

@@ -1,6 +1,6 @@
 package org.agorahq.agora.post.domain
 
-import org.agorahq.agora.core.api.document.ResourceURL
+import org.agorahq.agora.core.api.content.ResourceURL
 import org.agorahq.agora.core.api.extensions.toSlug
 
 data class PostURL(

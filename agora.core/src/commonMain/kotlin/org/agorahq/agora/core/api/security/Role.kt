@@ -1,18 +1,13 @@
 package org.agorahq.agora.core.api.security
 
-import org.agorahq.agora.core.internal.user.DefaultRole
+import org.agorahq.agora.core.api.resource.Resource
 
 /**
  * [Role] is the primary component of the Role Based Access Control (RBAC) utility.
  */
 interface Role {
 
-    val name: String
-    val permissions: Iterable<Permission>
+    val descriptor: RoleDescriptor
+    val permissions: Iterable<Permission<out Resource>>
 
-    companion object {
-
-        fun create(name: String, permissions: Iterable<Permission>): Role =
-                DefaultRole(name, permissions)
-    }
 }
