@@ -23,6 +23,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
+import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
@@ -41,25 +42,29 @@ import org.agorahq.agora.comment.operations.CreateComment
 import org.agorahq.agora.comment.operations.DeleteComment
 import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.comment.operations.ShowCommentForm
+import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.content.ResourceURL
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.extensions.AnyPageRenderer
-import org.agorahq.agora.core.api.extensions.AnyResourceListRenderer
-import org.agorahq.agora.core.api.extensions.AnyResourceOperation
-import org.agorahq.agora.core.api.extensions.toResourceContext
-import org.agorahq.agora.core.api.extensions.tryToExecute
-import org.agorahq.agora.core.api.extensions.whenHasOperation
+import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
+import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
+import org.agorahq.agora.core.api.security.OperationType.PageFormRenderer
+import org.agorahq.agora.core.api.security.OperationType.PageListRenderer
+import org.agorahq.agora.core.api.security.OperationType.PageRenderer
+import org.agorahq.agora.core.api.security.OperationType.ResourceDeleter
+import org.agorahq.agora.core.api.security.OperationType.ResourceSaver
 import org.agorahq.agora.core.api.service.ModuleRegistry
-import org.agorahq.agora.core.api.service.impl.InMemoryChildResourceQueryService
+import org.agorahq.agora.core.api.service.impl.InMemoryPageElementQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryPageQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryStorageService
 import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
 import org.agorahq.agora.core.api.view.ConverterService
+import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.delivery.extensions.create
 import org.agorahq.agora.delivery.extensions.createRedirectFor
+import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.delivery.extensions.toOperationContext
-import org.agorahq.agora.delivery.extensions.toResource
 import org.agorahq.agora.delivery.extensions.tryRedirectToReferrer
 import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
 import org.agorahq.agora.delivery.security.BuiltInRoles.ATTENDEE
@@ -78,6 +83,31 @@ private val logger = LoggerFactory.getLogger("Application")
 fun main(args: Array<String>) {
     EngineMain.main(args)
 }
+
+val userQueryService = InMemoryQueryService(mapOf(
+        JACK.id to JACK, JENNA.id to JENNA, FRANK.id to FRANK, EDEM.id to EDEM, OGABI.id to OGABI)
+        .toMutableMap())
+
+val converterService = ConverterService.create(listOf(
+        CommentConverter(userQueryService), PostConverter(userQueryService)))
+
+val commentQueryService = InMemoryPageElementQueryService(COMMENTS)
+val postQueryService = InMemoryPageQueryService(Post::class, POSTS)
+val commentStorage = InMemoryStorageService(COMMENTS)
+val postStorage = InMemoryStorageService(POSTS)
+
+val listPosts = ListPosts(postQueryService, converterService)
+val renderPost = ShowPost(postQueryService, converterService)
+val createPost = CreatePost(postStorage, converterService)
+val deletePost = DeletePost(postStorage)
+
+val listComments = ListComments(commentQueryService, converterService)
+val renderCommentForm = ShowCommentForm()
+val createComment = CreateComment(commentStorage, converterService)
+val deleteComment = DeleteComment(commentStorage)
+
+val postModule = PostModule(listOf(listPosts, renderPost, listComments))
+val commentModule = CommentModule(listOf(renderCommentForm, createComment))
 
 fun Application.module() {
 
@@ -148,24 +178,6 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
 
     val moduleRegistry = site.moduleRegistry
 
-    val commentQueryService = InMemoryChildResourceQueryService(COMMENTS)
-    val postQueryService = InMemoryPageQueryService(Post::class, POSTS)
-    val commentStorage = InMemoryStorageService(COMMENTS)
-    val postStorage = InMemoryStorageService(POSTS)
-
-    val listPosts = ListPosts(postQueryService)
-    val renderPost = ShowPost(postQueryService)
-    val createPost = CreatePost(postStorage)
-    val deletePost = DeletePost(postStorage)
-
-    val listComments = ListComments(commentQueryService)
-    val renderCommentForm = ShowCommentForm()
-    val createComment = CreateComment(commentStorage)
-    val deleteComment = DeleteComment(commentStorage)
-
-    val postModule = PostModule(listOf(listPosts, renderPost, listComments))
-    val commentModule = CommentModule(listOf(renderCommentForm, createComment))
-
     moduleRegistry.register(postModule)
     moduleRegistry.register(commentModule)
 
@@ -174,52 +186,68 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
 
 private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
 
-    val userQueryService = InMemoryQueryService(mapOf(
-            JACK.id to JACK, JENNA.id to JENNA, FRANK.id to FRANK, EDEM.id to EDEM, OGABI.id to OGABI)
-            .toMutableMap())
-
-    val converterService = ConverterService.create(listOf(
-            CommentConverter(userQueryService), PostConverter(userQueryService)))
-
     get(SITE.baseUrl) {
-        call.respondText(HOMEPAGE.render(call.toOperationContext(SITE, converterService)), ContentType.Text.Html)
+        call.respondText(HOMEPAGE.render(call.toOperationContext(SITE)), ContentType.Text.Html)
     }
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
 
-        module.whenHasOperation<AnyResourceListRenderer> { documentListing ->
-            logger.info("Registering module ${documentListing::class.simpleName} at ${documentListing.route}")
-            get(documentListing.route) {
-                call.respondText(
-                        text = with(documentListing) { call.toOperationContext(SITE, converterService).reify().execute().get() },
-                        contentType = ContentType.Text.Html)
-            }
-        }
-
-        module.whenHasOperation<AnyPageRenderer> { renderer ->
-            logger.info("Registering module ${renderer::class.simpleName} at ${renderer.route}")
+        module.findOperationsWithType(PageRenderer(Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
             get(renderer.route) {
-                val ctx = with(call.toOperationContext(SITE, converterService)) {
-                    ResourceURL.create(
-                            klass = renderer.urlType,
-                            parameters = call.parameters).toPageRequestContext()
-
-                }
+                val url = ResourceURL.create(
+                        klass = renderer.urlClass,
+                        parameters = call.parameters)
                 call.respondText(
-                        text = with(renderer) { ctx.reify().execute().get() },
+                        text = with(renderer) {
+                            call.toOperationContext(SITE).toPageURLContext(url).createCommand().execute().get()
+                        },
                         contentType = ContentType.Text.Html)
             }
         }
 
-        module.whenHasOperation<AnyResourceOperation> { op ->
-            logger.info("Registering module ${op::class.simpleName} at ${op.route}")
-            post(op.route) {
-                call.receiveParameters()
-                        .toResource(converterService, op.resourceClass)
-                        .toResourceContext(call.toOperationContext(SITE, converterService))
-                        .tryToExecute(op)
+        module.findOperationsWithType(PageListRenderer(Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
+            get(renderer.route) {
+                call.respondText(
+                        text = with(renderer) {
+                            call.toOperationContext(SITE).createCommand().execute().get()
+                        },
+                        contentType = ContentType.Text.Html)
+            }
+        }
+
+        module.findOperationsWithType(PageFormRenderer(Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
+            // TODO
+        }
+
+        module.findOperationsWithType(PageElementFormRenderer(Resource::class, Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
+            // TODO
+        }
+
+        module.findOperationsWithType(PageElementListRenderer(Resource::class, Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
+            // TODO
+        }
+
+        module.findOperationsWithType(ResourceSaver(Resource::class, ViewModel::class)).forEach { saver ->
+            logger.info("Registering module ${saver.name} at route ${saver.route}.")
+            post(saver.route) {
+                val modelClass = converterService.findViewModelClassFor(saver.resourceClass)
+                with(saver) {
+                    call.toOperationContext(SITE)
+                            .toViewModelContext(call.receiveParameters().mapTo(modelClass))
+                            .createCommand().execute().get()
+                }
                 call.tryRedirectToReferrer(SITE)
             }
+        }
+
+        module.findOperationsWithType(ResourceDeleter(Resource::class)).forEach { deleter ->
+            logger.info("Registering module ${deleter.name} at route ${deleter.route}.")
+            // TODO 
         }
 
     }

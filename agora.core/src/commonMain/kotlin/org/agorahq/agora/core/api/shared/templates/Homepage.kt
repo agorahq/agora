@@ -5,7 +5,7 @@ import kotlinx.html.div
 import kotlinx.html.h1
 import kotlinx.html.html
 import org.agorahq.agora.core.api.extensions.include
-import org.agorahq.agora.core.api.module.context.OperationContext
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.template.template
 
 val HOMEPAGE = template<OperationContext> { ctx ->

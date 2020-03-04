@@ -3,24 +3,38 @@ package org.agorahq.agora.comment.operations
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.templates.COMMENT_LIST
+import org.agorahq.agora.comment.viewmodel.CommentListViewModel
+import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.extensions.toCommand
-import org.agorahq.agora.core.api.module.context.ResourceContext
-import org.agorahq.agora.core.api.module.renderer.ChildResourceListRenderer
-import org.agorahq.agora.core.api.service.ChildResourceQueryService
+import org.agorahq.agora.core.api.operation.RenderPageElementList
+import org.agorahq.agora.core.api.operation.RenderPageElementListDescriptor
+import org.agorahq.agora.core.api.operation.context.ResourceContext
+import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
+import org.agorahq.agora.core.api.service.PageElementQueryService
+import org.agorahq.agora.core.api.view.ConverterService
 
 class ListComments(
-        private val commentService: ChildResourceQueryService<Comment>
-) : ChildResourceListRenderer<Comment, ResourceContext<Page>> {
+        private val commentService: PageElementQueryService<Comment>,
+        private val converterService: ConverterService
+) : RenderPageElementList<Comment, Page>, RenderPageElementListDescriptor<Comment> by Companion {
 
-    override val resourceClass = Comment::class
-    override val route = CommentURL.root
-
-    override fun ResourceContext<Page>.reify() = {
-        COMMENT_LIST.render(commentService
-                .findByParent(resource)
-                .toViewListingContext())
+    override fun ResourceContext<Page>.createCommand() = {
+        COMMENT_LIST.render(CommentListViewModel(
+                comments = commentService
+                        .findByParent(resource)
+                        .map {
+                            converterService.convertToView<CommentViewModel>(it, this).get()
+                        }))
     }.toCommand()
 
+    companion object : RenderPageElementListDescriptor<Comment> {
+
+        override val name = "List Comments"
+        override val resourceClass = Comment::class
+        override val type = PageElementListRenderer(Comment::class, Page::class)
+        override val route = CommentURL.root
+        override val urlClass = CommentURL::class
+    }
 
 }

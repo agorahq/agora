@@ -15,4 +15,8 @@ class InMemoryStorageService<E : Resource>(
     override fun delete(resource: E) {
         objects.remove(resource.id)
     }
+
+    override fun deleteById(id: UUID) {
+        objects.remove(id)
+    }
 }

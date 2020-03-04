@@ -1,4 +1,4 @@
-package org.agorahq.agora.core.api.module
+package org.agorahq.agora.core.api.operation
 
 import org.agorahq.agora.core.api.data.Result
 

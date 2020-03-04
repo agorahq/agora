@@ -4,15 +4,16 @@ package org.agorahq.agora.core.api.extensions
 
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.module.Module
+import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 
-inline fun <reified T : AnyContentOperation> Module<out Resource, out ViewModel>.whenHasOperation(noinline fn: (T) -> Unit) {
-    findOperation(T::class).map(fn)
-}
-
-inline fun <reified T : AnyContentOperation> SiteMetadata.forEachModuleWithOperation(fn: (Pair<AnyModule, T>) -> Unit) {
-    modules.filter { it.hasOperation(T::class) }.map {
-        fn(it as Module<Resource, ViewModel> to it.findOperation(T::class).get())
-    }
+fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> SiteMetadata.forEachModuleHavingOperationWithType(
+        type: T, fn: (Pair<Module<out Resource, out ViewModel>, Operation<R, C, T, U>>) -> Unit
+) {
+    modules.flatMap { module ->
+        module.findOperationsWithType(type).map { module to it }
+    }.forEach(fn)
 }

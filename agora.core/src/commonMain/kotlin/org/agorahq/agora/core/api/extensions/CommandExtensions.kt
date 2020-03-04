@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.extensions
 
 import org.agorahq.agora.core.api.data.Result
-import org.agorahq.agora.core.api.module.Command
+import org.agorahq.agora.core.api.operation.Command
 
 fun <T : Any> (() -> T).toCommand(): Command<T> = object : Command<T> {
 

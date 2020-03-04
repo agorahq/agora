@@ -3,10 +3,11 @@ package org.agorahq.agora.core.internal.view
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.Result.Failure
 import org.agorahq.agora.core.api.exception.MissingConverterException
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.view.ConverterService
-import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.api.view.ResourceConverter
+import org.agorahq.agora.core.api.view.ViewModel
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST", "ThrowableNotThrown")
@@ -36,10 +37,10 @@ class DefaultConverterService(
         } ?: Failure(MissingConverterException(view))
     }
 
-    override fun <V : ViewModel> convertToView(resource: Resource): Result<out V, out Exception> {
+    override fun <V : ViewModel> convertToView(resource: Resource, context: OperationContext): Result<out V, out Exception> {
         return resourceLookup[resource::class as KClass<Resource>]?.let { converter ->
             try {
-                Result.Success(with(converter) { resource.toViewModel() } as V)
+                Result.Success(with(converter) { resource.toViewModel(context) } as V)
             } catch (e: Exception) {
                 Failure(e)
             }

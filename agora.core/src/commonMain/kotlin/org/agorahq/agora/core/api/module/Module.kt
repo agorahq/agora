@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.api.module
 
-import org.agorahq.agora.core.api.extensions.AnyContentOperation
-import org.agorahq.agora.core.api.module.context.OperationContext
+import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
-import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 
 interface Module<R : Resource, M : ViewModel> {
@@ -13,20 +13,18 @@ interface Module<R : Resource, M : ViewModel> {
     val resourceClass: KClass<R>
     val viewModelClass: KClass<M>
 
-    fun hasOperation(operationType: KClass<out AnyContentOperation>): Boolean
+    fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> findOperationsWithType(
+            operationType: T
+    ): Iterable<Operation<R, C, T, U>>
 
-    fun hasOperation(operation: AnyContentOperation): Boolean = hasOperation(operation::class)
+    fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> hasOperationWithType(
+            operationType: T
+    ): Boolean
 
     fun supportsResource(resource: Resource): Boolean
 
     fun supportsViewModel(viewModel: ViewModel): Boolean
 
     fun supportsContext(context: OperationContext): Boolean
-
-    fun <T : AnyContentOperation> findOperation(operationType: KClass<T>): Maybe<T>
-
-    fun <T : AnyContentOperation> filterOperations(operationType: KClass<T>): Iterable<T>
-
-
 
 }

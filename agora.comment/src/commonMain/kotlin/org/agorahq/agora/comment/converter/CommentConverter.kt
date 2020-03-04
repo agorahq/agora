@@ -4,6 +4,7 @@ import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.exception.EntityNotFoundException
 import org.agorahq.agora.core.api.extensions.toUUID
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.view.ResourceConverter
@@ -28,7 +29,7 @@ class CommentConverter(
             id = id?.toUUID() ?: UUID.randomUUID())
 
 
-    override fun Comment.toViewModel() = CommentViewModel(
+    override fun Comment.toViewModel(context: OperationContext) = CommentViewModel(
             id = id.toString(),
             parentId = parentId.toString(),
             content = MarkdownRendererFactory.createRenderer().render(content),

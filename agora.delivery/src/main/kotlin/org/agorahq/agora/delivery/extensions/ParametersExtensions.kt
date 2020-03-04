@@ -13,9 +13,9 @@ import kotlin.reflect.KClassifier
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
 
-fun <R : Resource> Parameters.toResource(converterService: ConverterService, resourceClass: KClass<R>): Result<out R, out Exception> {
+fun <V : Resource> Parameters.toResource(converterService: ConverterService, resourceClass: KClass<V>): Result<out V, out Exception> {
     val viewClass = converterService.findViewModelClassFor(resourceClass)
-    return converterService.convertToResource<Resource>(mapTo(viewClass)) as Result<out R, out Exception>
+    return converterService.convertToResource<Resource>(mapTo(viewClass)) as Result<out V, out Exception>
 }
 
 fun <T : Any> Parameters.mapTo(type: KClass<T>): T {

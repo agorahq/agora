@@ -1,6 +1,7 @@
 package org.agorahq.agora.post.converter
 
 import org.agorahq.agora.core.api.extensions.toUUID
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.view.ResourceConverter
@@ -22,11 +23,14 @@ class PostConverter(
             owner = userService.findById(ownerId.toUUID()).get(),
             content = content)
 
-    override fun Post.toViewModel() = PostViewModel(
+    override fun Post.toViewModel(context: OperationContext) = PostViewModel(
             ownerId = owner.id.toString(),
             shortDescription = shortDescription,
             url = url.generate(),
             title = title,
             tags = tags,
-            content = MarkdownRendererFactory.createRenderer().render(content))
+            content = MarkdownRendererFactory.createRenderer().render(content),
+            context = context,
+            children = "", // TODO: children + forms
+            forms = "")
 }

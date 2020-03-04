@@ -1,6 +1,10 @@
 package org.agorahq.agora.delivery
 
 import org.agorahq.agora.comment.domain.Comment
+import org.agorahq.agora.comment.operations.CreateComment
+import org.agorahq.agora.comment.operations.DeleteComment
+import org.agorahq.agora.comment.operations.ListComments
+import org.agorahq.agora.comment.operations.ShowCommentForm
 import org.agorahq.agora.core.api.data.UserMetadata
 import org.agorahq.agora.core.api.security.builder.all
 import org.agorahq.agora.core.api.security.builder.authorization
@@ -9,9 +13,12 @@ import org.agorahq.agora.core.api.security.builder.saving
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import org.agorahq.agora.delivery.extensions.toTimestamp
-import org.agorahq.agora.delivery.security.BuiltInOperations
 import org.agorahq.agora.delivery.security.BuiltInRoles
 import org.agorahq.agora.post.domain.Post
+import org.agorahq.agora.post.operations.CreatePost
+import org.agorahq.agora.post.operations.DeletePost
+import org.agorahq.agora.post.operations.ListPosts
+import org.agorahq.agora.post.operations.ShowPost
 import org.hexworks.cobalt.core.api.UUID
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap
@@ -20,29 +27,29 @@ val POST_A_ID = UUID.randomUUID()
 val POST_B_ID = UUID.randomUUID()
 
 val AUTHORIZATION = authorization {
-    BuiltInRoles.ATTENDEE {
-        Post::class {
-            BuiltInOperations.LIST_POSTS allowReadingFor all
-            BuiltInOperations.SHOW_POST allowReadingFor all
-        }
-        Comment::class {
-            BuiltInOperations.LIST_COMMENTS allowReadingFor all
-            BuiltInOperations.CREATE_COMMENT allow saving
-            BuiltInOperations.DELETE_COMMENT allowDeletingFor ownOnly
-            BuiltInOperations.SHOW_COMMENT_FORM allowReadingFor all
-        }
-    }
-    BuiltInRoles.ADMIN {
-        inheritFrom(BuiltInRoles.ATTENDEE)
-
-        Post::class {
-            BuiltInOperations.CREATE_POST allow saving
-            BuiltInOperations.DELETE_POST allowDeletingFor all
-        }
-        Comment::class {
-            BuiltInOperations.DELETE_COMMENT allowDeletingFor all
-        }
-    }
+//    BuiltInRoles.ATTENDEE {
+//        Post::class {
+//            ListPosts allowReadingFor all
+//            ShowPost allowReadingFor all
+//        }
+//        Comment::class {
+//            ListComments allowReadingFor all
+//            CreateComment allow saving
+//            DeleteComment allowDeletingFor ownOnly
+//            ShowCommentForm allowReadingFor all
+//        }
+//    }
+//    BuiltInRoles.ADMIN {
+//        inheritFrom(BuiltInRoles.ATTENDEE)
+//
+//        Post::class {
+//            CreatePost allow saving
+//            DeletePost allowDeletingFor all
+//        }
+//        Comment::class {
+//            DeleteComment allowDeletingFor all
+//        }
+//    }
 }
 
 val JACK = UserMetadata.create(

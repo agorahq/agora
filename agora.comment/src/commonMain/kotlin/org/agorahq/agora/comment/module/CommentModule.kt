@@ -2,11 +2,11 @@ package org.agorahq.agora.comment.module
 
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
-import org.agorahq.agora.core.api.extensions.AnyContentOperation
 import org.agorahq.agora.core.api.module.base.BaseModule
+import org.agorahq.agora.core.api.operation.AnyOperation
 
 class CommentModule(
-        operations: Iterable<AnyContentOperation> = listOf()
+        operations: Iterable<AnyOperation> = listOf()
 ) : BaseModule<Comment, CommentViewModel>(operations, Comment::class, CommentViewModel::class) {
 
     override val name = "Comments"
