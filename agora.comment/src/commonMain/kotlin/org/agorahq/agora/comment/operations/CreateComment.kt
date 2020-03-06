@@ -17,7 +17,10 @@ class CreateComment(
 ) : SaveResource<Comment, CommentViewModel>, SaveResourceDescriptor<Comment, CommentViewModel> by Companion {
 
     override fun ViewModelContext<CommentViewModel>.createCommand() = {
-        commentStorage.create(converterService.convertToResource<Comment>(viewModel).get())
+        val enrichedModel = viewModel.copy(
+                userId = user.id.toString(),
+                username = user.username)
+        commentStorage.create(converterService.convertToResource<Comment>(enrichedModel).get())
     }.toCommand()
 
     companion object : SaveResourceDescriptor<Comment, CommentViewModel> {

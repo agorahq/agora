@@ -31,6 +31,5 @@ class PostConverter(
             tags = tags,
             content = MarkdownRendererFactory.createRenderer().render(content),
             context = context,
-            children = "", // TODO: children + forms
-            forms = "")
+            renderedPageElements = "")
 }

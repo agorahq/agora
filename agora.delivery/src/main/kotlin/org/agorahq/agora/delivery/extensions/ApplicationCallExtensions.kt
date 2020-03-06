@@ -9,8 +9,11 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.data.UserMetadata
+import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.delivery.Session
+import org.agorahq.agora.core.api.security.User
+import org.agorahq.agora.core.api.service.QueryService
+import org.agorahq.agora.delivery.data.Session
 
 suspend fun ApplicationCall.tryRedirectToReferrer(site: SiteMetadata) {
     request.headers["Referer"]?.let { referer ->
@@ -26,9 +29,11 @@ fun ApplicationCall.createRedirectFor(path: String): String {
 }
 
 fun ApplicationCall.toOperationContext(
+        userService: QueryService<User>,
         site: SiteMetadata
 ): OperationContext {
-    val session = sessions.get<Session>()
-    val user = session?.toUser() ?: UserMetadata.ANONYMOUS
+    val user = sessions.get<Session>()?.let {
+        userService.findById(it.id.toUUID()).orElse(it.toUser())
+    } ?: UserMetadata.ANONYMOUS
     return OperationContext.create(site, user)
 }

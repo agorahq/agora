@@ -6,14 +6,15 @@ import org.agorahq.agora.comment.operations.DeleteComment
 import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.comment.operations.ShowCommentForm
 import org.agorahq.agora.core.api.data.UserMetadata
-import org.agorahq.agora.core.api.security.builder.all
 import org.agorahq.agora.core.api.security.builder.authorization
-import org.agorahq.agora.core.api.security.builder.ownOnly
-import org.agorahq.agora.core.api.security.builder.saving
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
+import org.agorahq.agora.delivery.extensions.all
+import org.agorahq.agora.delivery.extensions.ownOnly
+import org.agorahq.agora.delivery.extensions.postIsPublished
 import org.agorahq.agora.delivery.extensions.toTimestamp
-import org.agorahq.agora.delivery.security.BuiltInRoles
+import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
+import org.agorahq.agora.delivery.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.operations.CreatePost
 import org.agorahq.agora.post.operations.DeletePost
@@ -27,55 +28,68 @@ val POST_A_ID = UUID.randomUUID()
 val POST_B_ID = UUID.randomUUID()
 
 val AUTHORIZATION = authorization {
-//    BuiltInRoles.ATTENDEE {
-//        Post::class {
-//            ListPosts allowReadingFor all
-//            ShowPost allowReadingFor all
-//        }
-//        Comment::class {
-//            ListComments allowReadingFor all
-//            CreateComment allow saving
-//            DeleteComment allowDeletingFor ownOnly
-//            ShowCommentForm allowReadingFor all
-//        }
-//    }
-//    BuiltInRoles.ADMIN {
-//        inheritFrom(BuiltInRoles.ATTENDEE)
-//
-//        Post::class {
-//            CreatePost allow saving
-//            DeletePost allowDeletingFor all
-//        }
-//        Comment::class {
-//            DeleteComment allowDeletingFor all
-//        }
-//    }
+
+    groups {
+
+    }
+
+    roles {
+        val attendeeRole = ATTENDEE {
+
+            Post::class {
+                ListPosts allowFor all filterFor postIsPublished
+                ShowPost allowFor all filterFor postIsPublished
+            }
+
+            Comment::class {
+                ListComments allowFor all
+                CreateComment allowFor all
+                DeleteComment allowFor ownOnly
+                ShowCommentForm allowFor all
+            }
+        }
+        ADMIN {
+
+            inheritFrom(attendeeRole)
+
+            Post::class {
+                ListPosts allowFor all
+                ShowPost allowFor all
+                CreatePost allowFor all
+                DeletePost allowFor ownOnly
+            }
+
+            Comment::class {
+                DeleteComment allowFor all
+            }
+        }
+    }
 }
 
 val JACK = UserMetadata.create(
         email = "jack@jack.com",
         username = "jack",
-        roles = setOf(BuiltInRoles.ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE)).toUser()
 
 val JENNA = UserMetadata.create(
         email = "jenna@jenna.com",
         username = "jenna",
-        roles = setOf(BuiltInRoles.ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE)).toUser()
 
 val FRANK = UserMetadata.create(
         email = "frank@frank.com",
         username = "frank",
-        roles = setOf(BuiltInRoles.ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE)).toUser()
 
 val EDEM = UserMetadata.create(
         email = "arold.adam@gmail.com",
         username = "edem",
-        roles = setOf(BuiltInRoles.ADMIN)).toUser()
+        roles = setOf(ADMIN)).toUser()
 
 val OGABI = UserMetadata.create(
         email = "gabor.orosz@me.com",
         username = "ogabi",
-        roles = setOf(BuiltInRoles.ADMIN)).toUser()
+        roles = setOf(ADMIN)).toUser()
 
 
 val POST_A = Post(
@@ -130,9 +144,10 @@ val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_B_1.id, COMMENT_B_1)
 }
 
-val CLIENT_ID = System.getenv("AGORA_OAUTH_CLIENT_ID") ?: error("AGORA_OAUTH_CLIENT_ID env variable is missing")
-val CLIENT_SECRET = System.getenv("AGORA_OAUTH_CLIENT_SECRET")
-        ?: error("AGORA_OAUTH_CLIENT_SECRET env variable is missing")
+val GOOGLE_CLIENT_ID = System.getenv("GOOGLE_OAUTH_CLIENT_ID")
+        ?: error("GOOGLE_OAUTH_CLIENT_ID env variable is missing")
+val GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+        ?: error("GOOGLE_OAUTH_CLIENT_SECRET env variable is missing")
 
 val SITE = DefaultSiteMetadata(
         title = "Agora",

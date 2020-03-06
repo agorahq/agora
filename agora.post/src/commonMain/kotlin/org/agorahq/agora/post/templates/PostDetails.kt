@@ -33,8 +33,7 @@ val POST_DETAILS = template<PostViewModel> { model ->
                 }
                 hr { }
                 div {
-                    htmlContent(model.children)
-                    htmlContent(model.forms)
+                    htmlContent(model.renderedPageElements)
                 }
                 include(DEFAULT_FOOTER, model.context.site)
             }

@@ -11,6 +11,5 @@ data class PostViewModel(
         val tags: Iterable<String>,
         val content: String,
         val context: OperationContext,
-        val children: String,
-        val forms: String
+        val renderedPageElements: String
 ) : ViewModel

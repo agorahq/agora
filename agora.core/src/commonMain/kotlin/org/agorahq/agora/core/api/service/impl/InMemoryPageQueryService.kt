@@ -6,17 +6,12 @@ import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.exception.EntityNotFoundException
 import org.agorahq.agora.core.api.service.PageQueryService
 import org.hexworks.cobalt.core.api.UUID
-import org.hexworks.cobalt.datatypes.Maybe
 import kotlin.reflect.KClass
 
 class InMemoryPageQueryService<D : Page>(
         private val pageClass: KClass<D>,
         private val objects: MutableMap<UUID, D>
-) : PageQueryService<D> {
-
-    override fun findAll(): Sequence<D> = objects.values.asSequence()
-
-    override fun findById(id: UUID) = Maybe.ofNullable(objects[id])
+) : BaseQueryService<D>(objects), PageQueryService<D> {
 
     override fun findByUrl(resourceURL: ResourceURL<D>): Result<out D, out Exception> {
         return Result.create(objects.values.firstOrNull { resourceURL.matches(it) }) {

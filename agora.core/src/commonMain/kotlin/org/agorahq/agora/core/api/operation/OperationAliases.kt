@@ -19,6 +19,8 @@ import org.agorahq.agora.core.api.security.OperationType.ResourceSaver
 
 typealias AnyOperation = Operation<out Resource, out OperationContext, out OperationType<*, *, *>, out Any>
 
+typealias AnyOperationDescriptor = OperationDescriptor<out Resource, out OperationContext, out Any>
+
 typealias SaveResource<R, M> = Operation<R, ViewModelContext<M>, ResourceSaver<R, M>, Unit>
 
 typealias SaveResourceDescriptor<R, M> = OperationDescriptor<R, ViewModelContext<M>, Unit>
@@ -35,9 +37,9 @@ typealias RenderResource<R> = Operation<R, PageURLContext<R>, PageRenderer<R>, S
 
 typealias RenderResourceDescriptor<R> = OperationDescriptor<R, PageURLContext<R>, String>
 
-typealias RenderPageElementList<R, P> = Operation<R, ResourceContext<P>, PageElementListRenderer<R, P>, String>
+typealias RenderPageElementList<R, P> = Operation<R, PageContext<P>, PageElementListRenderer<R, P>, String>
 
-typealias RenderPageElementListDescriptor<R> = OperationDescriptor<R, ResourceContext<Page>, String>
+typealias RenderPageElementListDescriptor<R> = OperationDescriptor<R, PageContext<Page>, String>
 
 typealias RenderPageElementForm<R, P> = Operation<R, PageContext<P>, PageElementFormRenderer<R, P>, String>
 

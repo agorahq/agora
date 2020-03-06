@@ -2,6 +2,7 @@
 
 package org.agorahq.agora.delivery
 
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.Application
@@ -21,9 +22,9 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.request.receiveParameters
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.Routing
-import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
@@ -53,21 +54,25 @@ import org.agorahq.agora.core.api.security.OperationType.PageListRenderer
 import org.agorahq.agora.core.api.security.OperationType.PageRenderer
 import org.agorahq.agora.core.api.security.OperationType.ResourceDeleter
 import org.agorahq.agora.core.api.security.OperationType.ResourceSaver
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.ModuleRegistry
 import org.agorahq.agora.core.api.service.impl.InMemoryPageElementQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryPageQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryStorageService
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_REGISTRATION_PAGE
 import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.core.api.view.ViewModel
+import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
+import org.agorahq.agora.delivery.data.GoogleUserData
+import org.agorahq.agora.delivery.data.Session
+import org.agorahq.agora.delivery.data.UserState
 import org.agorahq.agora.delivery.extensions.create
 import org.agorahq.agora.delivery.extensions.createRedirectFor
 import org.agorahq.agora.delivery.extensions.mapTo
 import org.agorahq.agora.delivery.extensions.toOperationContext
 import org.agorahq.agora.delivery.extensions.tryRedirectToReferrer
-import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
-import org.agorahq.agora.delivery.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.module.PostModule
@@ -75,8 +80,8 @@ import org.agorahq.agora.post.operations.CreatePost
 import org.agorahq.agora.post.operations.DeletePost
 import org.agorahq.agora.post.operations.ListPosts
 import org.agorahq.agora.post.operations.ShowPost
-import org.hexworks.cobalt.core.api.UUID
 import org.hexworks.cobalt.logging.api.LoggerFactory
+import java.util.*
 
 private val logger = LoggerFactory.getLogger("Application")
 
@@ -85,7 +90,7 @@ fun main(args: Array<String>) {
 }
 
 val userQueryService = InMemoryQueryService(mapOf(
-        JACK.id to JACK, JENNA.id to JENNA, FRANK.id to FRANK, EDEM.id to EDEM, OGABI.id to OGABI)
+        JACK.id to JACK, JENNA.id to JENNA, FRANK.id to FRANK, OGABI.id to OGABI)
         .toMutableMap())
 
 val converterService = ConverterService.create(listOf(
@@ -117,11 +122,10 @@ fun Application.module() {
             accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
             requestMethod = HttpMethod.Post,
 
-            clientId = CLIENT_ID,
-            clientSecret = CLIENT_SECRET,
+            clientId = GOOGLE_CLIENT_ID,
+            clientSecret = GOOGLE_CLIENT_SECRET,
             defaultScopes = listOf("profile", "email")  // no email, but gives full name, picture, and id
     )
-
 
     install(Sessions) {
         cookie<Session>("oauthSampleSessionId") {
@@ -131,7 +135,7 @@ fun Application.module() {
     }
 
     install(Authentication) {
-        oauth("google-oauth") {
+        oauth("google") {
             client = HttpClient(Apache)
             providerLookup = { googleOauthProvider }
             urlProvider = { createRedirectFor("/login") }
@@ -145,7 +149,21 @@ fun Application.module() {
             call.tryRedirectToReferrer(SITE)
         }
 
-        authenticate("google-oauth") {
+        get("/register") {
+            val ctx = call.toOperationContext(userQueryService, SITE)
+            val model = UserRegistrationViewModel(
+                    context = ctx,
+                    email = ctx.user.email)
+            call.respondText(
+                    text = DEFAULT_REGISTRATION_PAGE.render(model),
+                    contentType = ContentType.Text.Html)
+        }
+
+        post("/register") {
+            call.respondRedirect(SITE.baseUrl)
+        }
+
+        authenticate("google") {
             route("/login") {
                 handle {
                     val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
@@ -155,18 +173,21 @@ fun Application.module() {
                         header("Authorization", "Bearer ${principal.accessToken}")
                     }
 
-                    val data = ObjectMapper().readValue<Map<String, Any?>>(json)
-                    val email = data["email"] as String?
-
-                    email?.let {
-                        log.info("User data is: $data.")
+                    val googleUserData = ObjectMapper()
+                            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                            .readValue<GoogleUserData>(json)
+                    log.info("User data is: $googleUserData.")
+                    val user = userQueryService.findOneBy(User::email, googleUserData.email)
+                    if (user.isPresent) {
+                        call.sessions.set(Session.fromUser(user.get()))
+                        call.tryRedirectToReferrer(SITE)
+                    } else {
                         call.sessions.set(Session(
-                                userId = UUID.randomUUID().toString(),
-                                userEmail = it,
-                                userNick = data["given_name"]?.toString() ?: "anonymous",
-                                role = if (it == "arold.adam@gmail.com") ADMIN.name else ATTENDEE.name))
-                    } ?: error("An email address is mandatory for a User to log in.")
-                    call.tryRedirectToReferrer(SITE)
+                                email = googleUserData.email,
+                                id = UUID.randomUUID().toString(),
+                                state = UserState.REGISTERING.name))
+                        call.respondRedirect("/register")
+                    }
                 }
             }
         }
@@ -187,7 +208,7 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
 private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
 
     get(SITE.baseUrl) {
-        call.respondText(HOMEPAGE.render(call.toOperationContext(SITE)), ContentType.Text.Html)
+        call.respondText(HOMEPAGE.render(call.toOperationContext(userQueryService, SITE)), ContentType.Text.Html)
     }
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
@@ -200,7 +221,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
                         parameters = call.parameters)
                 call.respondText(
                         text = with(renderer) {
-                            call.toOperationContext(SITE).toPageURLContext(url).createCommand().execute().get()
+                            call.toOperationContext(userQueryService, SITE).toPageURLContext(url).createCommand().execute().get()
                         },
                         contentType = ContentType.Text.Html)
             }
@@ -211,7 +232,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             get(renderer.route) {
                 call.respondText(
                         text = with(renderer) {
-                            call.toOperationContext(SITE).createCommand().execute().get()
+                            call.toOperationContext(userQueryService, SITE).createCommand().execute().get()
                         },
                         contentType = ContentType.Text.Html)
             }
@@ -237,7 +258,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             post(saver.route) {
                 val modelClass = converterService.findViewModelClassFor(saver.resourceClass)
                 with(saver) {
-                    call.toOperationContext(SITE)
+                    call.toOperationContext(userQueryService, SITE)
                             .toViewModelContext(call.receiveParameters().mapTo(modelClass))
                             .createCommand().execute().get()
                 }

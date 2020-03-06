@@ -6,6 +6,6 @@ data class CommentViewModel(
         val id: String? = null,
         val parentId: String,
         val content: String,
-        val userId: String,
-        val username: String
+        val userId: String = "",
+        val username: String = ""
 ) : ViewModel

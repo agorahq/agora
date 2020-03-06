@@ -9,7 +9,7 @@ import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.RenderPageElementList
 import org.agorahq.agora.core.api.operation.RenderPageElementListDescriptor
-import org.agorahq.agora.core.api.operation.context.ResourceContext
+import org.agorahq.agora.core.api.operation.context.PageContext
 import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
 import org.agorahq.agora.core.api.service.PageElementQueryService
 import org.agorahq.agora.core.api.view.ConverterService
@@ -19,10 +19,10 @@ class ListComments(
         private val converterService: ConverterService
 ) : RenderPageElementList<Comment, Page>, RenderPageElementListDescriptor<Comment> by Companion {
 
-    override fun ResourceContext<Page>.createCommand() = {
+    override fun PageContext<Page>.createCommand() = {
         COMMENT_LIST.render(CommentListViewModel(
                 comments = commentService
-                        .findByParent(resource)
+                        .findByParent(page)
                         .map {
                             converterService.convertToView<CommentViewModel>(it, this).get()
                         }))

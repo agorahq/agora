@@ -8,11 +8,7 @@ import org.hexworks.cobalt.datatypes.Maybe
 
 class InMemoryPageElementQueryService<E : PageElement>(
         private val objects: MutableMap<UUID, E>
-) : PageElementQueryService<E> {
-
-    override fun findAll() = objects.values.asSequence()
-
-    override fun findById(id: UUID) = Maybe.ofNullable(objects[id])
+) : BaseQueryService<E>(objects), PageElementQueryService<E> {
 
     override fun findByParent(parent: Page): Sequence<E> {
         return objects.asSequence()

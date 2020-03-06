@@ -1,30 +1,29 @@
 package org.agorahq.agora.core.api.extensions
 
-import org.agorahq.agora.core.api.data.Result
+import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.content.PageElement
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.context.ResourceContext
-import org.agorahq.agora.core.api.resource.Resource
-import org.agorahq.agora.core.api.view.ViewModel
+import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
+import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
 
-//fun <R : Resource> R.toResourceContext(context: OperationContext): ResourceContext<out R> =
-//        DefaultResourceContext(
-//                site = context.site,
-//                user = context.user,
-//                resource = this,
-//                converterService = context.converterService)
-//
-//fun <M : ViewModel> OperationContext.toViewContext(viewModel: M): ViewContext<M> =
-//        DefaultViewContext(
-//                site = site,
-//                user = user,
-//                viewModel = viewModel,
-//                converterService = converterService)
-//
-//fun Result<out Resource, out Exception>.toResourceContext(context: OperationContext): Result<out ResourceContext<Resource>, out Exception> =
-//        map {
-//            DefaultResourceContext(
-//                    site = context.site,
-//                    user = context.user,
-//                    resource = it,
-//                    converterService = context.converterService)
-//        }
+fun OperationContext.renderPageElementListsFor(page: Page): String {
+    val renderedPageElements = StringBuilder()
+    site.forEachModuleHavingOperationWithType(PageElementListRenderer(PageElement::class, Page::class)) { (_, renderer) ->
+        with(renderer) {
+            renderedPageElements.append(toPageContext(page).createCommand().execute().get())
+        }
+    }
+    return renderedPageElements.toString()
+}
+
+fun OperationContext.renderPageElementFormsFor(page: Page): String {
+    val renderedPageElements = StringBuilder()
+    if (user.isAuthenticated) {
+        site.forEachModuleHavingOperationWithType(PageElementFormRenderer(PageElement::class, Page::class)) { (_, renderer) ->
+            with(renderer) {
+                renderedPageElements.append(toPageContext(page).createCommand().execute().get())
+            }
+        }
+    }
+    return renderedPageElements.toString()
+}

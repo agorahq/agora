@@ -4,7 +4,6 @@ import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.PageContext
 import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.operation.context.ResourceContext
 import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.operation.context.ViewModelContext
 import org.agorahq.agora.core.api.resource.Resource
@@ -114,9 +113,9 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     class PageElementListRenderer<R : Resource, P : Page>(
             private val resourceClass: KClass<R>,
             private val pageClass: KClass<P>
-    ) : ReadOperation<R, ResourceContext<P>>() {
+    ) : ReadOperation<R, PageContext<P>>() {
 
-        override val contextClass = PageContext::class as KClass<ResourceContext<P>>
+        override val contextClass = PageContext::class as KClass<PageContext<P>>
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -14,9 +14,6 @@ val COMMENT_FORM = template<CommentViewModel> { model ->
         input(type = InputType.hidden, name = CommentViewModel::parentId.name) {
             value = model.parentId
         }
-        input(type = InputType.hidden, name = CommentViewModel::parentId.name) {
-            value = model.parentId
-        }
         input(type = InputType.submit) {
             value = "Go"
         }
