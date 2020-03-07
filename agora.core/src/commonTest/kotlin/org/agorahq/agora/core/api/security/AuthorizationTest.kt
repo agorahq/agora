@@ -3,50 +3,56 @@ package org.agorahq.agora.core.api.security
 import org.agorahq.agora.core.api.Item
 import org.agorahq.agora.core.api.ListItems
 import org.agorahq.agora.core.api.ShowItem
+import org.agorahq.agora.core.api.data.Result.Failure
+import org.agorahq.agora.core.api.data.Result.Success
+import org.agorahq.agora.core.api.exception.MissingPermissionException
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.builder.authorization
 import org.agorahq.agora.core.api.security.policy.ResourceFilterPolicy
-import org.agorahq.agora.core.api.security.policy.allGroups
-import org.agorahq.agora.core.api.security.policy.allUsers
+import org.agorahq.agora.core.api.security.policy.group
+import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
+import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
+@Suppress("TestFunctionName")
 class AuthorizationTest {
 
     @Test
-    fun Given_an_operation_When() {
-
-        val auth = authorization {
-            roles {
-                val userRole = USER {
-                    Item::class {
-                        ListItems allowFor allGroups filterFor IN_STOCK_ONLY
-                        ShowItem allowFor allUsers filterFor IN_STOCK_ONLY
-                    }
-                }
-                ADMIN {
-                    inherit from userRole
-                    Item::class {
-                        ListItems allowFor allGroups
-                    }
-                }
-            }
-        }
+    fun Given_an_operation_When_executing_it_with_an_unauthorized_user_Then_an_exception_is_thrown() {
 
         val listItems = ListItems(
                 items = listOf(Item(
                         inStock = true,
-                        owner = USER_JOE)),
-                authorization = auth)
+                        owner = USER_JOE)))
 
+        val result = with(listItems) {
+            OperationContext.create(SITE, User.ANONYMOUS, AUTH).createCommand().execute()
+        }
 
+        when (result) {
+            is Success -> fail("This operation was not supposed to be successful.")
+            is Failure -> assertEquals(result.exception.message, MissingPermissionException(User.ANONYMOUS, listItems).message)
+        }
     }
 
 
     companion object {
 
+        val SITE = DefaultSiteMetadata(
+                title = "site",
+                email = "test@test.com",
+                description = "test site",
+                baseUrl = "/",
+                moduleRegistry = DefaultModuleRegistry())
+
+        private val REGISTERED_USERS = Group.create("REGISTERED_USERS")
+
         val USER = RoleDescriptor.create("user")
         val ADMIN = RoleDescriptor.create("admin")
 
-        val IN_STOCK_ONLY = ResourceFilterPolicy.create<Item> {
+        private val IN_STOCK_ONLY = ResourceFilterPolicy.create<Item> {
             it.inStock
         }
 
@@ -57,5 +63,22 @@ class AuthorizationTest {
         val ADMIN_SAM = User.create(
                 email = "sam@admin.com",
                 username = "admin_sam").toUser()
+
+        val AUTH = authorization {
+            roles {
+                val userRole = USER {
+                    Item::class {
+                        ListItems allowFor group(REGISTERED_USERS) filterFor IN_STOCK_ONLY
+                        ShowItem allowFor group(REGISTERED_USERS) filterFor IN_STOCK_ONLY
+                    }
+                }
+                ADMIN {
+                    inherit from userRole
+                    Item::class {
+                        ListItems allowFor group(REGISTERED_USERS)
+                    }
+                }
+            }
+        }
     }
 }

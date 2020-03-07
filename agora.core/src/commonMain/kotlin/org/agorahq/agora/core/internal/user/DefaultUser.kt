@@ -17,4 +17,6 @@ data class DefaultUser(
 
     override fun toUser(): User = this
 
+    override fun toString() = User.toString(this)
+
 }

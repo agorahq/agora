@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 class RoleBuilder(private val descriptor: RoleDescriptor) {
 
-    private lateinit var permissions: Iterable<Permission<out Resource>>
+    private val permissions = mutableListOf<Permission<out Resource>>()
     private val parents = mutableListOf<Role>()
 
     val inherit = Inherit
@@ -22,7 +22,7 @@ class RoleBuilder(private val descriptor: RoleDescriptor) {
     operator fun <R : Resource> KClass<R>.invoke(fn: PermissionsBuilder<R>.() -> Unit) {
         val builder = PermissionsBuilder<R>()
         fn(builder)
-        permissions = builder.build()
+        permissions.addAll(builder.build())
     }
 
     fun build(): Role {

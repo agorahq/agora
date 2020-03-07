@@ -36,5 +36,7 @@ interface User : UserMetadata {
                     roles = roles,
                     groups = groups)
         }
+
+        fun toString(user: User) = "${user.username}<${user.email}>"
     }
 }

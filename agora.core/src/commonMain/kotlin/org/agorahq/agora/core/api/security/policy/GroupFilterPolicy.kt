@@ -1,15 +1,15 @@
 package org.agorahq.agora.core.api.security.policy
 
-import org.agorahq.agora.core.api.security.User
+import org.agorahq.agora.core.api.security.Group
 
 interface GroupFilterPolicy : Policy {
 
-    operator fun invoke(user: User): Boolean
+    operator fun invoke(group: Group): Boolean
 
     companion object {
 
-        fun create(fn: (user: User) -> Boolean) = object : GroupFilterPolicy {
-            override fun invoke(user: User) = fn(user)
+        fun create(fn: (group: Group) -> Boolean) = object : GroupFilterPolicy {
+            override fun invoke(group: Group) = fn(group)
         }
     }
 }
