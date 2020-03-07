@@ -31,5 +31,6 @@ class PostConverter(
             tags = tags,
             content = MarkdownRendererFactory.createRenderer().render(content),
             context = context,
-            renderedPageElements = "")
+            renderedPageElements = "",
+            owner = owner)
 }

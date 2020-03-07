@@ -9,12 +9,7 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.application.log
-import io.ktor.auth.Authentication
-import io.ktor.auth.OAuthAccessTokenResponse
-import io.ktor.auth.OAuthServerSettings
-import io.ktor.auth.authenticate
-import io.ktor.auth.authentication
-import io.ktor.auth.oauth
+import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.get
@@ -30,12 +25,7 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.netty.EngineMain
-import io.ktor.sessions.SessionTransportTransformerMessageAuthentication
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.clear
-import io.ktor.sessions.cookie
-import io.ktor.sessions.sessions
-import io.ktor.sessions.set
+import io.ktor.sessions.*
 import io.ktor.util.hex
 import org.agorahq.agora.comment.converter.CommentConverter
 import org.agorahq.agora.comment.module.CommentModule
@@ -46,14 +36,10 @@ import org.agorahq.agora.comment.operations.ShowCommentForm
 import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.content.ResourceURL
 import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.resource.Resource
-import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
-import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
-import org.agorahq.agora.core.api.security.OperationType.PageFormRenderer
-import org.agorahq.agora.core.api.security.OperationType.PageListRenderer
-import org.agorahq.agora.core.api.security.OperationType.PageRenderer
-import org.agorahq.agora.core.api.security.OperationType.ResourceDeleter
-import org.agorahq.agora.core.api.security.OperationType.ResourceSaver
+import org.agorahq.agora.core.api.security.OperationType.*
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.ModuleRegistry
 import org.agorahq.agora.core.api.service.impl.InMemoryPageElementQueryService
@@ -68,11 +54,7 @@ import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.GoogleUserData
 import org.agorahq.agora.delivery.data.Session
 import org.agorahq.agora.delivery.data.UserState
-import org.agorahq.agora.delivery.extensions.create
-import org.agorahq.agora.delivery.extensions.createRedirectFor
-import org.agorahq.agora.delivery.extensions.mapTo
-import org.agorahq.agora.delivery.extensions.toOperationContext
-import org.agorahq.agora.delivery.extensions.tryRedirectToReferrer
+import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.module.PostModule
@@ -150,7 +132,7 @@ fun Application.module() {
         }
 
         get("/register") {
-            val ctx = call.toOperationContext(userQueryService, SITE)
+            val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
             val model = UserRegistrationViewModel(
                     context = ctx,
                     email = ctx.user.email)
@@ -208,57 +190,57 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
 private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
 
     get(SITE.baseUrl) {
-        call.respondText(HOMEPAGE.render(call.toOperationContext(userQueryService, SITE)), ContentType.Text.Html)
+        call.respondText(HOMEPAGE.render(call.toOperationContext(userQueryService, SITE, AUTHORIZATION)), ContentType.Text.Html)
     }
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
 
-        module.findOperationsWithType(PageRenderer(Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
+        module.findMatchingOperations(PageRenderer(Page::class)).forEach { renderer: Operation<Page, PageURLContext<Page>, String> ->
+            logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
             get(renderer.route) {
-                val url = ResourceURL.create(
-                        klass = renderer.urlClass,
-                        parameters = call.parameters)
+                with(renderer) {
+                    call.tryToRespondWithHtml(call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                            .toPageURLContext(ResourceURL.create(
+                                    urlClass = renderer.urlClass,
+                                    parameters = call.parameters))
+                            .createCommand()
+                            .execute())
+                }
+            }
+        }
+
+        module.findMatchingOperations(PageListRenderer(Page::class)).forEach { renderer ->
+            logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
+            get(renderer.route) {
                 call.respondText(
                         text = with(renderer) {
-                            call.toOperationContext(userQueryService, SITE).toPageURLContext(url).createCommand().execute().get()
+                            call.toOperationContext(userQueryService, SITE, AUTHORIZATION).createCommand().execute().get()
                         },
                         contentType = ContentType.Text.Html)
             }
         }
 
-        module.findOperationsWithType(PageListRenderer(Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
-            get(renderer.route) {
-                call.respondText(
-                        text = with(renderer) {
-                            call.toOperationContext(userQueryService, SITE).createCommand().execute().get()
-                        },
-                        contentType = ContentType.Text.Html)
-            }
-        }
-
-        module.findOperationsWithType(PageFormRenderer(Page::class)).forEach { renderer ->
+        module.findMatchingOperations(PageFormRenderer(Page::class)).forEach { renderer ->
             logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
             // TODO
         }
 
-        module.findOperationsWithType(PageElementFormRenderer(Resource::class, Page::class)).forEach { renderer ->
+        module.findMatchingOperations(PageElementFormRenderer(Resource::class, Page::class)).forEach { renderer ->
             logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
             // TODO
         }
 
-        module.findOperationsWithType(PageElementListRenderer(Resource::class, Page::class)).forEach { renderer ->
+        module.findMatchingOperations(PageElementListRenderer(Resource::class, Page::class)).forEach { renderer ->
             logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
             // TODO
         }
 
-        module.findOperationsWithType(ResourceSaver(Resource::class, ViewModel::class)).forEach { saver ->
+        module.findMatchingOperations(ResourceSaver(Resource::class, ViewModel::class)).forEach { saver ->
             logger.info("Registering module ${saver.name} at route ${saver.route}.")
             post(saver.route) {
                 val modelClass = converterService.findViewModelClassFor(saver.resourceClass)
                 with(saver) {
-                    call.toOperationContext(userQueryService, SITE)
+                    call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
                             .toViewModelContext(call.receiveParameters().mapTo(modelClass))
                             .createCommand().execute().get()
                 }
@@ -266,10 +248,11 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             }
         }
 
-        module.findOperationsWithType(ResourceDeleter(Resource::class)).forEach { deleter ->
+        module.findMatchingOperations(ResourceDeleter(Resource::class)).forEach { deleter ->
             logger.info("Registering module ${deleter.name} at route ${deleter.route}.")
             // TODO 
         }
 
     }
 }
+

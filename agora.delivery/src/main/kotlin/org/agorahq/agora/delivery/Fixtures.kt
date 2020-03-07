@@ -5,12 +5,15 @@ import org.agorahq.agora.comment.operations.CreateComment
 import org.agorahq.agora.comment.operations.DeleteComment
 import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.comment.operations.ShowCommentForm
-import org.agorahq.agora.core.api.data.UserMetadata
+import org.agorahq.agora.core.api.security.Role.Companion.ANONYMOUS
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.security.builder.authorization
+import org.agorahq.agora.core.api.security.policy.allGroups
+import org.agorahq.agora.core.api.security.policy.allUsers
+import org.agorahq.agora.core.api.security.policy.ownOnly
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
-import org.agorahq.agora.delivery.extensions.all
-import org.agorahq.agora.delivery.extensions.ownOnly
+import org.agorahq.agora.delivery.extensions.commentIsNotHidden
 import org.agorahq.agora.delivery.extensions.postIsPublished
 import org.agorahq.agora.delivery.extensions.toTimestamp
 import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
@@ -34,59 +37,68 @@ val AUTHORIZATION = authorization {
     }
 
     roles {
-        val attendeeRole = ATTENDEE {
+        val anonymousRole = ANONYMOUS {
 
             Post::class {
-                ListPosts allowFor all filterFor postIsPublished
-                ShowPost allowFor all filterFor postIsPublished
+                ListPosts allowFor allGroups filterFor postIsPublished
+                ShowPost allowFor allUsers filterFor postIsPublished
             }
 
             Comment::class {
-                ListComments allowFor all
-                CreateComment allowFor all
+                ListComments allowFor allUsers filterFor commentIsNotHidden
+            }
+
+        }
+        val attendeeRole = ATTENDEE {
+
+            inherit from anonymousRole
+
+            Comment::class {
+                ListComments allowFor allUsers
+                CreateComment allowFor allUsers
+                ShowCommentForm allowFor allUsers
                 DeleteComment allowFor ownOnly
-                ShowCommentForm allowFor all
             }
         }
         ADMIN {
 
-            inheritFrom(attendeeRole)
+            inherit from attendeeRole
 
             Post::class {
-                ListPosts allowFor all
-                ShowPost allowFor all
-                CreatePost allowFor all
-                DeletePost allowFor ownOnly
+                ListPosts allowFor allGroups
+                ShowPost allowFor allUsers
+                CreatePost allowFor allUsers
+                DeletePost allowFor allUsers
             }
 
             Comment::class {
-                DeleteComment allowFor all
+                DeleteComment allowFor allUsers
             }
         }
     }
 }
 
-val JACK = UserMetadata.create(
+val JACK = User.create(
         email = "jack@jack.com",
         username = "jack",
         roles = setOf(ATTENDEE)).toUser()
 
-val JENNA = UserMetadata.create(
+val JENNA = User.create(
         email = "jenna@jenna.com",
         username = "jenna",
         roles = setOf(ATTENDEE)).toUser()
 
-val FRANK = UserMetadata.create(
+val FRANK = User.create(
         email = "frank@frank.com",
         username = "frank",
         roles = setOf(ATTENDEE)).toUser()
 
-val EDEM = UserMetadata.create(
+val EDEM = User.create(
         email = "arold.adam@gmail.com",
         username = "edem",
         roles = setOf(ADMIN)).toUser()
 
-val OGABI = UserMetadata.create(
+val OGABI = User.create(
         email = "gabor.orosz@me.com",
         username = "ogabi",
         roles = setOf(ADMIN)).toUser()

@@ -7,6 +7,6 @@ import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.policy.Policy
 
 data class DefaultPermission<R : Resource>(
-        override val operation: OperationDescriptor<out R, out OperationContext, out Any>,
+        override val operationDescriptor: OperationDescriptor<out R, out OperationContext, out Any>,
         override val policies: Iterable<Policy>
 ) : Permission<R>

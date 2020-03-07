@@ -13,6 +13,8 @@ class DeleteComment(
         private val commentStorage: StorageService<Comment>
 ) : DeleteResource<Comment>, DeleteResourceDescriptor<Comment> by Companion {
 
+    override val descriptor = DeleteComment
+
     override fun ResourceIdContext.createCommand() = {
         commentStorage.deleteById(id)
     }.toCommand()

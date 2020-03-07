@@ -13,12 +13,18 @@ import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
 
 class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementFormDescriptor<Comment> by Companion {
 
+    override val descriptor = ShowCommentForm
+
+    private val operation = this
+
     override fun PageContext<Page>.createCommand() = {
+        authorization.tryAuthorize(user, page.owner, operation)
         COMMENT_FORM.render(CommentViewModel(
                 parentId = page.id.toString(),
                 content = "",
                 username = user.username,
-                userId = user.id.toString()))
+                userId = user.id.toString(),
+                owner = user))
     }.toCommand()
 
     companion object : RenderPageElementFormDescriptor<Comment> {

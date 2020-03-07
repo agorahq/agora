@@ -1,6 +1,7 @@
 package org.agorahq.agora.core.api.viewmodel
 
 import org.agorahq.agora.core.api.operation.context.OperationContext
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.view.ViewModel
 
 data class UserRegistrationViewModel(
@@ -8,5 +9,6 @@ data class UserRegistrationViewModel(
         val username: String = "",
         val firstName: String = "",
         val lastName: String = "",
-        val context: OperationContext
+        val context: OperationContext,
+        override val owner: User = User.ANONYMOUS
 ) : ViewModel

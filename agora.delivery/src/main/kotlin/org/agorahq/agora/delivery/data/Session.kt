@@ -1,6 +1,8 @@
 package org.agorahq.agora.delivery.data
 
 import org.agorahq.agora.core.api.extensions.toUUID
+import org.agorahq.agora.core.api.security.Group
+import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.user.DefaultUser
 import org.agorahq.agora.delivery.security.BuiltInRoles
@@ -12,15 +14,21 @@ data class Session(
         val firstName: String = "",
         val lastName: String = "",
         val state: String,
-        val roles: Set<String> = setOf()) {
+        val roles: Set<String> = setOf(),
+        val groups: Set<String> = setOf()) {
 
     fun toUser(): User = DefaultUser(
             firstName = firstName,
             lastName = lastName,
             email = email,
             username = username,
-            roles = roles.map { BuiltInRoles.valueOf(it) }.toSet(),
-            id = id.toUUID())
+            roles = roles.map {
+                if (it == Role.ANONYMOUS.name) Role.ANONYMOUS else BuiltInRoles.valueOf(it)
+            }.toSet(),
+            id = id.toUUID(),
+            groups = groups.map {
+                Group.create(it)
+            }.toSet())
 
     companion object {
 

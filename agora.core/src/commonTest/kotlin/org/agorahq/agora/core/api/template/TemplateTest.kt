@@ -10,6 +10,7 @@ import kotlinx.html.title
 import org.agorahq.agora.core.api.data.UserMetadata
 import org.agorahq.agora.core.api.extensions.documentContent
 import org.agorahq.agora.core.api.extensions.include
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import kotlin.test.Test
@@ -31,7 +32,7 @@ class TemplateTest {
 
         private const val POST_COLLECTION_NAME = "Posts"
 
-        private val TEST_USER = UserMetadata.create(
+        private val TEST_USER = User.create(
                 email = "test@test.com",
                 username = "testuser").toUser()
 

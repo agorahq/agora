@@ -8,6 +8,6 @@ import org.agorahq.agora.core.api.resource.Resource
 import kotlin.reflect.KClass
 
 fun <R : Resource> ResourceURL.Companion.create(
-        klass: KClass<out ResourceURL<R>>,
+        urlClass: KClass<out ResourceURL<R>>,
         parameters: Parameters
-): ResourceURL<R> = parameters.mapTo(klass)
+): ResourceURL<R> = parameters.mapTo(urlClass)

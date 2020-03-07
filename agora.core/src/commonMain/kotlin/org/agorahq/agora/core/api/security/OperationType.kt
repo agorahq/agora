@@ -22,6 +22,8 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
 
         override val contextClass = PageURLContext::class as KClass<PageURLContext<P>>
 
+        override fun toString() = "PageRenderer(pageClass=${pageClass.simpleName}, contextClass=${contextClass.simpleName})"
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
@@ -42,6 +44,8 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     class PageListRenderer<P : Page>(private val pageClass: KClass<P>) : ReadOperation<P, OperationContext>() {
 
         override val contextClass = OperationContext::class
+
+        override fun toString() = "PageListRenderer(pageClass=${pageClass.simpleName}, contextClass=${contextClass.simpleName})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -64,6 +68,8 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     class PageFormRenderer<P : Page>(private val pageClass: KClass<P>) : ReadOperation<P, PageContext<P>>() {
 
         override val contextClass = PageContext::class as KClass<PageContext<P>>
+
+        override fun toString() = "PageFormRenderer(pageClass=${pageClass.simpleName}, contextClass=${contextClass.simpleName})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -89,6 +95,10 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     ) : ReadOperation<R, PageContext<P>>() {
 
         override val contextClass = PageContext::class as KClass<PageContext<P>>
+
+        override fun toString() = "PageElementFormRenderer(resourceClass=${resourceClass.simpleName}, " +
+                "pageClass=${pageClass.simpleName}, " +
+                "contextClass=${contextClass.simpleName})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -116,6 +126,10 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     ) : ReadOperation<R, PageContext<P>>() {
 
         override val contextClass = PageContext::class as KClass<PageContext<P>>
+
+        override fun toString() = "PageElementListRenderer(resourceClass=${resourceClass.simpleName}, " +
+                "pageClass=${pageClass.simpleName}, " +
+                "contextClass=${contextClass.simpleName})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -145,6 +159,10 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
 
         override val contextClass = ViewModelContext::class as KClass<ViewModelContext<V>>
 
+        override fun toString() = "ResourceSaver(resourceClass=${resourceClass.simpleName}, " +
+                "viewModelClass=${viewModelClass.simpleName}, " +
+                "contextClass=${contextClass.simpleName})"
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
@@ -169,6 +187,8 @@ sealed class OperationType<R : Resource, C : OperationContext, U : Any> {
     class ResourceDeleter<R : Resource>(private val resourceClass: KClass<R>) : OperationType<R, ResourceIdContext, Unit>() {
 
         override val contextClass = ResourceIdContext::class
+
+        override fun toString() = "ResourceDeleter(resourceClass=${resourceClass.simpleName}, contextClass=${contextClass.simpleName})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

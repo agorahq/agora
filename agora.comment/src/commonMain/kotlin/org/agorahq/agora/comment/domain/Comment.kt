@@ -10,6 +10,7 @@ import org.hexworks.cobalt.core.api.UUID
 data class Comment(
         override val owner: User,
         override val parentId: UUID,
+        val hiddenSince: Long = Long.MAX_VALUE,
         override val createdAt: Long = SystemUtils.currentTimeMillis(),
         override val updatedAt: Long = createdAt,
         override val publishedAt: Long = createdAt,

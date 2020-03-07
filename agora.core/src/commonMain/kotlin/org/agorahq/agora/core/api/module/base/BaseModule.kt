@@ -23,16 +23,16 @@ abstract class BaseModule<R : Resource, M : ViewModel>(
         it::class to it
     }.toMap().toMutableMap()
 
-    override fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> findOperationsWithType(
-            operationType: T
-    ): Iterable<Operation<R, C, T, U>> {
+    override fun <R : Resource, C : OperationContext, T : Any> findMatchingOperations(
+            type: OperationType<R, C, T>
+    ): Iterable<Operation<R, C, T>> {
         return operations.values.filter {
-            it.type == operationType
-        }.map { it as Operation<R, C, T, U> }
+            it.type == type
+        }.map { it as Operation<R, C, T> }
     }
 
-    override fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> hasOperationWithType(operationType: T): Boolean {
-        return operations.values.any { it.type == operationType }
+    override fun <R : Resource, C : OperationContext, T : Any> hasMatchingOperation(type: OperationType<R, C, T>): Boolean {
+        return operations.values.any { it.type == type }
     }
 
     override fun supportsResource(resource: Resource) = isSubclassOf(resource::class, resourceClass)

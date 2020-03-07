@@ -10,10 +10,10 @@ import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 
-fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> SiteMetadata.forEachModuleHavingOperationWithType(
-        type: T, fn: (Pair<Module<out Resource, out ViewModel>, Operation<R, C, T, U>>) -> Unit
+fun <R : Resource, C : OperationContext, T : Any> SiteMetadata.forEachModuleHavingOperationWithType(
+        type: OperationType<R, C, T>, fn: (Pair<Module<out Resource, out ViewModel>, Operation<R, C, T>>) -> Unit
 ) {
     modules.flatMap { module ->
-        module.findOperationsWithType(type).map { module to it }
+        module.findMatchingOperations<R, C, T>(type).map { module to it }
     }.forEach(fn)
 }

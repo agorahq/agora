@@ -13,7 +13,9 @@ class RoleBuilder(private val descriptor: RoleDescriptor) {
     private lateinit var permissions: Iterable<Permission<out Resource>>
     private val parents = mutableListOf<Role>()
 
-    fun inheritFrom(role: Role) {
+    val inherit = Inherit
+
+    infix fun Inherit.from(role: Role) {
         parents.add(role)
     }
 
@@ -25,8 +27,8 @@ class RoleBuilder(private val descriptor: RoleDescriptor) {
 
     fun build(): Role {
         val finalPermissions = parents.map { it.permissions }
-                .map { permissions -> permissions.groupBy { it.operation } }
-                .plus(permissions.groupBy { it.operation })
+                .map { permissions -> permissions.groupBy { it.operationDescriptor } }
+                .plus(permissions.groupBy { it.operationDescriptor })
                 .fold(mapOf<AnyOperationDescriptor, List<Permission<out Resource>>>()) { acc, next -> acc + next }
                 .flatMap { it.value }
 
@@ -35,4 +37,5 @@ class RoleBuilder(private val descriptor: RoleDescriptor) {
                 permissions = finalPermissions)
     }
 
+    object Inherit
 }

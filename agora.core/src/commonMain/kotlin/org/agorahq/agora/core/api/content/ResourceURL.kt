@@ -8,5 +8,8 @@ interface ResourceURL<R : Resource> {
 
     fun matches(resource: R): Boolean
 
-    companion object
+    companion object {
+
+        fun <R : Resource> toString(resourceURL: ResourceURL<R>) = resourceURL.generate()
+    }
 }

@@ -1,5 +1,6 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
 import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.extensions.toCommand
@@ -19,6 +20,8 @@ class ShowPost(
         private val postQueryService: PageQueryService<Post>,
         private val converterService: ConverterService
 ) : RenderResource<Post>, RenderResourceDescriptor<Post> by Companion {
+
+    override val descriptor = ShowPost
 
     override fun PageURLContext<Post>.createCommand() = {
         val post = postQueryService.findByUrl(url).get()

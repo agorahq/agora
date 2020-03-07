@@ -1,5 +1,6 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.RenderPageList
 import org.agorahq.agora.core.api.operation.RenderPageListDescriptor
@@ -17,6 +18,8 @@ class ListPosts(
         private val postQueryService: PageQueryService<Post>,
         private val converterService: ConverterService
 ) : RenderPageList<Post>, RenderPageListDescriptor<Post> by Companion {
+
+    override val descriptor = ListPosts
 
     override fun OperationContext.createCommand() = {
         POST_LIST.render(PostListViewModel(

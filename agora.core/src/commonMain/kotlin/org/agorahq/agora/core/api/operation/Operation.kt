@@ -5,7 +5,9 @@ import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.security.OperationDescriptor
 import org.agorahq.agora.core.api.security.OperationType
 
-interface Operation<R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> : OperationDescriptor<R, C, U> {
+interface Operation<R : Resource, C : OperationContext, T : Any> : OperationDescriptor<R, C, T> {
 
-    fun C.createCommand(): Command<U>
+    val descriptor: OperationDescriptor<R, C, T>
+
+    fun C.createCommand(): Command<T>
 }

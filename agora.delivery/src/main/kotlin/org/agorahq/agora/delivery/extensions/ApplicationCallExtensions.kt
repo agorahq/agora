@@ -2,15 +2,19 @@ package org.agorahq.agora.delivery.extensions
 
 import io.ktor.application.ApplicationCall
 import io.ktor.features.origin
+import io.ktor.http.ContentType
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondRedirect
+import io.ktor.response.respondText
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
+import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.data.UserMetadata
 import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
+import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.delivery.data.Session
@@ -30,10 +34,17 @@ fun ApplicationCall.createRedirectFor(path: String): String {
 
 fun ApplicationCall.toOperationContext(
         userService: QueryService<User>,
-        site: SiteMetadata
+        site: SiteMetadata,
+        authorization: Authorization
 ): OperationContext {
     val user = sessions.get<Session>()?.let {
         userService.findById(it.id.toUUID()).orElse(it.toUser())
-    } ?: UserMetadata.ANONYMOUS
-    return OperationContext.create(site, user)
+    } ?: User.ANONYMOUS
+    return OperationContext.create(site, user, authorization)
+}
+
+suspend fun ApplicationCall.tryToRespondWithHtml(cmdResult: Result<out String, out Exception>) {
+    respondText(
+            text = cmdResult.get(), // TODO: proper error handling
+            contentType = ContentType.Text.Html)
 }

@@ -13,12 +13,12 @@ interface Module<R : Resource, M : ViewModel> {
     val resourceClass: KClass<R>
     val viewModelClass: KClass<M>
 
-    fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> findOperationsWithType(
-            operationType: T
-    ): Iterable<Operation<R, C, T, U>>
+    fun <R : Resource, C : OperationContext, T : Any> findMatchingOperations(
+            type: OperationType<R, C, T>
+    ): Iterable<Operation<R, C, T>>
 
-    fun <R : Resource, C : OperationContext, T : OperationType<R, C, U>, U : Any> hasOperationWithType(
-            operationType: T
+    fun <R : Resource, C : OperationContext, T : Any> hasMatchingOperation(
+            type: OperationType<R, C, T>
     ): Boolean
 
     fun supportsResource(resource: Resource): Boolean

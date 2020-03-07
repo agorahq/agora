@@ -16,6 +16,8 @@ class CreatePost(
         private val converterService: ConverterService
 ) : SaveResource<Post, PostViewModel>, SaveResourceDescriptor<Post, PostViewModel> by Companion {
 
+    override val descriptor = CreatePost
+
     override fun ViewModelContext<PostViewModel>.createCommand() = {
         postStorage.create(converterService.convertToResource<Post>(viewModel).get())
     }.toCommand()

@@ -6,6 +6,11 @@ import org.agorahq.agora.core.api.security.policy.Policy
 
 
 interface Permission<R : Resource> {
-    val operation: OperationDescriptor<out R, out OperationContext, out Any>
+
+    val operationDescriptor: OperationDescriptor<out R, out OperationContext, out Any>
     val policies: Iterable<Policy>
+
+    operator fun component1() = operationDescriptor
+
+    operator fun component2() = policies
 }
