@@ -160,6 +160,10 @@ val GOOGLE_CLIENT_ID = System.getenv("GOOGLE_OAUTH_CLIENT_ID")
         ?: error("GOOGLE_OAUTH_CLIENT_ID env variable is missing")
 val GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
         ?: error("GOOGLE_OAUTH_CLIENT_SECRET env variable is missing")
+val FACEBOOK_CLIENT_ID = System.getenv("FACEBOOK_OAUTH_CLIENT_ID")
+        ?: error("GOOGLE_OAUTH_CLIENT_ID env variable is missing")
+val FACEBOOK_CLIENT_SECRET = System.getenv("FACEBOOK_OAUTH_CLIENT_SECRET")
+        ?: error("GOOGLE_OAUTH_CLIENT_SECRET env variable is missing")
 
 val SITE = DefaultSiteMetadata(
         title = "Agora",

@@ -1,10 +1,13 @@
 package org.agorahq.agora.delivery.data
 
+import org.agorahq.agora.core.api.extensions.isAuthenticated
 import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.security.Group
 import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.user.DefaultUser
+import org.agorahq.agora.delivery.data.AuthenticationState.LOGGED_IN
+import org.agorahq.agora.delivery.data.AuthenticationState.LOGGED_OUT
 import org.agorahq.agora.delivery.security.BuiltInRoles
 
 data class Session(
@@ -13,7 +16,7 @@ data class Session(
         val username: String = "",
         val firstName: String = "",
         val lastName: String = "",
-        val state: String,
+        val state: String = LOGGED_OUT.name,
         val roles: Set<String> = setOf(),
         val groups: Set<String> = setOf()) {
 
@@ -38,7 +41,7 @@ data class Session(
                 id = user.id.toString(),
                 firstName = user.firstName,
                 lastName = user.lastName,
-                state = UserState.REGISTERED.name,
+                state = if (user.isAuthenticated) LOGGED_IN.name else LOGGED_OUT.name,
                 roles = user.roles.map { it.name }.toSet())
     }
 }

@@ -35,7 +35,10 @@ import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.comment.operations.ShowCommentForm
 import org.agorahq.agora.core.api.content.Page
 import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.FormField.Valid
 import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.data.Validators
+import org.agorahq.agora.core.api.extensions.isAuthenticated
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.resource.Resource
@@ -51,9 +54,9 @@ import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
+import org.agorahq.agora.delivery.data.AuthenticationState
 import org.agorahq.agora.delivery.data.GoogleUserData
 import org.agorahq.agora.delivery.data.Session
-import org.agorahq.agora.delivery.data.UserState
 import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
@@ -109,6 +112,17 @@ fun Application.module() {
             defaultScopes = listOf("profile", "email")  // no email, but gives full name, picture, and id
     )
 
+    val facebookOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+            name = "facebook",
+            authorizeUrl = "https://graph.facebook.com/oauth/authorize",
+            accessTokenUrl = "https://graph.facebook.com/oauth/access_token",
+            requestMethod = HttpMethod.Post,
+
+            clientId = FACEBOOK_CLIENT_ID,
+            clientSecret = FACEBOOK_CLIENT_SECRET,
+            defaultScopes = listOf("public_profile")
+    )
+
     install(Sessions) {
         cookie<Session>("oauthSampleSessionId") {
             val secretSignKey = hex("000102030405060708090a0b0c0d0e0f")
@@ -135,7 +149,7 @@ fun Application.module() {
             val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
             val model = UserRegistrationViewModel(
                     context = ctx,
-                    email = ctx.user.email)
+                    email = Valid(ctx.user.email, Validators.email))
             call.respondText(
                     text = DEFAULT_REGISTRATION_PAGE.render(model),
                     contentType = ContentType.Text.Html)
@@ -148,27 +162,32 @@ fun Application.module() {
         authenticate("google") {
             route("/login") {
                 handle {
-                    val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
-                            ?: error("No principal")
-
-                    val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
-                        header("Authorization", "Bearer ${principal.accessToken}")
-                    }
-
-                    val googleUserData = ObjectMapper()
-                            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                            .readValue<GoogleUserData>(json)
-                    log.info("User data is: $googleUserData.")
-                    val user = userQueryService.findOneBy(User::email, googleUserData.email)
-                    if (user.isPresent) {
-                        call.sessions.set(Session.fromUser(user.get()))
+                    val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    if (ctx.user.isAuthenticated) {
                         call.tryRedirectToReferrer(SITE)
                     } else {
-                        call.sessions.set(Session(
-                                email = googleUserData.email,
-                                id = UUID.randomUUID().toString(),
-                                state = UserState.REGISTERING.name))
-                        call.respondRedirect("/register")
+                        val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
+                                ?: error("No principal")
+
+                        val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                            header("Authorization", "Bearer ${principal.accessToken}")
+                        }
+
+                        val googleUserData = ObjectMapper()
+                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                                .readValue<GoogleUserData>(json)
+                        log.info("User data is: $googleUserData.")
+                        val user = userQueryService.findOneBy(User::email, googleUserData.email)
+                        if (user.isPresent) {
+                            call.sessions.set(Session.fromUser(user.get()))
+                            call.tryRedirectToReferrer(SITE)
+                        } else {
+                            call.sessions.set(Session(
+                                    email = googleUserData.email,
+                                    id = UUID.randomUUID().toString(),
+                                    state = AuthenticationState.REGISTERING.name))
+                            call.respondRedirect("/register")
+                        }
                     }
                 }
             }

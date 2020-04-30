@@ -5,4 +5,5 @@ import org.agorahq.agora.core.api.security.User
 interface ViewModel {
 
     val owner: User
+
 }

@@ -39,7 +39,7 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                     input(type = InputType.email, classes = "form-control") {
                                         id = "email"
                                         disabled = true
-                                        value = model.email
+                                        value = model.email.value
                                     }
                                 }
                                 div("form-group col-md-6") {
@@ -47,7 +47,10 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                         htmlFor = "username"
                                         +"Username"
                                     }
-                                    input(classes = "form-control") { id = "username" }
+                                    input(classes = "form-control") {
+                                        id = "username"
+                                        value = model.username.value
+                                    }
                                 }
                             }
                             div("form-row") {
@@ -56,14 +59,20 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                         htmlFor = "firstName"
                                         +"First Name"
                                     }
-                                    input(classes = "form-control") { id = "firstName" }
+                                    input(classes = "form-control") {
+                                        id = "firstName"
+                                        value = model.firstName.value
+                                    }
                                 }
                                 div("form-group col-md-6") {
                                     label {
                                         htmlFor = "lastName"
                                         +"Last Name"
                                     }
-                                    input(classes = "form-control") { id = "lastName" }
+                                    input(classes = "form-control") {
+                                        id = "lastName"
+                                        value = model.lastName.value
+                                    }
                                 }
                             }
                             button(type = ButtonType.submit, classes = "btn btn-primary") { +"Go" }

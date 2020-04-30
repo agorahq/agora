@@ -11,7 +11,6 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.data.UserMetadata
 import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.Authorization

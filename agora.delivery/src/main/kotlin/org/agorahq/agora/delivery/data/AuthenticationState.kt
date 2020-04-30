@@ -1,7 +1,7 @@
 package org.agorahq.agora.delivery.data
 
-enum class UserState {
-    UNKNOWN,
+enum class AuthenticationState {
+    LOGGED_OUT,
     REGISTERING,
-    REGISTERED
+    LOGGED_IN
 }
