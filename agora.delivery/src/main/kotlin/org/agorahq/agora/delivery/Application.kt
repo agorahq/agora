@@ -54,9 +54,7 @@ import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
-import org.agorahq.agora.delivery.data.AuthenticationState
-import org.agorahq.agora.delivery.data.GoogleUserData
-import org.agorahq.agora.delivery.data.Session
+import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
@@ -120,7 +118,7 @@ fun Application.module() {
 
             clientId = FACEBOOK_CLIENT_ID,
             clientSecret = FACEBOOK_CLIENT_SECRET,
-            defaultScopes = listOf("public_profile")
+            defaultScopes = listOf("public_profile", "email")
     )
 
     install(Sessions) {
@@ -134,7 +132,12 @@ fun Application.module() {
         oauth("google") {
             client = HttpClient(Apache)
             providerLookup = { googleOauthProvider }
-            urlProvider = { createRedirectFor("/login") }
+            urlProvider = { createRedirectFor("/login/google") }
+        }
+        oauth("facebook") {
+            client = HttpClient(Apache)
+            providerLookup = { facebookOauthProvider }
+            urlProvider = { createRedirectFor("/login/facebook") }
         }
     }
 
@@ -160,7 +163,7 @@ fun Application.module() {
         }
 
         authenticate("google") {
-            route("/login") {
+            route("/login/google") {
                 handle {
                     val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
                     if (ctx.user.isAuthenticated) {
@@ -184,6 +187,47 @@ fun Application.module() {
                         } else {
                             call.sessions.set(Session(
                                     email = googleUserData.email,
+                                    id = UUID.randomUUID().toString(),
+                                    state = AuthenticationState.REGISTERING.name))
+                            call.respondRedirect("/register")
+                        }
+                    }
+                }
+            }
+        }
+        authenticate("facebook") {
+            route("/login/facebook") {
+                handle {
+                    val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    if (ctx.user.isAuthenticated) {
+                        call.tryRedirectToReferrer(SITE)
+                    } else {
+                        val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
+                                ?: error("No principal")
+
+                        val idResult = HttpClient(Apache).get<String>("https://graph.facebook.com/me") {
+                            header("Authorization", "Bearer ${principal.accessToken}")
+                        }
+
+                        println("================= token: '${principal.accessToken}'")
+
+                        val id = ObjectMapper()
+                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                                .readValue<FacebookUserId>(idResult).id
+                        val token = principal.accessToken
+                        val url = "https://graph.facebook.com/$id?fields=first_name,last_name,email,id&access_token=$token"
+                        val json = HttpClient(Apache).get<String>(url)
+                        val fbUserData = ObjectMapper()
+                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                                .readValue<FacebookUserData>(json)
+
+                        val user = userQueryService.findOneBy(User::email, fbUserData.email)
+                        if (user.isPresent) {
+                            call.sessions.set(Session.fromUser(user.get()))
+                            call.tryRedirectToReferrer(SITE)
+                        } else {
+                            call.sessions.set(Session(
+                                    email = fbUserData.email,
                                     id = UUID.randomUUID().toString(),
                                     state = AuthenticationState.REGISTERING.name))
                             call.respondRedirect("/register")
