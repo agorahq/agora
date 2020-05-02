@@ -30,13 +30,12 @@ object Libs {
     const val ktorClient = "io.ktor:ktor-client-apache:$ktorVersion"
     const val ktorServerCore = "io.ktor:ktor-server-core:$ktorVersion"
     const val ktorServerSessions = "io.ktor:ktor-server-sessions:$ktorVersion"
-    const val ktorJackson = "io.ktor:ktor-jackson:$ktorVersion"
+    const val ktorSerialization = "io.ktor:ktor-serialization:$ktorVersion"
     const val ktorHtmlBuilder = "io.ktor:ktor-html-builder:$ktorVersion"
-
     const val ktorLocations = "io.ktor:ktor-locations:$ktorVersion"
-
     const val ktorServerTests = "io.ktor:ktor-server-tests:$ktorVersion"
 
+    const val kfsm = "io.jumpco.open:kfsm-common:1.0.2"
     const val flexmark = "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
     const val slf4jApi = "org.slf4j:slf4j-api:$slf4jVersion"
     const val logbackClassic = "ch.qos.logback:logback-classic:$logbackVersion"

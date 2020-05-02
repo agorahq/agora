@@ -8,7 +8,7 @@ import org.agorahq.agora.core.api.extensions.include
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.template.template
 
-val HOMEPAGE = template<OperationContext> { ctx ->
+val DEFAULT_HOMEPAGE = template<OperationContext> { ctx ->
     val (site) = ctx
     html {
         include(DEFAULT_HEAD, site.title)

@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.security.Group
 import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.internal.security.DefaultAuthorization
 
-class AuthorizationBuilder() {
+class AuthorizationBuilder {
 
     private val roles = mutableListOf<Role>()
     private val groups = mutableListOf<Group>()

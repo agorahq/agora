@@ -17,7 +17,6 @@ interface Role {
     companion object {
 
         val ANONYMOUS = RoleDescriptor.create(
-                name = "ANONYMOUS",
-                label = "Anonymous")
+                name = "ANONYMOUS")
     }
 }

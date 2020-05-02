@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("maven-publish")
     id("signing")
+    kotlin("plugin.serialization") version "1.3.71"
 }
 
 kotlin {
@@ -21,6 +22,7 @@ kotlin {
             commonMainApi(kotlinxCoroutines)
             commonMainApi(kotlinReflect)
             commonMainApi(kotlinxHtmlCommon)
+            commonMainApi("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             commonMainApi(cobaltCore)
 
             jvmMainApi(kotlinStdLibJdk8)

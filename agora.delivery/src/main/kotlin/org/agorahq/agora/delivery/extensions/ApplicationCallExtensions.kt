@@ -11,7 +11,6 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
@@ -32,13 +31,10 @@ fun ApplicationCall.createRedirectFor(path: String): String {
 }
 
 fun ApplicationCall.toOperationContext(
-        userService: QueryService<User>,
         site: SiteMetadata,
         authorization: Authorization
 ): OperationContext {
-    val user = sessions.get<Session>()?.let {
-        userService.findById(it.id.toUUID()).orElse(it.toUser())
-    } ?: User.ANONYMOUS
+    val user = sessions.get<Session>()?.toUser() ?: User.ANONYMOUS
     return OperationContext.create(site, user, authorization)
 }
 

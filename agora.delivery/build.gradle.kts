@@ -5,6 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow") version "5.2.0"
+    kotlin("plugin.serialization") version "1.3.71"
 }
 
 val mainClassName = "io.ktor.server.netty.EngineMain"
@@ -24,6 +25,7 @@ dependencies {
 
     with(Libs) {
         implementation(kotlinStdLibJdk8)
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
         implementation(ktorServerCore)
         implementation(ktorServerNetty)
@@ -31,7 +33,11 @@ dependencies {
         implementation(ktorAuth)
         implementation(ktorClient)
         implementation(ktorServerSessions)
-        implementation(ktorJackson)
+        implementation(ktorSerialization)
+
+        implementation("io.jsonwebtoken:jjwt-api:0.11.1")
+        implementation("io.jsonwebtoken:jjwt-impl:0.11.1")
+        runtime("io.jsonwebtoken:jjwt-impl:0.11.1")
 
         implementation(logbackClassic)
         implementation(kotlinCssJvm)

@@ -2,13 +2,9 @@
 
 package org.agorahq.agora.delivery
 
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.application.log
 import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
@@ -26,7 +22,8 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.netty.EngineMain
 import io.ktor.sessions.*
-import io.ktor.util.hex
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.agorahq.agora.comment.converter.CommentConverter
 import org.agorahq.agora.comment.module.CommentModule
 import org.agorahq.agora.comment.operations.CreateComment
@@ -50,11 +47,15 @@ import org.agorahq.agora.core.api.service.impl.InMemoryPageQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryQueryService
 import org.agorahq.agora.core.api.service.impl.InMemoryStorageService
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_REGISTRATION_PAGE
-import org.agorahq.agora.core.api.shared.templates.HOMEPAGE
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_HOMEPAGE
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_LOGIN_PAGE
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
-import org.agorahq.agora.delivery.data.*
+import org.agorahq.agora.delivery.data.FacebookUser
+import org.agorahq.agora.delivery.data.FacebookUserId
+import org.agorahq.agora.delivery.data.GoogleUser
+import org.agorahq.agora.delivery.data.Session
 import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
@@ -64,9 +65,9 @@ import org.agorahq.agora.post.operations.DeletePost
 import org.agorahq.agora.post.operations.ListPosts
 import org.agorahq.agora.post.operations.ShowPost
 import org.hexworks.cobalt.logging.api.LoggerFactory
-import java.util.*
 
 private val logger = LoggerFactory.getLogger("Application")
+private val json = Json(JsonConfiguration.Stable)
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -122,9 +123,8 @@ fun Application.module() {
     )
 
     install(Sessions) {
-        cookie<Session>("oauthSampleSessionId") {
-            val secretSignKey = hex("000102030405060708090a0b0c0d0e0f")
-            transform(SessionTransportTransformerMessageAuthentication(secretSignKey))
+        cookie<Session>("auth") {
+            cookie.path = "/"
         }
     }
 
@@ -148,8 +148,15 @@ fun Application.module() {
             call.tryRedirectToReferrer(SITE)
         }
 
+        get("/login") {
+            val ctx = call.toOperationContext(SITE, AUTHORIZATION)
+            call.respondText(
+                    text = DEFAULT_LOGIN_PAGE.render(ctx),
+                    contentType = ContentType.Text.Html)
+        }
+
         get("/register") {
-            val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+            val ctx = call.toOperationContext(SITE, AUTHORIZATION)
             val model = UserRegistrationViewModel(
                     context = ctx,
                     email = Valid(ctx.user.email, Validators.email))
@@ -165,30 +172,24 @@ fun Application.module() {
         authenticate("google") {
             route("/login/google") {
                 handle {
-                    val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    val ctx = call.toOperationContext(SITE, AUTHORIZATION)
                     if (ctx.user.isAuthenticated) {
                         call.tryRedirectToReferrer(SITE)
                     } else {
                         val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
                                 ?: error("No principal")
 
-                        val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                        val data = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                             header("Authorization", "Bearer ${principal.accessToken}")
                         }
+                        val oauthUser = data.deserializeTo(GoogleUser.serializer())
 
-                        val googleUserData = ObjectMapper()
-                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                                .readValue<GoogleUserData>(json)
-                        log.info("User data is: $googleUserData.")
-                        val user = userQueryService.findOneBy(User::email, googleUserData.email)
+                        val user = userQueryService.findOneBy(User::email, oauthUser.email)
                         if (user.isPresent) {
                             call.sessions.set(Session.fromUser(user.get()))
                             call.tryRedirectToReferrer(SITE)
                         } else {
-                            call.sessions.set(Session(
-                                    email = googleUserData.email,
-                                    id = UUID.randomUUID().toString(),
-                                    state = AuthenticationState.REGISTERING.name))
+                            call.sessions.set(Session.fromOauthUser(oauthUser))
                             call.respondRedirect("/register")
                         }
                     }
@@ -198,38 +199,26 @@ fun Application.module() {
         authenticate("facebook") {
             route("/login/facebook") {
                 handle {
-                    val ctx = call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    val ctx = call.toOperationContext(SITE, AUTHORIZATION)
                     if (ctx.user.isAuthenticated) {
                         call.tryRedirectToReferrer(SITE)
                     } else {
                         val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
                                 ?: error("No principal")
 
-                        val idResult = HttpClient(Apache).get<String>("https://graph.facebook.com/me") {
+                        val id = HttpClient(Apache).get<String>("https://graph.facebook.com/me") {
                             header("Authorization", "Bearer ${principal.accessToken}")
-                        }
-
-                        println("================= token: '${principal.accessToken}'")
-
-                        val id = ObjectMapper()
-                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                                .readValue<FacebookUserId>(idResult).id
+                        }.deserializeTo(FacebookUserId.serializer()).id
                         val token = principal.accessToken
                         val url = "https://graph.facebook.com/$id?fields=first_name,last_name,email,id&access_token=$token"
-                        val json = HttpClient(Apache).get<String>(url)
-                        val fbUserData = ObjectMapper()
-                                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                                .readValue<FacebookUserData>(json)
+                        val oauthUser = HttpClient(Apache).get<String>(url).deserializeTo(FacebookUser.serializer())
 
-                        val user = userQueryService.findOneBy(User::email, fbUserData.email)
+                        val user = userQueryService.findOneBy(User::email, oauthUser.email)
                         if (user.isPresent) {
                             call.sessions.set(Session.fromUser(user.get()))
                             call.tryRedirectToReferrer(SITE)
                         } else {
-                            call.sessions.set(Session(
-                                    email = fbUserData.email,
-                                    id = UUID.randomUUID().toString(),
-                                    state = AuthenticationState.REGISTERING.name))
+                            call.sessions.set(Session.fromOauthUser(oauthUser))
                             call.respondRedirect("/register")
                         }
                     }
@@ -253,7 +242,7 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
 private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
 
     get(SITE.baseUrl) {
-        call.respondText(HOMEPAGE.render(call.toOperationContext(userQueryService, SITE, AUTHORIZATION)), ContentType.Text.Html)
+        call.respondText(DEFAULT_HOMEPAGE.render(call.toOperationContext(SITE, AUTHORIZATION)), ContentType.Text.Html)
     }
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
@@ -262,7 +251,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
             get(renderer.route) {
                 with(renderer) {
-                    call.tryToRespondWithHtml(call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    call.tryToRespondWithHtml(call.toOperationContext(SITE, AUTHORIZATION)
                             .toPageURLContext(ResourceURL.create(
                                     urlClass = renderer.urlClass,
                                     parameters = call.parameters))
@@ -277,7 +266,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             get(renderer.route) {
                 call.respondText(
                         text = with(renderer) {
-                            call.toOperationContext(userQueryService, SITE, AUTHORIZATION).createCommand().execute().get()
+                            call.toOperationContext(SITE, AUTHORIZATION).createCommand().execute().get()
                         },
                         contentType = ContentType.Text.Html)
             }
@@ -303,7 +292,7 @@ private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
             post(saver.route) {
                 val modelClass = converterService.findViewModelClassFor(saver.resourceClass)
                 with(saver) {
-                    call.toOperationContext(userQueryService, SITE, AUTHORIZATION)
+                    call.toOperationContext(SITE, AUTHORIZATION)
                             .toViewModelContext(call.receiveParameters().mapTo(modelClass))
                             .createCommand().execute().get()
                 }

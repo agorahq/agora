@@ -3,7 +3,7 @@ package org.agorahq.agora.core.api.security.builder
 import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.api.security.RoleDescriptor
 
-class RolesBuilder() {
+class RolesBuilder {
 
     private val roles = mutableListOf<Role>()
 

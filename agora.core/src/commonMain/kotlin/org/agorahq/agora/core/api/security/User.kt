@@ -11,6 +11,8 @@ interface User : UserMetadata {
     val roles: Set<RoleDescriptor>
     val groups: Set<Group>
 
+    override fun toUser() = this
+
     companion object {
 
         val ANONYMOUS: User = create(
