@@ -51,11 +51,15 @@ fun ApplicationCall.toOperationContext(
         is AuthenticatedUserState -> state.principal.toUser()
         else -> User.ANONYMOUS
     }
+    val msg = agoraSession.state.message
+    if (msg != null) {
+        sessions.set(agoraSession.withMessage(null))
+    }
     return OperationContext.create(
             site = site,
             user = user,
             authorization = authorization,
-            message = agoraSession.state.message
+            message = msg
     )
 }
 

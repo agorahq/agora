@@ -10,7 +10,11 @@ fun OperationContext.renderPageElementListsFor(page: Page): String {
     val renderedPageElements = StringBuilder()
     site.forEachModuleHavingOperationWithType(PageElementListRenderer(PageElement::class, Page::class)) { (_, renderer) ->
         with(renderer) {
-            renderedPageElements.append(toPageContext(page).createCommand().execute().get())
+            val ctx = toPageContext(page)
+            val (_, user, auth) = ctx
+            if (auth.hasGroupAccess(user, renderer)) {
+                renderedPageElements.append(ctx.createCommand().execute().get())
+            }
         }
     }
     return renderedPageElements.toString()
@@ -21,7 +25,11 @@ fun OperationContext.renderPageElementFormsFor(page: Page): String {
     if (user.isAuthenticated) {
         site.forEachModuleHavingOperationWithType(PageElementFormRenderer(PageElement::class, Page::class)) { (_, renderer) ->
             with(renderer) {
-                renderedPageElements.append(toPageContext(page).createCommand().execute().get())
+                val ctx = toPageContext(page)
+                val (_, user, auth) = ctx
+                if (auth.hasGroupAccess(user, renderer)) {
+                    renderedPageElements.append(ctx.createCommand().execute().get())
+                }
             }
         }
     }

@@ -54,7 +54,6 @@ val AUTHORIZATION = authorization {
             inherit from anonymousRole
 
             Comment::class {
-                ListComments allowFor allUsers
                 CreateComment allowFor allUsers
                 ShowCommentForm allowFor allUsers
                 DeleteComment allowFor ownOnly

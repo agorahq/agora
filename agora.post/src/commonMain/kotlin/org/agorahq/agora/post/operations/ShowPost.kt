@@ -1,6 +1,5 @@
 package org.agorahq.agora.post.operations
 
-import org.agorahq.agora.comment.operations.ListComments
 import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
 import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.extensions.toCommand

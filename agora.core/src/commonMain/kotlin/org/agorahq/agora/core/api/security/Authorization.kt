@@ -15,6 +15,9 @@ interface Authorization {
      * Tells whether the [currentUser] can perform the given [operation] on an object
      * owned by [owner].
      */
+    // TODO: user/group access is irrelevant from the outside world
+    // TODO: we should authorize commands, not operations, operations don't have
+    // TODO: the context!
     fun hasUserAccess(currentUser: User, owner: User, operation: AnyOperation): Boolean
 
     /**
