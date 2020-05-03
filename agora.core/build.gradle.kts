@@ -26,11 +26,13 @@ kotlin {
             commonMainApi(cobaltCore)
 
             jvmMainApi(kotlinStdLibJdk8)
+            jvmMainApi("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             jvmMainApi(kotlinxHtmlJvm)
             jvmMainApi(flexmark)
 
             jsMainApi(kotlinStdLibJs)
             jsMainApi(kotlinxHtmlJs)
+            jsMainApi("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
         }
 
         with(TestLibs) {

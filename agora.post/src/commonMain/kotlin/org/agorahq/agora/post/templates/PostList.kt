@@ -13,7 +13,7 @@ import org.agorahq.agora.post.viewmodel.PostListViewModel
 
 val POST_LIST = template<PostListViewModel> { model ->
     val (posts, ctx) = model
-    val (site, user) = ctx
+    val (site) = ctx
     html {
         include(DEFAULT_HEAD, "${site.title} | Posts")
         body {

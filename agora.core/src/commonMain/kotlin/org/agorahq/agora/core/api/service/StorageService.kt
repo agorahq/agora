@@ -1,13 +1,14 @@
 package org.agorahq.agora.core.api.service
 
+import org.agorahq.agora.core.api.data.Entity
 import org.agorahq.agora.core.api.resource.Resource
 import org.hexworks.cobalt.core.api.UUID
 
-interface StorageService<R : Resource> {
+interface StorageService<E : Entity> {
 
-    fun create(resource: R)
+    fun create(entity: E)
 
-    fun delete(resource: R)
+    fun delete(entity: E)
 
     fun deleteById(id: UUID)
 }

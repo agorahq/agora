@@ -3,10 +3,10 @@
 package org.agorahq.agora.delivery.extensions
 
 import io.ktor.http.Parameters
+import org.agorahq.agora.core.api.data.FormField
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.view.ConverterService
-import org.agorahq.agora.core.api.view.ViewModel
 import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
@@ -48,6 +48,7 @@ private fun mapValue(classifier: KClassifier, value: String): Any {
         Long::class -> value.toLong()
         Boolean::class -> value.toBoolean()
         UUID::class -> UUID.fromString(value)
+        FormField::class -> FormField.Dirty(value)
         else -> {
             throw UnsupportedOperationException("Can't map value '$value' to type $classifier")
         }

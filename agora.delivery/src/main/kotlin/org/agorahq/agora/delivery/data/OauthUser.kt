@@ -1,23 +1,32 @@
 package org.agorahq.agora.delivery.data
 
-import org.agorahq.agora.core.api.security.User
-import org.agorahq.agora.delivery.security.BuiltInRoles
-import org.hexworks.cobalt.core.api.UUID
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-interface OauthUser {
+@Serializable
+sealed class OauthUser {
 
-    val id: String
-    val email: String
-    val firstName: String
-    val lastName: String
+    abstract val email: String
+    abstract val firstName: String
+    abstract val lastName: String
 
-
-    fun toUser() = User.create(
-            email = email,
-            username = "",
-            id = UUID.fromString(id),
-            firstName = firstName,
-            lastName = lastName,
-            roles = setOf(BuiltInRoles.ATTENDEE),
-            groups = setOf())
 }
+
+@Serializable
+data class FacebookUser(
+        override val email: String,
+        @SerialName("first_name")
+        override val firstName: String,
+        @SerialName("last_name")
+        override val lastName: String
+) : OauthUser()
+
+@Serializable
+data class GoogleUser(
+        override val email: String,
+        @SerialName("given_name")
+        override val firstName: String,
+        @SerialName("family_name")
+        override val lastName: String
+) : OauthUser()

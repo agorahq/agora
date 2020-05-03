@@ -15,7 +15,7 @@ object Validators {
     }
 
     val notBlank: (String) -> ValidationResult = { value: String ->
-        if (value.isBlank()) {
+        if (value.isNotBlank()) {
             Result.Success(Unit)
         } else Result.Failure(FormFieldValidationFailedException(
                 "$value cannot be blank."

@@ -93,11 +93,6 @@ val FRANK = User.create(
         username = "frank",
         roles = setOf(ATTENDEE)).toUser()
 
-val EDEM = User.create(
-        email = "arold.adam@gmail.com",
-        username = "edem",
-        roles = setOf(ADMIN)).toUser()
-
 val OGABI = User.create(
         email = "gabor.orosz@me.com",
         username = "ogabi",
@@ -107,7 +102,7 @@ val OGABI = User.create(
 val POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
-        owner = EDEM,
+        owner = OGABI,
         tags = setOf("agora", "post"),
         createdAt = LocalDate.of(2019, 12, 28).toTimestamp(),
         shortDescription = "Agora is planned to launch in early Q2.",
@@ -154,6 +149,13 @@ val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_A_0.id, COMMENT_A_0)
     put(COMMENT_B_0.id, COMMENT_B_0)
     put(COMMENT_B_1.id, COMMENT_B_1)
+}
+
+val USERS = ConcurrentHashMap<UUID, User>().apply {
+    put(JACK.id, JACK)
+    put(JENNA.id, JENNA)
+    put(FRANK.id, FRANK)
+    put(OGABI.id, OGABI)
 }
 
 val GOOGLE_CLIENT_ID = System.getenv("GOOGLE_OAUTH_CLIENT_ID")

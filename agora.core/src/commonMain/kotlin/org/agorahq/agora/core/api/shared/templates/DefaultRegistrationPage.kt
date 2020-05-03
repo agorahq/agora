@@ -38,8 +38,9 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                     }
                                     input(type = InputType.email, classes = "form-control") {
                                         id = "email"
+                                        name = "email"
                                         disabled = true
-                                        value = model.email.value
+                                        value = model.email
                                     }
                                 }
                                 div("form-group col-md-6") {
@@ -49,6 +50,7 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                     }
                                     input(classes = "form-control") {
                                         id = "username"
+                                        name = "username"
                                         value = model.username.value
                                     }
                                 }
@@ -61,7 +63,9 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                     }
                                     input(classes = "form-control") {
                                         id = "firstName"
-                                        value = model.firstName.value
+                                        name = "firstName"
+                                        disabled = true
+                                        value = model.firstName
                                     }
                                 }
                                 div("form-group col-md-6") {
@@ -71,7 +75,9 @@ val DEFAULT_REGISTRATION_PAGE = template<UserRegistrationViewModel> { model ->
                                     }
                                     input(classes = "form-control") {
                                         id = "lastName"
-                                        value = model.lastName.value
+                                        name = "lastName"
+                                        disabled = true
+                                        value = model.lastName
                                     }
                                 }
                             }

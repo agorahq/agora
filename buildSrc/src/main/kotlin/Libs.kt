@@ -21,7 +21,6 @@ object Libs {
     const val kotlinxHtmlJs = "org.jetbrains.kotlinx:kotlinx-html-js:$kotlinxHtmlVersion"
 
     const val kotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    const val kotlinxCollectionsImmutable = "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
 
     const val cobaltCore = "org.hexworks.cobalt:cobalt.core:$cobaltVersion"
 
@@ -32,10 +31,10 @@ object Libs {
     const val ktorServerSessions = "io.ktor:ktor-server-sessions:$ktorVersion"
     const val ktorSerialization = "io.ktor:ktor-serialization:$ktorVersion"
     const val ktorHtmlBuilder = "io.ktor:ktor-html-builder:$ktorVersion"
-    const val ktorLocations = "io.ktor:ktor-locations:$ktorVersion"
+    const val ktorNetworkTls = "io.ktor:ktor-network-tls:$ktorVersion"
+    const val ktorNetworkTlsCertificates = "io.ktor:ktor-network-tls-certificates:$ktorVersion"
     const val ktorServerTests = "io.ktor:ktor-server-tests:$ktorVersion"
 
-    const val kfsm = "io.jumpco.open:kfsm-common:1.0.2"
     const val flexmark = "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
     const val slf4jApi = "org.slf4j:slf4j-api:$slf4jVersion"
     const val logbackClassic = "ch.qos.logback:logback-classic:$logbackVersion"

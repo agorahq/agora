@@ -35,7 +35,7 @@ val DEFAULT_NAVIGATION = template<OperationContext> { ctx ->
             div("nav navbar-nav navbar-right") {
                 if (user.isAnonymous) {
                     a("/login", classes = "nav-link") { +"Log in" }
-                } else if(user.username.isNotBlank()) {
+                } else {
                     span("navbar-text") { +"Hello, ${user.username}." }
                     a("/logout", classes = "nav-link") { +"Logout" }
                 }

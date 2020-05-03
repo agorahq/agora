@@ -32,12 +32,17 @@ dependencies {
         implementation(ktorHtmlBuilder)
         implementation(ktorAuth)
         implementation(ktorClient)
+        implementation(ktorNetworkTls)
+        implementation(ktorNetworkTlsCertificates)
         implementation(ktorServerSessions)
         implementation(ktorSerialization)
 
         implementation("io.jsonwebtoken:jjwt-api:0.11.1")
         implementation("io.jsonwebtoken:jjwt-impl:0.11.1")
+        implementation("io.jsonwebtoken:jjwt-jackson:0.11.1")
+
         runtime("io.jsonwebtoken:jjwt-impl:0.11.1")
+        runtime("io.jsonwebtoken:jjwt-jackson:0.11.1")
 
         implementation(logbackClassic)
         implementation(kotlinCssJvm)

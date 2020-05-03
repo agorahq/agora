@@ -1,19 +1,19 @@
 package org.agorahq.agora.core.api.service.impl
 
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Entity
 import org.agorahq.agora.core.api.service.StorageService
 import org.hexworks.cobalt.core.api.UUID
 
-class InMemoryStorageService<E : Resource>(
+class InMemoryStorageService<E : Entity>(
         private val objects: MutableMap<UUID, E>
 ) : StorageService<E> {
 
-    override fun create(resource: E) {
-        objects[resource.id] = resource
+    override fun create(entity: E) {
+        objects[entity.id] = entity
     }
 
-    override fun delete(resource: E) {
-        objects.remove(resource.id)
+    override fun delete(entity: E) {
+        objects.remove(entity.id)
     }
 
     override fun deleteById(id: UUID) {

@@ -22,8 +22,6 @@ class StringExtensionsTest {
     @Test
     fun testDeserialization() {
 
-        val result = googleJson.deserializeTo(GoogleUser.serializer())
-
-        println(result)
+        googleJson.deserializeTo(GoogleUser.serializer())
     }
 }

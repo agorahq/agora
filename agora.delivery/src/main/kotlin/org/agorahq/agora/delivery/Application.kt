@@ -3,100 +3,59 @@
 package org.agorahq.agora.delivery
 
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.*
+import io.ktor.auth.OAuthAccessTokenResponse.OAuth2
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
+import io.ktor.network.tls.certificates.generateCertificate
 import io.ktor.request.receiveParameters
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
-import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.netty.EngineMain
 import io.ktor.sessions.*
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import org.agorahq.agora.comment.converter.CommentConverter
-import org.agorahq.agora.comment.module.CommentModule
-import org.agorahq.agora.comment.operations.CreateComment
-import org.agorahq.agora.comment.operations.DeleteComment
-import org.agorahq.agora.comment.operations.ListComments
-import org.agorahq.agora.comment.operations.ShowCommentForm
-import org.agorahq.agora.core.api.content.Page
-import org.agorahq.agora.core.api.content.ResourceURL
-import org.agorahq.agora.core.api.data.FormField.Valid
+import org.agorahq.agora.core.api.data.FormField
+import org.agorahq.agora.core.api.data.Message
+import org.agorahq.agora.core.api.data.MessageType
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.data.Validators
 import org.agorahq.agora.core.api.extensions.isAuthenticated
-import org.agorahq.agora.core.api.operation.Operation
-import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.resource.Resource
-import org.agorahq.agora.core.api.security.OperationType.*
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.ModuleRegistry
-import org.agorahq.agora.core.api.service.impl.InMemoryPageElementQueryService
-import org.agorahq.agora.core.api.service.impl.InMemoryPageQueryService
-import org.agorahq.agora.core.api.service.impl.InMemoryQueryService
-import org.agorahq.agora.core.api.service.impl.InMemoryStorageService
-import org.agorahq.agora.core.api.shared.templates.DEFAULT_REGISTRATION_PAGE
-import org.agorahq.agora.core.api.shared.templates.DEFAULT_HOMEPAGE
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_LOGIN_PAGE
-import org.agorahq.agora.core.api.view.ConverterService
-import org.agorahq.agora.core.api.view.ViewModel
+import org.agorahq.agora.core.api.shared.templates.DEFAULT_REGISTRATION_PAGE
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
-import org.agorahq.agora.delivery.data.FacebookUser
-import org.agorahq.agora.delivery.data.FacebookUserId
-import org.agorahq.agora.delivery.data.GoogleUser
-import org.agorahq.agora.delivery.data.Session
+import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
-import org.agorahq.agora.post.converter.PostConverter
-import org.agorahq.agora.post.domain.Post
-import org.agorahq.agora.post.module.PostModule
-import org.agorahq.agora.post.operations.CreatePost
-import org.agorahq.agora.post.operations.DeletePost
-import org.agorahq.agora.post.operations.ListPosts
-import org.agorahq.agora.post.operations.ShowPost
+import org.agorahq.agora.delivery.security.BuiltInRoles
 import org.hexworks.cobalt.logging.api.LoggerFactory
+import java.io.File
 
 private val logger = LoggerFactory.getLogger("Application")
 private val json = Json(JsonConfiguration.Stable)
 
 fun main(args: Array<String>) {
+    val jksFile = File("build/temporary.jks").apply {
+        parentFile.mkdirs()
+    }
+    if (!jksFile.exists()) {
+        generateCertificate(jksFile)
+    }
     EngineMain.main(args)
 }
-
-val userQueryService = InMemoryQueryService(mapOf(
-        JACK.id to JACK, JENNA.id to JENNA, FRANK.id to FRANK, OGABI.id to OGABI)
-        .toMutableMap())
-
-val converterService = ConverterService.create(listOf(
-        CommentConverter(userQueryService), PostConverter(userQueryService)))
-
-val commentQueryService = InMemoryPageElementQueryService(COMMENTS)
-val postQueryService = InMemoryPageQueryService(Post::class, POSTS)
-val commentStorage = InMemoryStorageService(COMMENTS)
-val postStorage = InMemoryStorageService(POSTS)
-
-val listPosts = ListPosts(postQueryService, converterService)
-val renderPost = ShowPost(postQueryService, converterService)
-val createPost = CreatePost(postStorage, converterService)
-val deletePost = DeletePost(postStorage)
-
-val listComments = ListComments(commentQueryService, converterService)
-val renderCommentForm = ShowCommentForm()
-val createComment = CreateComment(commentStorage, converterService)
-val deleteComment = DeleteComment(commentStorage)
-
-val postModule = PostModule(listOf(listPosts, renderPost, listComments))
-val commentModule = CommentModule(listOf(renderCommentForm, createComment))
 
 fun Application.module() {
 
@@ -123,17 +82,31 @@ fun Application.module() {
     )
 
     install(Sessions) {
-        cookie<Session>("auth") {
+        cookie<AgoraSession>(Cookies.AGORA_SESSION) {
             cookie.path = "/"
         }
     }
 
     install(Authentication) {
+
+        session<AgoraSession>(Cookies.AGORA_SESSION) {
+            challenge {
+                call.respondRedirect("/login")
+            }
+            validate { session: AgoraSession ->
+                when (val state = session.state) {
+                    is AuthenticatedUserState -> state.principal
+                    else -> error("User is not authenticated")
+                }
+            }
+        }
+
         oauth("google") {
             client = HttpClient(Apache)
             providerLookup = { googleOauthProvider }
             urlProvider = { createRedirectFor("/login/google") }
         }
+
         oauth("facebook") {
             client = HttpClient(Apache)
             providerLookup = { facebookOauthProvider }
@@ -143,55 +116,88 @@ fun Application.module() {
 
     routing {
 
-        get("/logout") {
-            call.sessions.clear<Session>()
-            call.tryRedirectToReferrer(SITE)
+        get("/login") {
+            whenNotAuthenticated { ctx ->
+                call.respondText(
+                        text = DEFAULT_LOGIN_PAGE.render(ctx),
+                        contentType = ContentType.Text.Html)
+            }
         }
 
-        get("/login") {
-            val ctx = call.toOperationContext(SITE, AUTHORIZATION)
-            call.respondText(
-                    text = DEFAULT_LOGIN_PAGE.render(ctx),
-                    contentType = ContentType.Text.Html)
+        get("/logout") {
+            logger.info("Logging user out.")
+            call.sessions.set(AgoraSession.anon().withMessage(Message(
+                    type = MessageType.INFO,
+                    text = "You've been successfully logged out."
+            )))
+            call.respondRedirect(SITE.baseUrl)
         }
 
         get("/register") {
-            val ctx = call.toOperationContext(SITE, AUTHORIZATION)
-            val model = UserRegistrationViewModel(
-                    context = ctx,
-                    email = Valid(ctx.user.email, Validators.email))
-            call.respondText(
-                    text = DEFAULT_REGISTRATION_PAGE.render(model),
-                    contentType = ContentType.Text.Html)
+            whenNotAuthenticated { ctx ->
+                val session = call.sessions.get<AgoraSession>() ?: error("No session present")
+                when (val state = session.state) {
+                    is AuthenticatedUserState -> {
+                        logger.info("User is already authenticated, no need to register.")
+                        call.respondRedirect(SITE.baseUrl)
+                    }
+                    is RegisteringState -> {
+                        logger.info("Rendering registration form...")
+                        call.respondText(
+                                text = DEFAULT_REGISTRATION_PAGE.render(
+                                        state.toUserRegistrationModel(ctx)),
+                                contentType = ContentType.Text.Html)
+                    }
+                }
+            }
         }
 
         post("/register") {
-            call.respondRedirect(SITE.baseUrl)
+            whenNotAuthenticated { ctx ->
+                val params = call.receiveParameters()
+                val username = params.mapTo(UserRegistrationParams::class).username
+                val session = call.sessions.get<AgoraSession>() ?: error("No session present")
+                when (val state = session.state) {
+                    is RegisteringState -> {
+                        val model = UserRegistrationViewModel(
+                                context = ctx,
+                                email = state.oauthUser.email,
+                                firstName = state.oauthUser.firstName,
+                                lastName = state.oauthUser.lastName,
+                                username = FormField.Dirty(username)
+                        ).validate()
+                        if (model.isValid) {
+                            val user = User.create(
+                                    email = model.email,
+                                    username = model.username.value,
+                                    firstName = model.firstName,
+                                    lastName = model.lastName,
+                                    roles = setOf(BuiltInRoles.ATTENDEE),
+                                    groups = setOf()
+                            )
+                            Services.userStorage.create(user)
+                            call.sessions.set(AgoraSession.fromUser(user))
+                            call.respondRedirect(SITE.baseUrl)
+                        } else {
+                            logger.info("Model is not valid, re-rendering registration page.")
+                            call.respondText(
+                                    text = DEFAULT_REGISTRATION_PAGE.render(model),
+                                    contentType = ContentType.Text.Html)
+                        }
+                    }
+                    else -> call.respondRedirect(SITE.baseUrl)
+                }
+                call.respondRedirect(SITE.baseUrl)
+            }
         }
 
         authenticate("google") {
             route("/login/google") {
                 handle {
-                    val ctx = call.toOperationContext(SITE, AUTHORIZATION)
-                    if (ctx.user.isAuthenticated) {
-                        call.tryRedirectToReferrer(SITE)
-                    } else {
-                        val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
-                                ?: error("No principal")
-
-                        val data = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                    handleOauth { principal ->
+                        HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                             header("Authorization", "Bearer ${principal.accessToken}")
-                        }
-                        val oauthUser = data.deserializeTo(GoogleUser.serializer())
-
-                        val user = userQueryService.findOneBy(User::email, oauthUser.email)
-                        if (user.isPresent) {
-                            call.sessions.set(Session.fromUser(user.get()))
-                            call.tryRedirectToReferrer(SITE)
-                        } else {
-                            call.sessions.set(Session.fromOauthUser(oauthUser))
-                            call.respondRedirect("/register")
-                        }
+                        }.deserializeTo(GoogleUser.serializer())
                     }
                 }
             }
@@ -199,28 +205,15 @@ fun Application.module() {
         authenticate("facebook") {
             route("/login/facebook") {
                 handle {
-                    val ctx = call.toOperationContext(SITE, AUTHORIZATION)
-                    if (ctx.user.isAuthenticated) {
-                        call.tryRedirectToReferrer(SITE)
-                    } else {
-                        val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
-                                ?: error("No principal")
-
-                        val id = HttpClient(Apache).get<String>("https://graph.facebook.com/me") {
-                            header("Authorization", "Bearer ${principal.accessToken}")
-                        }.deserializeTo(FacebookUserId.serializer()).id
+                    handleOauth { principal ->
                         val token = principal.accessToken
+                        val id = HttpClient(Apache).get<String>("https://graph.facebook.com/me") {
+                            header("Authorization", "Bearer $token")
+                        }.deserializeTo(FacebookUserId.serializer()).id
                         val url = "https://graph.facebook.com/$id?fields=first_name,last_name,email,id&access_token=$token"
-                        val oauthUser = HttpClient(Apache).get<String>(url).deserializeTo(FacebookUser.serializer())
-
-                        val user = userQueryService.findOneBy(User::email, oauthUser.email)
-                        if (user.isPresent) {
-                            call.sessions.set(Session.fromUser(user.get()))
-                            call.tryRedirectToReferrer(SITE)
-                        } else {
-                            call.sessions.set(Session.fromOauthUser(oauthUser))
-                            call.respondRedirect("/register")
-                        }
+                        HttpClient(Apache)
+                                .get<String>(url)
+                                .deserializeTo(FacebookUser.serializer())
                     }
                 }
             }
@@ -229,82 +222,53 @@ fun Application.module() {
     }
 }
 
+private suspend fun PipelineContext<Unit, ApplicationCall>.whenNotAuthenticated(
+        fn: suspend (OperationContext) -> Unit
+) {
+    val ctx = call.toOperationContext(SITE, AUTHORIZATION)
+    if (ctx.user.isAuthenticated) {
+        logger.info("User is already authenticated, redirecting to referrer.")
+        call.tryRedirectToReferrer(SITE)
+    } else {
+        fn(ctx)
+    }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleOauth(
+        fn: suspend (OAuth2) -> OauthUser
+) {
+    whenNotAuthenticated {
+        val principal: OAuth2 = call.authentication.principal()
+                ?: error("No principal")
+        val oauthUser = fn(principal)
+        val user = Services.userQueryService.findOneBy(User::email, oauthUser.email)
+        if (user.isPresent) {
+            logger.info("User is already registered, redirecting to front page.")
+            call.sessions.set(AgoraSession.fromUser(user.get()))
+            call.respondRedirect(SITE.baseUrl)
+        } else {
+            logger.info("User is not yet registered, redirecting to registration.")
+            call.sessions.set(AgoraSession.fromOauthUser(oauthUser))
+            call.respondRedirect("/register")
+        }
+    }
+}
+
 private fun createModules(site: SiteMetadata): ModuleRegistry {
 
     val moduleRegistry = site.moduleRegistry
 
-    moduleRegistry.register(postModule)
-    moduleRegistry.register(commentModule)
+    moduleRegistry.register(Services.postModule)
+    moduleRegistry.register(Services.commentModule)
 
     return moduleRegistry
 }
 
-private fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
-
-    get(SITE.baseUrl) {
-        call.respondText(DEFAULT_HOMEPAGE.render(call.toOperationContext(SITE, AUTHORIZATION)), ContentType.Text.Html)
-    }
-    logger.info("Registering modules...")
-    moduleRegistry.modules.forEach { module ->
-
-        module.findMatchingOperations(PageRenderer(Page::class)).forEach { renderer: Operation<Page, PageURLContext<Page>, String> ->
-            logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
-            get(renderer.route) {
-                with(renderer) {
-                    call.tryToRespondWithHtml(call.toOperationContext(SITE, AUTHORIZATION)
-                            .toPageURLContext(ResourceURL.create(
-                                    urlClass = renderer.urlClass,
-                                    parameters = call.parameters))
-                            .createCommand()
-                            .execute())
-                }
-            }
-        }
-
-        module.findMatchingOperations(PageListRenderer(Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
-            get(renderer.route) {
-                call.respondText(
-                        text = with(renderer) {
-                            call.toOperationContext(SITE, AUTHORIZATION).createCommand().execute().get()
-                        },
-                        contentType = ContentType.Text.Html)
-            }
-        }
-
-        module.findMatchingOperations(PageFormRenderer(Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
-            // TODO
-        }
-
-        module.findMatchingOperations(PageElementFormRenderer(Resource::class, Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
-            // TODO
-        }
-
-        module.findMatchingOperations(PageElementListRenderer(Resource::class, Page::class)).forEach { renderer ->
-            logger.info("Registering module ${renderer.name} at route ${renderer.route}.")
-            // TODO
-        }
-
-        module.findMatchingOperations(ResourceSaver(Resource::class, ViewModel::class)).forEach { saver ->
-            logger.info("Registering module ${saver.name} at route ${saver.route}.")
-            post(saver.route) {
-                val modelClass = converterService.findViewModelClassFor(saver.resourceClass)
-                with(saver) {
-                    call.toOperationContext(SITE, AUTHORIZATION)
-                            .toViewModelContext(call.receiveParameters().mapTo(modelClass))
-                            .createCommand().execute().get()
-                }
-                call.tryRedirectToReferrer(SITE)
-            }
-        }
-
-        module.findMatchingOperations(ResourceDeleter(Resource::class)).forEach { deleter ->
-            logger.info("Registering module ${deleter.name} at route ${deleter.route}.")
-            // TODO 
-        }
-
-    }
-}
-
+private fun RegisteringState.toUserRegistrationModel(
+        ctx: OperationContext
+) = UserRegistrationViewModel(
+        context = ctx,
+        email = oauthUser.email,
+        firstName = oauthUser.firstName,
+        lastName = oauthUser.lastName
+)
