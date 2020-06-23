@@ -80,22 +80,22 @@ val AUTHORIZATION = authorization {
 val JACK = User.create(
         email = "jack@jack.com",
         username = "jack",
-        roles = setOf(ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE))
 
 val JENNA = User.create(
         email = "jenna@jenna.com",
         username = "jenna",
-        roles = setOf(ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE))
 
 val FRANK = User.create(
         email = "frank@frank.com",
         username = "frank",
-        roles = setOf(ATTENDEE)).toUser()
+        roles = setOf(ATTENDEE))
 
 val OGABI = User.create(
         email = "gabor.orosz@me.com",
         username = "ogabi",
-        roles = setOf(ADMIN)).toUser()
+        roles = setOf(ADMIN))
 
 
 val POST_A = Post(

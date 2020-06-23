@@ -7,7 +7,6 @@ import kotlinx.html.h1
 import kotlinx.html.head
 import kotlinx.html.html
 import kotlinx.html.title
-import org.agorahq.agora.core.api.data.UserMetadata
 import org.agorahq.agora.core.api.extensions.documentContent
 import org.agorahq.agora.core.api.extensions.include
 import org.agorahq.agora.core.api.security.User
@@ -34,7 +33,7 @@ class TemplateTest {
 
         private val TEST_USER = User.create(
                 email = "test@test.com",
-                username = "testuser").toUser()
+                username = "testuser")
 
         private val POST = TestPost(
                 title = "Christmas is coming",

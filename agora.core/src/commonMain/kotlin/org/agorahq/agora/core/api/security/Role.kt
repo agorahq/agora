@@ -1,16 +1,15 @@
 package org.agorahq.agora.core.api.security
 
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 
 /**
  * [Role] is the primary component of the Role Based Access Control (RBAC) utility.
  */
-interface Role {
+interface Role: RoleDescriptor {
 
-    val descriptor: RoleDescriptor
     val permissions: Iterable<Permission<out Resource>>
 
-    operator fun component1(): RoleDescriptor = descriptor
+    operator fun component1(): String = name
 
     operator fun component2(): Iterable<Permission<out Resource>> = permissions
 

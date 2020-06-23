@@ -1,5 +1,9 @@
 package org.agorahq.agora.core.api.data
 
+/**
+ * Represents the result of an operation. It can either be the return value
+ * of an operation of type [T] or an [Exception] of type [F].
+ */
 sealed class Result<T : Any, F : Exception> {
 
     data class Success<S : Any>(val result: S) : Result<S, Nothing>()

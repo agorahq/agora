@@ -7,11 +7,10 @@ import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
-import org.agorahq.agora.core.api.content.Page
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.Page
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.resource.Resource
 import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.service.ModuleRegistry
 import org.agorahq.agora.core.api.shared.templates.DEFAULT_HOMEPAGE
@@ -19,7 +18,7 @@ import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.delivery.extensions.*
 import org.hexworks.cobalt.logging.api.LoggerFactory
 
-private val logger = LoggerFactory.getLogger("Application")
+private val logger = LoggerFactory.getLogger("Modules")
 
 fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
 
@@ -29,14 +28,12 @@ fun Routing.registerModules(moduleRegistry: ModuleRegistry) {
     logger.info("Registering modules...")
     moduleRegistry.modules.forEach { module ->
 
-        module.findMatchingOperations(OperationType.PageRenderer(Page::class)).forEach { renderer: Operation<Page, PageURLContext<Page>, String> ->
-            logger.info("Registering module ${renderer.name} with route ${renderer.route}.")
-            get(renderer.route) {
-                with(renderer) {
-                    call.tryToRespondWithHtml(call.toOperationContext(SITE, AUTHORIZATION)
-                            .toPageURLContext(ResourceURL.create(
-                                    urlClass = renderer.urlClass,
-                                    parameters = call.parameters))
+        module.findMatchingOperations(OperationType.PageRenderer(Page::class)).forEach { pageRenderer: Operation<Page, PageURLContext<Page>, String> ->
+            logger.info("Registering module ${pageRenderer.name} with route ${pageRenderer.route}.")
+            get(pageRenderer.route) {
+                with(pageRenderer) {
+                    call.tryToRespondWithHtml(
+                            call.toPageURLContext(SITE, AUTHORIZATION, pageRenderer.urlClass)
                             .createCommand()
                             .execute())
                 }

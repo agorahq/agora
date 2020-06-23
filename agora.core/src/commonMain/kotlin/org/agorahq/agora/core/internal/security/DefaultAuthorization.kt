@@ -2,7 +2,7 @@ package org.agorahq.agora.core.internal.security
 
 import org.agorahq.agora.core.api.exception.MissingPermissionException
 import org.agorahq.agora.core.api.operation.AnyOperation
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.*
 import org.agorahq.agora.core.api.security.policy.GroupFilterPolicy
 import org.agorahq.agora.core.api.security.policy.ResourceFilterPolicy
@@ -56,7 +56,7 @@ data class DefaultAuthorization(
     }
 
     private fun User.fetchPermissions(): List<Permission<out Resource>> = roles.flatMap {
-        roleLookup.getOrElse(it) { listOf() }
+        roleLookup.getOrElse(it.name) { listOf() }
     }
 
     private fun Iterable<Permission<out Resource>>.fetchMatchingPermissions(operation: AnyOperation) = filter {

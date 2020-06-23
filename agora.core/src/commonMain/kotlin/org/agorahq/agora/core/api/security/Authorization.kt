@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.security
 
 import org.agorahq.agora.core.api.operation.AnyOperation
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.builder.AuthorizationBuilder
 
 /**

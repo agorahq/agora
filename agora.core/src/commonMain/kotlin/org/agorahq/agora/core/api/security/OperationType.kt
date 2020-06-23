@@ -1,12 +1,12 @@
 package org.agorahq.agora.core.api.security
 
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.PageContext
 import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.operation.context.ViewModelContext
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.platform.isSubclassOf
 import kotlin.reflect.KClass

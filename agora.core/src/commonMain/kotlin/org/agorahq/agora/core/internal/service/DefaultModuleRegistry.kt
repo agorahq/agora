@@ -2,7 +2,7 @@ package org.agorahq.agora.core.internal.service
 
 import kotlinx.collections.immutable.persistentMapOf
 import org.agorahq.agora.core.api.module.Module
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.service.ModuleRegistry
 import org.agorahq.agora.core.api.view.ViewModel
 import kotlin.reflect.KClass

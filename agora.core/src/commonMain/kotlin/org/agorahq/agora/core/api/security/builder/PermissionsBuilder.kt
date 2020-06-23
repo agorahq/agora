@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api.security.builder
 
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.operation.context.*
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.OperationDescriptor
 import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.policy.GroupFilterPolicy
@@ -52,6 +52,7 @@ class PermissionsBuilder<R : Resource>() {
 
     fun build(): Iterable<Permission<R>> = permissions.map { (operation, policies) ->
         DefaultPermission(
+                name = operation.name,
                 operationDescriptor = operation,
                 policies = policies)
     }

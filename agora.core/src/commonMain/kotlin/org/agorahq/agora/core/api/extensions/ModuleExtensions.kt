@@ -6,7 +6,7 @@ import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 

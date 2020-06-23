@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.operation.context
 
-import org.agorahq.agora.core.api.content.Page
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.Page
+import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.data.Message
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.security.Authorization

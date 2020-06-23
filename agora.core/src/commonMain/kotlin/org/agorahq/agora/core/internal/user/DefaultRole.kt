@@ -1,12 +1,11 @@
 package org.agorahq.agora.core.internal.user
 
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.Role
-import org.agorahq.agora.core.api.security.RoleDescriptor
 
 class DefaultRole(
-        override val descriptor: RoleDescriptor,
+        override val name: String,
         override val permissions: Iterable<Permission<out Resource>>
 ) : Role {
 
@@ -14,13 +13,13 @@ class DefaultRole(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as DefaultRole
-        if (descriptor != other.descriptor) return false
+        if (name != other.name) return false
         return true
     }
 
-    override fun hashCode() = descriptor.hashCode()
+    override fun hashCode() = name.hashCode()
 
-    override fun toString() = "DefaultRole(name='$descriptor', permissions=$permissions)"
+    override fun toString() = "DefaultRole(name='$name', permissions=$permissions)"
 
 
 }

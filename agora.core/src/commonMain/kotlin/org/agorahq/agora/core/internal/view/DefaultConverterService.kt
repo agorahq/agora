@@ -4,7 +4,7 @@ import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.Result.Failure
 import org.agorahq.agora.core.api.exception.MissingConverterException
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.core.api.view.ResourceConverter
 import org.agorahq.agora.core.api.view.ViewModel

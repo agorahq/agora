@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.extensions
 
-import org.agorahq.agora.core.api.content.Page
-import org.agorahq.agora.core.api.content.PageElement
+import org.agorahq.agora.core.api.data.Page
+import org.agorahq.agora.core.api.data.PageElement
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
 import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer

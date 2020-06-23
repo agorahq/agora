@@ -58,11 +58,11 @@ class AuthorizationTest {
 
         val USER_JOE = User.create(
                 email = "joe@user.com",
-                username = "user_joe").toUser()
+                username = "user_joe")
 
         val ADMIN_SAM = User.create(
                 email = "sam@admin.com",
-                username = "admin_sam").toUser()
+                username = "admin_sam")
 
         val AUTH = authorization {
             roles {

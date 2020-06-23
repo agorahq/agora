@@ -1,7 +1,6 @@
 package org.agorahq.agora.core.api.service
 
 import org.agorahq.agora.core.api.data.Entity
-import org.agorahq.agora.core.api.resource.Resource
 import org.hexworks.cobalt.core.api.UUID
 
 interface StorageService<E : Entity> {

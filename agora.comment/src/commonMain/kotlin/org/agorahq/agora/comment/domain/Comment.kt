@@ -1,7 +1,7 @@
 package org.agorahq.agora.comment.domain
 
-import org.agorahq.agora.core.api.content.ContentFormat
-import org.agorahq.agora.core.api.content.PageElement
+import org.agorahq.agora.core.api.data.ContentFormat
+import org.agorahq.agora.core.api.data.PageElement
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.document.BuiltInContentFormat.MARKDOWN
 import org.agorahq.agora.core.platform.SystemUtils

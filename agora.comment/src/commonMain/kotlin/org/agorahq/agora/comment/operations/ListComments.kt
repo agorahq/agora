@@ -5,7 +5,7 @@ import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.templates.COMMENT_LIST
 import org.agorahq.agora.comment.viewmodel.CommentListViewModel
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.RenderPageElementList
 import org.agorahq.agora.core.api.operation.RenderPageElementListDescriptor

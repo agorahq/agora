@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.api.template
 
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.extensions.toSlug
 
 data class PostResourceURL(

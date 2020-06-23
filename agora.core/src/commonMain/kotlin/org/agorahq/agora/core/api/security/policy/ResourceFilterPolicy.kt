@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.api.security.policy
 
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 
 interface ResourceFilterPolicy<R : Resource> : Policy {
 

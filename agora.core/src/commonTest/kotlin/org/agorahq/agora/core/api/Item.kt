@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api
 
-import org.agorahq.agora.core.api.content.ContentFormat
-import org.agorahq.agora.core.api.content.Page
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.ContentFormat
+import org.agorahq.agora.core.api.data.Page
+import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.internal.document.BuiltInContentFormat
 import org.agorahq.agora.core.platform.SystemUtils

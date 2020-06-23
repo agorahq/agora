@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.service
 
-import org.agorahq.agora.core.api.content.PageElement
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.PageElement
+import org.agorahq.agora.core.api.data.Page
 
 interface PageElementQueryService<C : PageElement> : QueryService<C> {
 

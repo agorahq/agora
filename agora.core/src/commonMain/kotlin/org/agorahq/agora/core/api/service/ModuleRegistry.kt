@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.service
 
 import org.agorahq.agora.core.api.module.Module
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.view.ViewModel
 
 interface ModuleRegistry {

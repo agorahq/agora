@@ -1,6 +1,6 @@
 package org.agorahq.agora.comment.domain
 
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.ResourceURL
 
 data class CommentURL(
         val id: String

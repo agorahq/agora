@@ -36,9 +36,10 @@ class AuthorizationBuilderTest {
         val expected = DefaultAuthorization(
                 roles = listOf(
                         DefaultRole(
-                                descriptor = USER,
+                                name = USER.name,
                                 permissions = listOf(
                                         DefaultPermission(
+                                                ListItems.name,
                                                 operationDescriptor = ListItems,
                                                 policies = listOf(allGroups))))),
                 groups = listOf(Group.ANONYMOUS))
@@ -64,8 +65,9 @@ class AuthorizationBuilderTest {
 
         val expected = DefaultAuthorization(
                 roles = listOf(DefaultRole(
-                        descriptor = USER,
+                        name = USER.name,
                         permissions = listOf(DefaultPermission(
+                                name = ListItems.name,
                                 operationDescriptor = ListItems,
                                 policies = listOf(allGroups, IN_STOCK_ONLY))))),
                 groups = listOf(Group.ANONYMOUS))
@@ -97,13 +99,15 @@ class AuthorizationBuilderTest {
 
         val expected = DefaultAuthorization(
                 roles = listOf(DefaultRole(
-                        descriptor = USER,
+                        name = USER.name,
                         permissions = listOf(DefaultPermission(
+                                name = ListItems.name,
                                 operationDescriptor = ListItems,
                                 policies = listOf(allGroups, IN_STOCK_ONLY)))),
                         DefaultRole(
-                                descriptor = ADMIN,
+                                name = ADMIN.name,
                                 permissions = listOf(DefaultPermission(
+                                        name = ListItems.name,
                                         operationDescriptor = ListItems,
                                         policies = listOf(allGroups))))),
                 groups = listOf(Group.ANONYMOUS))
@@ -141,18 +145,21 @@ class AuthorizationBuilderTest {
 
         val expected = DefaultAuthorization(
                 roles = listOf(DefaultRole(
-                        descriptor = POOR_SCHMUCK,
+                        name = POOR_SCHMUCK.name,
                         permissions = listOf(DefaultPermission(
+                                name = ListItems.name,
                                 operationDescriptor = ListItems,
                                 policies = listOf(allGroups, IN_STOCK_ONLY, EXPENSIVE_ITEMS_ONLY)))),
                         DefaultRole(
-                                descriptor = USER,
+                                name = USER.name,
                                 permissions = listOf(DefaultPermission(
+                                        name = ListItems.name,
                                         operationDescriptor = ListItems,
                                         policies = listOf(allGroups, IN_STOCK_ONLY)))),
                         DefaultRole(
-                                descriptor = ADMIN,
+                                name = ADMIN.name,
                                 permissions = listOf(DefaultPermission(
+                                        name = ListItems.name,
                                         operationDescriptor = ListItems,
                                         policies = listOf(allGroups))))),
                 groups = listOf(Group.ANONYMOUS))
@@ -186,17 +193,21 @@ class AuthorizationBuilderTest {
         val expected = DefaultAuthorization(
                 roles = listOf(
                         DefaultRole(
-                                descriptor = USER,
+                                name = USER.name,
                                 permissions = listOf(DefaultPermission(
+                                        name = ListItems.name,
                                         operationDescriptor = ListItems,
                                         policies = listOf(allGroups, IN_STOCK_ONLY)), DefaultPermission(
+                                        name = ShowItem.name,
                                         operationDescriptor = ShowItem,
                                         policies = listOf(allUsers, IN_STOCK_ONLY)))),
                         DefaultRole(
-                                descriptor = ADMIN,
+                                name = ADMIN.name,
                                 permissions = listOf(DefaultPermission(
+                                        name = ListItems.name,
                                         operationDescriptor = ListItems,
                                         policies = listOf(allGroups)), DefaultPermission(
+                                        name = ShowItem.name,
                                         operationDescriptor = ShowItem,
                                         policies = listOf(allUsers, IN_STOCK_ONLY))))),
                 groups = listOf(Group.ANONYMOUS))

@@ -6,7 +6,7 @@ import org.agorahq.agora.core.api.exception.FormFieldValidationFailedException
 
 /**
  * Represents a field in a html form which has a [value]. Whenever validation is performed
- * it returns a new [FormField] with the corresponding state ([Empty], [Valid] or [Invalid]).
+ * it returns a new [FormField] with the corresponding state ([Dirty], [Valid] or [Invalid]).
  */
 sealed class FormField {
 
@@ -28,7 +28,7 @@ sealed class FormField {
     /**
      * Validates the [FormField] and returns the corresponding new state:
      * - [Valid] if validation was successful or
-     * - [Invalid] if not
+     * - [Invalid] if not.
      */
     fun validate(validator: (String) -> ValidationResult): FormField = when (val result = validator(value)) {
         is Result.Success -> Valid(value)

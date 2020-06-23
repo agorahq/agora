@@ -1,12 +1,12 @@
 package org.agorahq.agora.core.api.operation
 
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.PageContext
 import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.operation.context.ViewModelContext
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.OperationDescriptor
 
 typealias AnyOperation = Operation<out Resource, out OperationContext, out Any>

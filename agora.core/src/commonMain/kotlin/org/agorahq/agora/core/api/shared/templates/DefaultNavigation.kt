@@ -6,7 +6,7 @@ import kotlinx.html.li
 import kotlinx.html.nav
 import kotlinx.html.span
 import kotlinx.html.ul
-import org.agorahq.agora.core.api.content.Page
+import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.forEachModuleHavingOperationWithType
 import org.agorahq.agora.core.api.extensions.isAnonymous
 import org.agorahq.agora.core.api.operation.context.OperationContext

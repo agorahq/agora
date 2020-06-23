@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.internal.document
 
-import org.agorahq.agora.core.api.content.ContentFormat
+import org.agorahq.agora.core.api.data.ContentFormat
 
 enum class BuiltInContentFormat : ContentFormat {
     MARKDOWN,

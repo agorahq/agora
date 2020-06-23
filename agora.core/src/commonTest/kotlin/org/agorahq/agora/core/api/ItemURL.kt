@@ -1,6 +1,6 @@
 package org.agorahq.agora.core.api
 
-import org.agorahq.agora.core.api.content.ResourceURL
+import org.agorahq.agora.core.api.data.ResourceURL
 import org.hexworks.cobalt.core.api.UUID
 
 class ItemURL(private val itemId: UUID) : ResourceURL<Item> {

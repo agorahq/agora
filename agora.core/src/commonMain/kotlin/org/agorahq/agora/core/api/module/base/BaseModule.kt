@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.operation.AnyOperation
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.ViewModelContext
-import org.agorahq.agora.core.api.resource.Resource
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.platform.isSubclassOf
