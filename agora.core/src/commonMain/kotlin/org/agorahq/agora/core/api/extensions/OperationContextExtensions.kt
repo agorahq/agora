@@ -3,8 +3,8 @@ package org.agorahq.agora.core.api.extensions
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.data.PageElement
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.security.OperationType.PageElementFormRenderer
-import org.agorahq.agora.core.api.security.OperationType.PageElementListRenderer
+import org.agorahq.agora.core.api.operation.OperationType.PageElementFormRenderer
+import org.agorahq.agora.core.api.operation.OperationType.PageElementListRenderer
 
 fun OperationContext.renderPageElementListsFor(page: Page): String {
     val renderedPageElements = StringBuilder()

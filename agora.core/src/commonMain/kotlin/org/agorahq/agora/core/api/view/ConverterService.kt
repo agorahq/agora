@@ -12,7 +12,7 @@ interface ConverterService {
 
     fun register(converter: ResourceConverter<ViewModel, Resource>)
 
-    fun findViewModelClassFor(klass: KClass<out Resource>): KClass<out ViewModel>
+    fun <R: Resource, V: ViewModel> findViewModelClassFor(klass: KClass<R>): KClass<V>
 
     fun <R : Resource> convertToResource(view: ViewModel): Result<out R, out Exception>
 

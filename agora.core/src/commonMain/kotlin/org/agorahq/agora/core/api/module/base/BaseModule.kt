@@ -1,12 +1,12 @@
 package org.agorahq.agora.core.api.module.base
 
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.AnyOperation
 import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.OperationType
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.ViewModelContext
-import org.agorahq.agora.core.api.data.Resource
-import org.agorahq.agora.core.api.security.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 import org.agorahq.agora.core.platform.isSubclassOf
 import org.agorahq.agora.core.platform.isSuperclassOf
@@ -27,12 +27,14 @@ abstract class BaseModule<R : Resource, M : ViewModel>(
             type: OperationType<R, C, T>
     ): Iterable<Operation<R, C, T>> {
         return operations.values.filter {
-            it.type == type
+            type.matches(it.type)
         }.map { it as Operation<R, C, T> }
     }
 
-    override fun <R : Resource, C : OperationContext, T : Any> hasMatchingOperation(type: OperationType<R, C, T>): Boolean {
-        return operations.values.any { it.type == type }
+    override fun <R : Resource, C : OperationContext, T : Any> hasMatchingOperation(
+            type: OperationType<R, C, T>
+    ): Boolean {
+        return operations.values.any { type.matches(it.type) }
     }
 
     override fun supportsResource(resource: Resource) = isSubclassOf(resource::class, resourceClass)

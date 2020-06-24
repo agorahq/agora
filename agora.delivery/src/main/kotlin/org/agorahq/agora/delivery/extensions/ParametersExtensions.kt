@@ -18,11 +18,6 @@ fun <R : Resource> Parameters.toResourceURL(
         urlClass: KClass<out ResourceURL<R>>
 ): ResourceURL<R> = mapTo(urlClass)
 
-fun <V : Resource> Parameters.toResource(converterService: ConverterService, resourceClass: KClass<V>): Result<out V, out Exception> {
-    val viewClass = converterService.findViewModelClassFor(resourceClass)
-    return converterService.convertToResource<Resource>(mapTo(viewClass)) as Result<out V, out Exception>
-}
-
 fun <T : Any> Parameters.mapTo(type: KClass<T>): T {
 
     require(type.isData) {

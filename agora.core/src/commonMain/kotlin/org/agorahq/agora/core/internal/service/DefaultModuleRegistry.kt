@@ -15,10 +15,6 @@ class DefaultModuleRegistry : ModuleRegistry {
 
     private var moduleLookup = persistentMapOf<KClass<Module<out Resource, out ViewModel>>, Module<out Resource, out ViewModel>>()
 
-//    override fun <D : Resource> findModule(klass: KClass<Module<D>>): Maybe<Module<D>> {
-//        return Maybe.ofNullable(moduleLookup[klass as KClass<Module<out Resource>>] as Module<D>)
-//    }
-
     override fun register(module: Module<out Resource, out ViewModel>) {
         moduleLookup = moduleLookup.put(module::class as KClass<Module<out Resource, out ViewModel>>, module)
     }

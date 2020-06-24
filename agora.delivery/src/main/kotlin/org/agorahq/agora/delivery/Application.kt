@@ -41,6 +41,7 @@ import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.delivery.security.BuiltInRoles
+import org.apache.http.auth.AUTH
 import org.hexworks.cobalt.logging.api.LoggerFactory
 import java.io.File
 
@@ -218,7 +219,8 @@ fun Application.module() {
                 }
             }
         }
-        registerModules(createModules(SITE))
+        createModules(SITE)
+        registerAdapters(SITE, AUTHORIZATION)
     }
 }
 

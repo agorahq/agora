@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.security.builder
 
-import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.api.security.RoleDescriptor

@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.internal.security
 
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.exception.MissingPermissionException
 import org.agorahq.agora.core.api.operation.AnyOperation
-import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.security.*
 import org.agorahq.agora.core.api.security.policy.GroupFilterPolicy
 import org.agorahq.agora.core.api.security.policy.ResourceFilterPolicy
@@ -60,6 +60,6 @@ data class DefaultAuthorization(
     }
 
     private fun Iterable<Permission<out Resource>>.fetchMatchingPermissions(operation: AnyOperation) = filter {
-        it.operationDescriptor == operation.descriptor
+        it.name == operation.name
     }
 }

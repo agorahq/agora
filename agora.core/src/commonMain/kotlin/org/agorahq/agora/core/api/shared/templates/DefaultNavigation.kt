@@ -10,7 +10,7 @@ import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.forEachModuleHavingOperationWithType
 import org.agorahq.agora.core.api.extensions.isAnonymous
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.security.OperationType.PageListRenderer
+import org.agorahq.agora.core.api.operation.OperationType.PageListRenderer
 import org.agorahq.agora.core.api.template.template
 
 val DEFAULT_NAVIGATION = template<OperationContext> { ctx ->

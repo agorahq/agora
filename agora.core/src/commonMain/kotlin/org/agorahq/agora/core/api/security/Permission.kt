@@ -2,6 +2,7 @@ package org.agorahq.agora.core.api.security
 
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.policy.Policy
 

@@ -3,10 +3,10 @@ package org.agorahq.agora.post.operations
 import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
 import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.OperationType.PageRenderer
 import org.agorahq.agora.core.api.operation.RenderResource
 import org.agorahq.agora.core.api.operation.RenderResourceDescriptor
 import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.security.OperationType.PageRenderer
 import org.agorahq.agora.core.api.service.PageQueryService
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.post.domain.Post
@@ -20,8 +20,6 @@ class ShowPost(
         private val converterService: ConverterService
 ) : RenderResource<Post>, RenderResourceDescriptor<Post> by Companion {
 
-    override val descriptor = ShowPost
-
     override fun PageURLContext<Post>.createCommand() = {
         val post = postQueryService.findByUrl(url).get()
         val model = converterService.convertToView<PostViewModel>(post, this).get()
@@ -31,14 +29,11 @@ class ShowPost(
         POST_DETAILS.render(model.copy(renderedPageElements = renderedPageElements.toString()))
     }.toCommand()
 
-    companion object : RenderResourceDescriptor<Post> {
-
+    companion object : RenderResourceDescriptor<Post>{
         override val name = "Show Post"
         override val resourceClass = Post::class
         override val type = PageRenderer(Post::class)
         override val route = PostURL.route
         override val urlClass = PostURL::class
-
     }
-
 }

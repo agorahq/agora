@@ -7,7 +7,11 @@ import org.agorahq.agora.core.api.operation.AnyOperation
 
 class CommentModule(
         operations: Iterable<AnyOperation> = listOf()
-) : BaseModule<Comment, CommentViewModel>(operations, Comment::class, CommentViewModel::class) {
+) : BaseModule<Comment, CommentViewModel>(
+        operations = operations,
+        resourceClass = Comment::class,
+        viewModelClass = CommentViewModel::class
+) {
 
     override val name = "Comments"
 }

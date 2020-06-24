@@ -5,7 +5,6 @@ package org.agorahq.agora.core.api.data
  * [Resource] can be accessed. This object can be used to [generate]
  * urls and to check whether a given [Resource] [matches] this URL.
  */
-// TODO: PageURL?
 interface ResourceURL<R : Resource> {
 
     /**

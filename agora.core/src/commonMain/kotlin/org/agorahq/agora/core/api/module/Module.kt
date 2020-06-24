@@ -3,7 +3,7 @@ package org.agorahq.agora.core.api.module
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.security.OperationType
+import org.agorahq.agora.core.api.operation.OperationType
 import org.agorahq.agora.core.api.view.ViewModel
 import kotlin.reflect.KClass
 

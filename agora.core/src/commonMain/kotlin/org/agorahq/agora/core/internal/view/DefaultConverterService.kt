@@ -24,8 +24,9 @@ class DefaultConverterService(
         resourceLookup[converter.resourceClass] = converter
     }
 
-    override fun findViewModelClassFor(klass: KClass<out Resource>) =
-            resourceLookup[klass]?.viewModelClass ?: error("Can't find view model class for $klass.")
+    override fun <R : Resource, V : ViewModel> findViewModelClassFor(klass: KClass<R>): KClass<V> {
+        return resourceLookup[klass as KClass<Resource>]?.viewModelClass as? KClass<V> ?: error("Can't find view model class for $klass.")
+    }
 
     override fun <R : Resource> convertToResource(view: ViewModel): Result<out R, out Exception> {
         return viewModelLookup[view::class as KClass<ViewModel>]?.let { converter ->

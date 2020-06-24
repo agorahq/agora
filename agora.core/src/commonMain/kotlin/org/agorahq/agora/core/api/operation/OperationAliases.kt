@@ -1,13 +1,7 @@
 package org.agorahq.agora.core.api.operation
 
-import org.agorahq.agora.core.api.data.Page
-import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.context.PageContext
-import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.operation.context.ResourceIdContext
-import org.agorahq.agora.core.api.operation.context.ViewModelContext
 import org.agorahq.agora.core.api.data.Resource
-import org.agorahq.agora.core.api.security.OperationDescriptor
+import org.agorahq.agora.core.api.operation.context.*
 
 typealias AnyOperation = Operation<out Resource, out OperationContext, out Any>
 
@@ -31,8 +25,8 @@ typealias RenderResourceDescriptor<R> = OperationDescriptor<R, PageURLContext<R>
 
 typealias RenderPageElementList<R, P> = Operation<R, PageContext<P>, String>
 
-typealias RenderPageElementListDescriptor<R> = OperationDescriptor<R, PageContext<Page>, String>
+typealias RenderPageElementListDescriptor<R, P> = OperationDescriptor<R, PageContext<P>, String>
 
 typealias RenderPageElementForm<R, P> = Operation<R, PageContext<P>, String>
 
-typealias RenderPageElementFormDescriptor<R> = OperationDescriptor<R, PageContext<Page>, String>
+typealias RenderPageElementFormDescriptor<R, P> = OperationDescriptor<R, PageContext<P>, String>

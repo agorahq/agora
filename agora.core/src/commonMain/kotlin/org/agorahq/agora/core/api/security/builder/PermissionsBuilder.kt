@@ -3,7 +3,7 @@ package org.agorahq.agora.core.api.security.builder
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.operation.context.*
 import org.agorahq.agora.core.api.data.Resource
-import org.agorahq.agora.core.api.security.OperationDescriptor
+import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.policy.GroupFilterPolicy
 import org.agorahq.agora.core.api.security.policy.Policy
