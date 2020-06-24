@@ -21,8 +21,7 @@ class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementF
                 parentId = page.id.toString(),
                 content = "",
                 username = user.username,
-                userId = user.id.toString(),
-                owner = user))
+                userId = user.id.toString()))
     }.toCommand()
 
     companion object : RenderPageElementFormDescriptor<Comment, Page> {

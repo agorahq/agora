@@ -3,8 +3,6 @@ package org.agorahq.agora.core.api.viewmodel
 import org.agorahq.agora.core.api.data.FormField
 import org.agorahq.agora.core.api.data.Validators
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.security.Role
-import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.view.ViewModel
 
 data class UserRegistrationViewModel(
@@ -12,8 +10,7 @@ data class UserRegistrationViewModel(
         val email: String,
         val firstName: String,
         val lastName: String,
-        val username: FormField = FormField.Dirty(),
-        override val owner: User = User.ANONYMOUS
+        val username: FormField = FormField.Dirty()
 ) : ViewModel {
 
     override val isValid: Boolean

@@ -18,6 +18,6 @@ class KtorResourceDeleterAdapter<R : Resource>(
     private val logger = LoggerFactory.getLogger(this::class)
 
     override fun Routing.register() {
-        TODO()
+        // TODO
     }
 }

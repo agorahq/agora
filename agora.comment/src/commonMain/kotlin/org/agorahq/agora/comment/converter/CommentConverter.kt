@@ -34,6 +34,5 @@ class CommentConverter(
             parentId = parentId.toString(),
             content = MarkdownRendererFactory.createRenderer().render(content),
             userId = owner.id.toString(),
-            username = owner.username,
-            owner = owner)
+            username = owner.username)
 }

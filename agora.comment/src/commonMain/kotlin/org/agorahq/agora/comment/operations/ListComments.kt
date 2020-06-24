@@ -11,7 +11,6 @@ import org.agorahq.agora.core.api.operation.OperationType.PageElementListRendere
 import org.agorahq.agora.core.api.operation.RenderPageElementList
 import org.agorahq.agora.core.api.operation.RenderPageElementListDescriptor
 import org.agorahq.agora.core.api.operation.context.PageContext
-import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.PageElementQueryService
 import org.agorahq.agora.core.api.view.ConverterService
 
@@ -26,11 +25,10 @@ class ListComments(
                         .findByParent(page)
                         .map {
                             converterService.convertToView<CommentViewModel>(it, this).get()
-                        },
-                owner = User.ANONYMOUS))
+                        }))
     }.toCommand()
 
-    companion object : RenderPageElementListDescriptor<Comment, Page>{
+    companion object : RenderPageElementListDescriptor<Comment, Page> {
         override val name = "List Comments"
         override val resourceClass = Comment::class
         override val type = PageElementListRenderer(Comment::class, Page::class)
