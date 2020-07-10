@@ -173,8 +173,7 @@ fun Application.module() {
                                     username = model.username.value,
                                     firstName = model.firstName,
                                     lastName = model.lastName,
-                                    roles = setOf(BuiltInRoles.ATTENDEE),
-                                    groups = setOf()
+                                    roles = setOf(BuiltInRoles.ATTENDEE)
                             )
                             Services.userStorage.create(user)
                             call.sessions.set(AgoraSession.fromUser(user))

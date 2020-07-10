@@ -1,15 +1,12 @@
 package org.agorahq.agora.core.api.operation.context
 
-import org.agorahq.agora.core.api.data.Page
-import org.agorahq.agora.core.api.data.ResourceURL
-import org.agorahq.agora.core.api.data.Message
-import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.data.*
+import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.view.ViewModel
+import org.hexworks.cobalt.core.api.UUID
 import kotlin.jvm.JvmStatic
-import org.agorahq.agora.core.api.operation.Operation
 
 /**
  * Contains the necessary metadata (context) for an [Operation].
@@ -36,6 +33,13 @@ interface OperationContext {
             authorization = authorization,
             message = message,
             url = url)
+
+    fun toResourceIdContext(id: UUID): ResourceIdContext = ResourceIdContext(
+            site = site,
+            user = user,
+            authorization = authorization,
+            message = message,
+            id = id)
 
     fun <M : ViewModel> toViewModelContext(viewModel: M): ViewModelContext<M> = ViewModelContext(
             site = site,

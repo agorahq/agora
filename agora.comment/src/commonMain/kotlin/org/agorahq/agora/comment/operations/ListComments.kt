@@ -5,6 +5,7 @@ import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.templates.COMMENT_LIST
 import org.agorahq.agora.comment.viewmodel.CommentListViewModel
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.OperationType.PageElementListRenderer
@@ -19,13 +20,16 @@ class ListComments(
         private val converterService: ConverterService
 ) : RenderPageElementList<Comment, Page>, RenderPageElementListDescriptor<Comment, Page> by Companion {
 
-    override fun PageContext<Page>.createCommand() = {
+    override fun PageContext<Page>.fetchData(): ElementSource<Comment> {
+        return ElementSource.fromSequence(commentService
+                .findByParent(page))
+    }
+
+    override fun PageContext<Page>.createCommand(data: ElementSource<Comment>) = {
         COMMENT_LIST.render(CommentListViewModel(
-                comments = commentService
-                        .findByParent(page)
-                        .map {
-                            converterService.convertToView<CommentViewModel>(it, this).get()
-                        }))
+                comments = data.asSequence().map {
+                    converterService.convertToView<CommentViewModel>(it, this).get()
+                }))
     }.toCommand()
 
     companion object : RenderPageElementListDescriptor<Comment, Page> {

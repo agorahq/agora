@@ -14,7 +14,6 @@ interface User : Entity {
     val firstName: String
     val lastName: String
     val roles: Set<RoleDescriptor>
-    val groups: Set<Group>
 
     companion object {
 
@@ -22,8 +21,7 @@ interface User : Entity {
                 id = UUID.fromString("acdc0c2d-c2f1-4597-b1be-cb9af2a6b2fc"),
                 email = "anonymous@agorahq.org",
                 username = "anonymous",
-                roles = setOf(Role.ANONYMOUS),
-                groups = setOf(Group.ANONYMOUS))
+                roles = setOf(Role.ANONYMOUS))
 
         fun create(
                 email: String,
@@ -31,16 +29,14 @@ interface User : Entity {
                 id: UUID = UUID.randomUUID(),
                 firstName: String = "",
                 lastName: String = "",
-                roles: Set<RoleDescriptor> = setOf(Role.ANONYMOUS),
-                groups: Set<Group> = setOf(Group.ANONYMOUS)
+                roles: Set<RoleDescriptor> = setOf(Role.ANONYMOUS)
         ): User = DefaultUser(
                 id = id,
                 username = username,
                 email = email,
                 firstName = firstName,
                 lastName = lastName,
-                roles = roles,
-                groups = groups)
+                roles = roles)
 
         fun toString(user: User) = "${user.username}<${user.email}>"
     }

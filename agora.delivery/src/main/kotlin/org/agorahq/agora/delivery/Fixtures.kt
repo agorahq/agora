@@ -8,9 +8,7 @@ import org.agorahq.agora.comment.operations.ShowCommentForm
 import org.agorahq.agora.core.api.security.Role.Companion.ANONYMOUS
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.security.builder.authorization
-import org.agorahq.agora.core.api.security.policy.allGroups
-import org.agorahq.agora.core.api.security.policy.allUsers
-import org.agorahq.agora.core.api.security.policy.ownOnly
+import org.agorahq.agora.core.api.security.policy.forAll
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import org.agorahq.agora.delivery.extensions.commentIsNotHidden
@@ -32,20 +30,16 @@ val POST_B_ID = UUID.randomUUID()
 
 val AUTHORIZATION = authorization {
 
-    groups {
-
-    }
-
     roles {
         val anonymousRole = ANONYMOUS {
 
             Post::class {
-                ListPosts allowFor allGroups filterFor postIsPublished
-                ShowPost allowFor allUsers filterFor postIsPublished
+                ListPosts allow forAll
+                ShowPost withPolicy postIsPublished
             }
 
             Comment::class {
-                ListComments allowFor allUsers filterFor commentIsNotHidden
+                ListComments withPolicy commentIsNotHidden
             }
 
         }
@@ -54,9 +48,9 @@ val AUTHORIZATION = authorization {
             inherit from anonymousRole
 
             Comment::class {
-                CreateComment allowFor allUsers
-                ShowCommentForm allowFor allUsers
-                DeleteComment allowFor ownOnly
+                CreateComment allow forAll
+                ShowCommentForm allow forAll
+                DeleteComment allow forAll
             }
         }
         ADMIN {
@@ -64,14 +58,14 @@ val AUTHORIZATION = authorization {
             inherit from attendeeRole
 
             Post::class {
-                ListPosts allowFor allGroups
-                ShowPost allowFor allUsers
-                CreatePost allowFor allUsers
-                DeletePost allowFor allUsers
+                ListPosts allow forAll
+                ShowPost allow forAll
+                CreatePost allow forAll
+                DeletePost allow forAll
             }
 
             Comment::class {
-                DeleteComment allowFor allUsers
+                DeleteComment allow forAll
             }
         }
     }

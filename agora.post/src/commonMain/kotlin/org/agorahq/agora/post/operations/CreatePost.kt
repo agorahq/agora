@@ -1,5 +1,6 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.OperationType.ResourceSaver
 import org.agorahq.agora.core.api.operation.SaveResource
@@ -16,8 +17,12 @@ class CreatePost(
         private val converterService: ConverterService
 ) : SaveResource<Post, PostViewModel>, SaveResourceDescriptor<Post, PostViewModel> by Companion {
 
-    override fun ViewModelContext<PostViewModel>.createCommand() = {
-        postStorage.create(converterService.convertToResource<Post>(viewModel).get())
+    override fun ViewModelContext<PostViewModel>.fetchData(): ElementSource<Post> {
+        return ElementSource.fromElement(converterService.convertToResource<Post>(viewModel).get())
+    }
+
+    override fun ViewModelContext<PostViewModel>.createCommand(data: ElementSource<Post>) = {
+        postStorage.create(data.asSingle())
     }.toCommand()
 
     companion object : SaveResourceDescriptor<Post, PostViewModel> {

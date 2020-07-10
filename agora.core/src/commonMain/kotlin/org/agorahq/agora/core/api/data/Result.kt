@@ -30,6 +30,13 @@ sealed class Result<T : Any, F : Exception> {
         }
     }
 
+    fun orElse(other: T): Result<out T, out F> {
+        return when (this) {
+            is Success -> Success(other)
+            is Failure -> throw exception
+        }
+    }
+
     companion object {
 
         fun <T : Any> create(obj: T?, exceptionProvider: () -> Exception): Result<out T, out Exception> {

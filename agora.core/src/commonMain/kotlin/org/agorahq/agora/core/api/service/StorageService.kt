@@ -7,6 +7,8 @@ interface StorageService<E : Entity> {
 
     fun create(entity: E)
 
+    fun update(entity: E)
+
     fun delete(entity: E)
 
     fun deleteById(id: UUID)

@@ -13,10 +13,12 @@ import io.ktor.sessions.set
 import org.agorahq.agora.core.api.data.*
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.context.PageURLContext
+import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.delivery.data.AgoraSession
 import org.agorahq.agora.delivery.data.AuthenticatedUserState
+import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
 
 suspend fun ApplicationCall.tryRedirectToReferrer(site: SiteMetadata) {
@@ -49,6 +51,13 @@ fun <P : Page> ApplicationCall.toPageURLContext(
         urlClass: KClass<out ResourceURL<P>>
 ): PageURLContext<P> = toOperationContext(site, authorization)
         .toPageURLContext(parameters.toResourceURL(urlClass))
+
+fun ApplicationCall.toResourceIdContext(
+        site: SiteMetadata,
+        authorization: Authorization,
+        id: UUID
+): ResourceIdContext = toOperationContext(site, authorization)
+        .toResourceIdContext(id)
 
 fun ApplicationCall.toOperationContext(
         site: SiteMetadata,

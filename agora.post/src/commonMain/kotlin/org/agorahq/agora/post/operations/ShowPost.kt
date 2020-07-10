@@ -1,5 +1,6 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
 import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.extensions.toCommand
@@ -20,8 +21,12 @@ class ShowPost(
         private val converterService: ConverterService
 ) : RenderResource<Post>, RenderResourceDescriptor<Post> by Companion {
 
-    override fun PageURLContext<Post>.createCommand() = {
-        val post = postQueryService.findByUrl(url).get()
+    override fun PageURLContext<Post>.fetchData(): ElementSource<Post> {
+        return ElementSource.fromElement(postQueryService.findByUrl(url).get())
+    }
+
+    override fun PageURLContext<Post>.createCommand(data: ElementSource<Post>) = {
+        val post = data.asSingle()
         val model = converterService.convertToView<PostViewModel>(post, this).get()
         val renderedPageElements = StringBuilder()
         renderedPageElements.append(renderPageElementListsFor(post))
@@ -29,7 +34,7 @@ class ShowPost(
         POST_DETAILS.render(model.copy(renderedPageElements = renderedPageElements.toString()))
     }.toCommand()
 
-    companion object : RenderResourceDescriptor<Post>{
+    companion object : RenderResourceDescriptor<Post> {
         override val name = "Show Post"
         override val resourceClass = Post::class
         override val type = PageRenderer(Post::class)

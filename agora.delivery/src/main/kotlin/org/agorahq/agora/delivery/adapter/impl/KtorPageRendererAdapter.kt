@@ -1,6 +1,8 @@
 package org.agorahq.agora.delivery.adapter.impl
 
 import io.ktor.application.call
+import io.ktor.http.ContentType
+import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import org.agorahq.agora.core.api.data.Page
@@ -10,7 +12,6 @@ import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.delivery.adapter.KtorOperationAdapter
 import org.agorahq.agora.delivery.extensions.toPageURLContext
-import org.agorahq.agora.delivery.extensions.tryToRespondWithHtml
 import org.hexworks.cobalt.logging.api.LoggerFactory
 
 class KtorPageRendererAdapter<P : Page>(
@@ -24,10 +25,13 @@ class KtorPageRendererAdapter<P : Page>(
     override fun Routing.register() {
         logger.info("Registering module $name with route ${route}.")
         get(operation.route) {
-            call.tryToRespondWithHtml(
-                    call.toPageURLContext(site, authorization, urlClass)
-                            .createCommand()
-                            .execute())
+            call.respondText(
+                    contentType = ContentType.Text.Html,
+                    text = authorization.authorize(call.toPageURLContext(
+                            site = site,
+                            authorization = authorization,
+                            urlClass = operation.urlClass
+                    ), operation).get().execute().get())
         }
     }
 }

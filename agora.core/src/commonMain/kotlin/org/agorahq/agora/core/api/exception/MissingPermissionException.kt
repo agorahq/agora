@@ -6,4 +6,4 @@ import org.agorahq.agora.core.api.security.User
 class MissingPermissionException(
         user: User,
         operation: AnyOperation
-) : RuntimeException("User $user has no permission to perform operation $operation.")
+) : AuthorizationException("User $user has no permission to perform operation $operation.")

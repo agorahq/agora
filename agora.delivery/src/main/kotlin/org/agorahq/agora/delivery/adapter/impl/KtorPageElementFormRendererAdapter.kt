@@ -21,6 +21,6 @@ class KtorPageElementFormRendererAdapter<PE : PageElement, P : Page>(
 
     override fun Routing.register() {
         logger.info("Registering module ${operation.name} with route ${operation.route}.")
-        // TODO:
+        // TODO
     }
 }

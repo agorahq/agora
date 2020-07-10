@@ -18,7 +18,6 @@ class SessionStateTest {
                         firstName = "jon",
                         lastName = "doe",
                         roles = setOf(),
-                        groups = setOf(),
                         email = "a@b.com",
                         username = "jondoe",
                         id = UUID.randomUUID().toString()

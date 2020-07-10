@@ -8,8 +8,8 @@ import org.agorahq.agora.core.api.data.Result.Success
 import org.agorahq.agora.core.api.exception.MissingPermissionException
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.builder.authorization
-import org.agorahq.agora.core.api.security.policy.ResourceFilterPolicy
-import org.agorahq.agora.core.api.security.policy.group
+import org.agorahq.agora.core.api.security.policy.Policy
+import org.agorahq.agora.core.api.security.policy.forAll
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import kotlin.test.Test
@@ -27,9 +27,9 @@ class AuthorizationTest {
                         inStock = true,
                         owner = USER_JOE)))
 
-        val result = with(listItems) {
-            OperationContext.create(SITE, User.ANONYMOUS, AUTH).createCommand().execute()
-        }
+        val ctx = OperationContext.create(SITE, User.ANONYMOUS, AUTH)
+
+        val result = AUTH.authorize(ctx, listItems)
 
         when (result) {
             is Success -> fail("This operation was not supposed to be successful.")
@@ -47,13 +47,11 @@ class AuthorizationTest {
                 baseUrl = "/",
                 moduleRegistry = DefaultModuleRegistry())
 
-        private val REGISTERED_USERS = Group.create("REGISTERED_USERS")
-
         val USER = RoleDescriptor.create("user")
         val ADMIN = RoleDescriptor.create("admin")
 
-        private val IN_STOCK_ONLY = ResourceFilterPolicy.create<Item> {
-            it.inStock
+        private val IN_STOCK_ONLY = Policy.create<Item> { ctx, item ->
+            item.inStock
         }
 
         val USER_JOE = User.create(
@@ -68,14 +66,15 @@ class AuthorizationTest {
             roles {
                 val userRole = USER {
                     Item::class {
-                        ListItems allowFor group(REGISTERED_USERS) filterFor IN_STOCK_ONLY
-                        ShowItem allowFor group(REGISTERED_USERS) filterFor IN_STOCK_ONLY
+                        ListItems withPolicy  IN_STOCK_ONLY
+                        ShowItem withPolicy  IN_STOCK_ONLY
                     }
                 }
                 ADMIN {
                     inherit from userRole
                     Item::class {
-                        ListItems allowFor group(REGISTERED_USERS)
+                        ListItems allow forAll
+                        ShowItem allow forAll
                     }
                 }
             }

@@ -1,65 +1,52 @@
 package org.agorahq.agora.core.internal.security
 
-import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.data.*
+import org.agorahq.agora.core.api.exception.AuthorizationException
 import org.agorahq.agora.core.api.exception.MissingPermissionException
-import org.agorahq.agora.core.api.operation.AnyOperation
+import org.agorahq.agora.core.api.exception.ResourceAccessNotPermittedException
+import org.agorahq.agora.core.api.operation.Command
+import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.*
-import org.agorahq.agora.core.api.security.policy.GroupFilterPolicy
-import org.agorahq.agora.core.api.security.policy.ResourceFilterPolicy
-import org.agorahq.agora.core.api.security.policy.UserFilterPolicy
+import org.agorahq.agora.core.api.security.policy.Policy
 
 data class DefaultAuthorization(
-        private val roles: Iterable<Role>,
-        private val groups: Iterable<Group>
+        private val roles: Iterable<Role>
 ) : Authorization {
 
-    private val roleLookup = roles.map { (descriptor, permissions) ->
-        descriptor to permissions
+    private val roleLookup: Map<String, List<Permission<out Resource>>> = roles.map { role ->
+        role.name to role.permissions.toList()
     }.toMap()
 
-    override fun hasUserAccess(currentUser: User, owner: User, operation: AnyOperation): Boolean {
-        return currentUser.fetchPermissions().fetchMatchingPermissions(operation).any { permission ->
-            permission.policies.filterIsInstance<UserFilterPolicy>().all { policy ->
-                policy(currentUser, owner)
-            }
-        }
-    }
-
-    override fun hasGroupAccess(currentUser: User, operation: AnyOperation): Boolean {
-        return currentUser.fetchPermissions().fetchMatchingPermissions(operation).any { permission ->
-            permission.policies.filterIsInstance<GroupFilterPolicy>().all { policy ->
-                currentUser.groups.any {
-                    policy(it)
+    @Suppress("UNCHECKED_CAST")
+    override fun <R : Resource, C : OperationContext, T : Any> authorize(
+            context: C,
+            operation: Operation<R, C, T>
+    ): Result<out Command<T>, out AuthorizationException> {
+        val user = context.user
+        val permissions = user.permissions
+        return permissions.firstOrNull {
+            it.operationDescriptor.name == operation.name
+        }?.let { (_, _, policies) ->
+            with(operation) {
+                val data = context.fetchData()
+                val filteredData = policies.fold(data) { remaining, next ->
+                    next as Policy<R>
+                    remaining.filter { next(context, it) }
+                }
+                when (data) {
+                    EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation))
+                    is SingleElementSource -> when (filteredData) {
+                        EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation))
+                        is SingleElementSource -> Result.Success(context.createCommand(filteredData))
+                        is MultipleElementSource -> Result.Success(context.createCommand(filteredData))
+                    }
+                    is MultipleElementSource -> Result.Success(context.createCommand(filteredData))
                 }
             }
-        }
+        } ?: Result.Failure(MissingPermissionException(user, operation))
     }
 
-    override fun <R : Resource> hasResourceAccess(user: User, resource: R): Boolean {
-        return user.fetchPermissions().any { permission ->
-            permission.policies.filterIsInstance<ResourceFilterPolicy<R>>().all { policy ->
-                policy(resource)
-            }
-        }
-    }
-
-    override fun tryAuthorize(currentUser: User, owner: User, operation: AnyOperation) {
-        if (hasUserAccess(currentUser, owner, operation).not()) {
-            throw MissingPermissionException(currentUser, operation)
-        }
-    }
-
-    override fun tryAuthorize(currentUser: User, operation: AnyOperation) {
-        if (hasGroupAccess(currentUser, operation).not()) {
-            throw MissingPermissionException(currentUser, operation)
-        }
-    }
-
-    private fun User.fetchPermissions(): List<Permission<out Resource>> = roles.flatMap {
-        roleLookup.getOrElse(it.name) { listOf() }
-    }
-
-    private fun Iterable<Permission<out Resource>>.fetchMatchingPermissions(operation: AnyOperation) = filter {
-        it.name == operation.name
-    }
+    private val User.permissions: List<Permission<out Resource>>
+        get() = roleLookup.keys.intersect(roles.map { it.name }).flatMap { roleLookup.getValue(it) }
 }

@@ -1,7 +1,11 @@
 package org.agorahq.agora.core.api.security
 
-import org.agorahq.agora.core.api.operation.AnyOperation
 import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.data.Result
+import org.agorahq.agora.core.api.exception.AuthorizationException
+import org.agorahq.agora.core.api.operation.Command
+import org.agorahq.agora.core.api.operation.Operation
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.builder.AuthorizationBuilder
 
 /**
@@ -12,36 +16,13 @@ import org.agorahq.agora.core.api.security.builder.AuthorizationBuilder
 interface Authorization {
 
     /**
-     * Tells whether the [currentUser] can perform the given [operation] on an object
-     * owned by [owner].
+     * Tries to authorize the given [operation] within the given [context]. If successful a [Command]
+     * is returned which can be called to execute the - now authorized - [operation].
+     * Otherwise an [AuthorizationException] is returned with a detailed error message.
      */
-    // TODO: user/group access is irrelevant from the outside world
-    // TODO: we should authorize commands, not operations, operations don't have
-    // TODO: the context!
-    fun hasUserAccess(currentUser: User, owner: User, operation: AnyOperation): Boolean
-
-    /**
-     * Tells whether the [currentUser] can perform the given [operation] based on
-     * their group(s).
-     */
-    fun hasGroupAccess(currentUser: User, operation: AnyOperation): Boolean
-
-    /**
-     * Tells whether the given [user] can access the given [resource].
-     */
-    fun <R : Resource> hasResourceAccess(user: User, resource: R): Boolean
-
-    /**
-     * Tries to authorize the [currentUser] to perform [operation] on an
-     * object owned by [owner]. Throws an exception if [currentUser] is not
-     * authorized.
-     */
-    fun tryAuthorize(currentUser: User, owner: User, operation: AnyOperation)
-
-    /**
-     * Tries to authorize the [currentUser] to perform [operation].
-     * Throws an exception if [currentUser] is not authorized.
-     */
-    fun tryAuthorize(currentUser: User, operation: AnyOperation)
+    fun <R : Resource, C : OperationContext, T : Any> authorize(
+            context: C,
+            operation: Operation<R, C, T>
+    ): Result<out Command<T>, out AuthorizationException>
 
 }

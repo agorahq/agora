@@ -1,6 +1,8 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.PageListRenderer
 import org.agorahq.agora.core.api.operation.RenderPageList
 import org.agorahq.agora.core.api.operation.RenderPageListDescriptor
@@ -18,15 +20,21 @@ class ListPosts(
         private val converterService: ConverterService
 ) : RenderPageList<Post>, RenderPageListDescriptor<Post> by Companion {
 
-    override fun OperationContext.createCommand() = {
+    override fun OperationContext.fetchData(): ElementSource<Post> {
+        return ElementSource.fromSequence(postQueryService.findAll())
+    }
+
+    override fun OperationContext.createCommand(data: ElementSource<Post>) = {
         POST_LIST.render(PostListViewModel(
-                posts = postQueryService.findAll().map {
+                posts = data.asSequence().map {
                     converterService.convertToView<PostViewModel>(it, this).get()
                 },
                 context = this))
     }.toCommand()
 
-    companion object: RenderPageListDescriptor<Post> {
+    override fun toString() = OperationDescriptor.toString(this)
+
+    companion object : RenderPageListDescriptor<Post> {
         override val name = "List Posts"
         override val resourceClass = Post::class
         override val type = PageListRenderer(Post::class)

@@ -26,10 +26,12 @@ class KtorPageListRendererAdapter<P : Page>(
         logger.info("Registering module ${operation.name} with route ${operation.route}.")
         get(operation.route) {
             call.respondText(
-                    text = call
-                            .toOperationContext(site, authorization)
-                            .createCommand().execute().get(),
-                    contentType = ContentType.Text.Html)
+                    contentType = ContentType.Text.Html,
+                    text = authorization.authorize(call.toOperationContext(
+                            site = site,
+                            authorization = authorization
+                    ), operation).get().execute().get()
+            )
         }
     }
 }

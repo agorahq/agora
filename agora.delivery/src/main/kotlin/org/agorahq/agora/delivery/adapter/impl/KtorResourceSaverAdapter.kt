@@ -29,9 +29,9 @@ class KtorResourceSaverAdapter<R : Resource, V : ViewModel>(
         logger.info("Registering module $name at route ${route}.")
         post(route) {
             val modelClass = Services.converterService.findViewModelClassFor<R, V>(resourceClass)
-            call.toOperationContext(site, authorization)
+            val ctx = call.toOperationContext(site, authorization)
                     .toViewModelContext(call.receiveParameters().mapTo(modelClass))
-                    .createCommand().execute().get()
+            authorization.authorize(ctx, operation).get().execute().get()
             call.tryRedirectToReferrer(site)
         }
     }

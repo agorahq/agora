@@ -1,7 +1,8 @@
 package org.agorahq.agora.core.api.operation
 
-import org.agorahq.agora.core.api.operation.context.OperationContext
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.operation.context.OperationContext
 
 /**
  * An [Operation] is a procedure which performs some kind of CRUD operation on a [Resource]
@@ -15,5 +16,8 @@ import org.agorahq.agora.core.api.data.Resource
  */
 interface Operation<R : Resource, C : OperationContext, T : Any> : OperationDescriptor<R, C, T> {
 
-    fun C.createCommand(): Command<T>
+    fun C.fetchData(): ElementSource<R>
+
+    fun C.createCommand(data: ElementSource<R>): Command<T>
+
 }

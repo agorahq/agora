@@ -1,3 +1,24 @@
 package org.agorahq.agora.core.api.security.policy
 
-interface Policy
+import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.operation.context.OperationContext
+
+interface Policy<R : Resource> {
+
+    operator fun invoke(
+            context: OperationContext,
+            element: R
+    ): Boolean
+
+    companion object {
+
+        fun <R : Resource> create(
+                fn: (context: OperationContext, element: R) -> Boolean
+        ) = object : Policy<R> {
+            override fun invoke(context: OperationContext, element: R): Boolean {
+                return fn(context, element)
+            }
+
+        }
+    }
+}

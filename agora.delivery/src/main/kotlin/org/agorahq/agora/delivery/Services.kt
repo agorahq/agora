@@ -35,12 +35,12 @@ object Services {
     val listPosts = ListPosts(postQueryService, converterService)
     val renderPost = ShowPost(postQueryService, converterService)
     val createPost = CreatePost(postStorage, converterService)
-    val deletePost = DeletePost(postStorage)
+    val deletePost = DeletePost(postQueryService, postStorage)
 
     val listComments = ListComments(commentQueryService, converterService)
     val renderCommentForm = ShowCommentForm()
     val createComment = CreateComment(commentStorage, converterService)
-    val deleteComment = DeleteComment(commentStorage)
+    val deleteComment = DeleteComment(commentQueryService, commentStorage)
 
     val postModule = PostModule(listOf(listPosts, renderPost, listComments))
     val commentModule = CommentModule(listOf(renderCommentForm, createComment))

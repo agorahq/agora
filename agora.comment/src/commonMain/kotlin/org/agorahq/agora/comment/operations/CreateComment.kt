@@ -3,6 +3,7 @@ package org.agorahq.agora.comment.operations
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
+import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.OperationType.ResourceSaver
 import org.agorahq.agora.core.api.operation.SaveResource
@@ -16,11 +17,15 @@ class CreateComment(
         private val converterService: ConverterService
 ) : SaveResource<Comment, CommentViewModel>, SaveResourceDescriptor<Comment, CommentViewModel> by Companion {
 
-    override fun ViewModelContext<CommentViewModel>.createCommand() = {
+    override fun ViewModelContext<CommentViewModel>.fetchData(): ElementSource<Comment> {
         val enrichedModel = viewModel.copy(
                 userId = user.id.toString(),
                 username = user.username)
-        commentStorage.create(converterService.convertToResource<Comment>(enrichedModel).get())
+        return ElementSource.fromElement(converterService.convertToResource<Comment>(enrichedModel).get())
+    }
+
+    override fun ViewModelContext<CommentViewModel>.createCommand(data: ElementSource<Comment>) = {
+        commentStorage.create(data.asSingle())
     }.toCommand()
 
     companion object : SaveResourceDescriptor<Comment, CommentViewModel> {
