@@ -22,10 +22,7 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
-import io.ktor.server.engine.applicationEngineEnvironment
-import io.ktor.server.engine.connector
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.sslConnector
+import io.ktor.server.engine.*
 import io.ktor.server.netty.Netty
 import io.ktor.sessions.*
 import io.ktor.util.pipeline.PipelineContext
@@ -53,38 +50,44 @@ private val logger = LoggerFactory.getLogger("Application")
 private val json = Json(JsonConfiguration.Stable)
 
 private const val keyAlias = "mykey"
-private const val password = "changeit"
-private val passwordArr = password.toCharArray()
+private const val PASSWORD = "changeit"
+private val PASSWORD_ARR = PASSWORD.toCharArray()
+
+private val PORT = System.getenv("PORT")?.toInt() ?: 8080
 
 fun main(args: Array<String>) {
-    val keyStoreFile = File.createTempFile("cert-", ".jks")
-    generateCertificate(
-            file = keyStoreFile,
-            keyAlias = keyAlias,
-            keyPassword = password
-    )
-    val keyStore = KeyStore.getInstance("JKS")
-    keyStore.load(keyStoreFile.inputStream(), passwordArr)
     val env = applicationEngineEnvironment {
         module {
             main()
         }
         connector {
-            port = 8080
+            port = PORT
             host = "0.0.0.0"
         }
-        sslConnector(
-                keyStore = keyStore,
-                keyAlias = keyAlias,
-                keyStorePassword = { passwordArr },
-                privateKeyPassword = { passwordArr }
-        ) {
-            port = 8443
-            keyStorePath = keyStoreFile.absoluteFile
-        }
+//        addSSLConnector()
     }
     embeddedServer(Netty, env).apply {
         start(wait = true)
+    }
+}
+
+private fun ApplicationEngineEnvironmentBuilder.addSSLConnector() {
+    val keyStoreFile = File.createTempFile("cert-", ".jks")
+    generateCertificate(
+            file = keyStoreFile,
+            keyAlias = keyAlias,
+            keyPassword = PASSWORD
+    )
+    val keyStore = KeyStore.getInstance("JKS")
+    keyStore.load(keyStoreFile.inputStream(), PASSWORD_ARR)
+    sslConnector(
+            keyStore = keyStore,
+            keyAlias = keyAlias,
+            keyStorePassword = { PASSWORD_ARR },
+            privateKeyPassword = { PASSWORD_ARR }
+    ) {
+        port = 8443
+        keyStorePath = keyStoreFile.absoluteFile
     }
 }
 
