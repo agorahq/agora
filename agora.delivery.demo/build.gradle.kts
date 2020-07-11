@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.serialization") version "1.3.71"
 }
 
-val mainClassName = "io.ktor.server.netty.EngineMain"
+val mainClassName = "org.agorahq.agora.delivery.ApplicationKt"
 
 
 kotlin {

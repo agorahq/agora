@@ -22,7 +22,11 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
-import io.ktor.server.netty.EngineMain
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.sslConnector
+import io.ktor.server.netty.Netty
 import io.ktor.sessions.*
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.serialization.json.Json
@@ -41,25 +45,50 @@ import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
 import org.agorahq.agora.delivery.security.BuiltInRoles
-import org.apache.http.auth.AUTH
 import org.hexworks.cobalt.logging.api.LoggerFactory
 import java.io.File
+import java.security.KeyStore
 
 private val logger = LoggerFactory.getLogger("Application")
 private val json = Json(JsonConfiguration.Stable)
 
+private const val keyAlias = "mykey"
+private const val password = "changeit"
+private val passwordArr = password.toCharArray()
+
 fun main(args: Array<String>) {
-    val jksFile = File("build/temporary.jks").apply {
-        parentFile.mkdirs()
+    val keyStoreFile = File.createTempFile("cert-", ".jks")
+    generateCertificate(
+            file = keyStoreFile,
+            keyAlias = keyAlias,
+            keyPassword = password
+    )
+    val keyStore = KeyStore.getInstance("JKS")
+    keyStore.load(keyStoreFile.inputStream(), passwordArr)
+    val env = applicationEngineEnvironment {
+        module {
+            main()
+        }
+        connector {
+            port = 8080
+            host = "0.0.0.0"
+        }
+        sslConnector(
+                keyStore = keyStore,
+                keyAlias = keyAlias,
+                keyStorePassword = { passwordArr },
+                privateKeyPassword = { passwordArr }
+        ) {
+            port = 8443
+            keyStorePath = keyStoreFile.absoluteFile
+        }
     }
-    if (!jksFile.exists()) {
-        generateCertificate(jksFile)
+    embeddedServer(Netty, env).apply {
+        start(wait = true)
     }
-    EngineMain.main(args)
 }
 
-fun Application.module() {
-
+fun Application.main() {
     val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
             name = "google",
             authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
