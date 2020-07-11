@@ -34,7 +34,8 @@ suspend fun ApplicationCall.redirectToRootWithMsg(site: SiteMetadata, message: M
 
 fun ApplicationCall.createRedirectFor(path: String): String {
     val defaultPort = if (request.origin.scheme == "http") 80 else 443
-    val hostPort = request.host() + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
+    val port = System.getenv("EXTERNAL_PORT")?.toInt() ?: request.port()
+    val hostPort = request.host() + if (port == defaultPort) "" else ":$port"
     val protocol = request.origin.scheme
     return "$protocol://$hostPort$path"
 }
