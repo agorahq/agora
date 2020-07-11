@@ -23,7 +23,9 @@ kotlin {
             commonMainApi(kotlinReflect)
             commonMainApi(kotlinxHtmlCommon)
             commonMainApi("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+
             commonMainApi(cobaltCore)
+            commonMainApi("com.soywiz.korlibs.klock:klock:1.11.14")
 
             jvmMainApi(kotlinStdLibJdk8)
             jvmMainApi("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")

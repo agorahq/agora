@@ -1,9 +1,12 @@
 package org.agorahq.agora.post.converter
 
+import com.soywiz.klock.DateTime
 import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
+import org.agorahq.agora.core.api.shared.date.Dates
+import org.agorahq.agora.core.api.shared.date.Dates.simpleDateFormat
 import org.agorahq.agora.core.api.view.ResourceConverter
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
 import org.agorahq.agora.post.domain.Post
@@ -31,5 +34,7 @@ class PostConverter(
             tags = tags,
             content = MarkdownRendererFactory.createRenderer().render(content),
             context = context,
-            renderedPageElements = "")
+            renderedPageElements = "",
+            excerpt = excerpt,
+            publicationDate = DateTime.fromUnix(publishedAt).format(simpleDateFormat))
 }

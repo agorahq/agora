@@ -2,7 +2,7 @@ package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.domain.CommentURL
-import org.agorahq.agora.comment.templates.COMMENT_FORM
+import org.agorahq.agora.comment.templates.renderCommentForm
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Page
@@ -11,6 +11,7 @@ import org.agorahq.agora.core.api.operation.OperationType.PageElementFormRendere
 import org.agorahq.agora.core.api.operation.RenderPageElementForm
 import org.agorahq.agora.core.api.operation.RenderPageElementFormDescriptor
 import org.agorahq.agora.core.api.operation.context.PageContext
+import org.agorahq.agora.core.api.shared.templates.Templates
 
 class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementFormDescriptor<Comment, Page> by Companion {
 
@@ -23,11 +24,15 @@ class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementF
 
     override fun PageContext<Page>.createCommand(data: ElementSource<Comment>) = {
         val comment = data.asSingle()
-        COMMENT_FORM.render(CommentViewModel(
-                parentId = comment.parentId.toString(),
-                content = comment.content,
-                username = comment.owner.username,
-                userId = comment.owner.id.toString()))
+        val context = this
+        Templates.htmlPartial {
+            renderCommentForm(CommentViewModel(
+                    parentId = comment.parentId.toString(),
+                    content = comment.content,
+                    username = comment.owner.username,
+                    userId = comment.owner.id.toString()
+            ))
+        }
     }.toCommand()
 
     companion object : RenderPageElementFormDescriptor<Comment, Page> {

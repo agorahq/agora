@@ -6,6 +6,8 @@ import org.agorahq.agora.core.api.view.ViewModel
 data class PostViewModel(
         val ownerId: String,
         val shortDescription: String,
+        val excerpt: String,
+        val publicationDate: String,
         val url: String,
         val title: String,
         val tags: Iterable<String>,

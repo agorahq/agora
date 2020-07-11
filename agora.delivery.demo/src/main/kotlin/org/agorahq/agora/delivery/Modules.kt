@@ -7,14 +7,17 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.security.Authorization
-import org.agorahq.agora.core.api.shared.templates.DEFAULT_HOMEPAGE
+import org.agorahq.agora.core.api.shared.templates.Templates
+import org.agorahq.agora.core.api.shared.templates.renderDefaultHomepage
 import org.agorahq.agora.delivery.adapter.impl.*
 import org.agorahq.agora.delivery.extensions.toOperationContext
 
 fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
 
     get(site.baseUrl) {
-        call.respondText(DEFAULT_HOMEPAGE.render(call.toOperationContext(site, authorization)), ContentType.Text.Html)
+        call.respondText(Templates.htmlTemplate {
+            renderDefaultHomepage(call.toOperationContext(site, authorization))
+        }, ContentType.Text.Html)
     }
 
     with(KtorPageListRendererAdapter(Services.listPosts, site, authorization)) { register() }

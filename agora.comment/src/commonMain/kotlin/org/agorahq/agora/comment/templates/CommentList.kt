@@ -1,14 +1,10 @@
 package org.agorahq.agora.comment.templates
 
-import kotlinx.html.dd
-import kotlinx.html.dl
-import kotlinx.html.dt
-import kotlinx.html.h3
+import kotlinx.html.*
 import org.agorahq.agora.comment.viewmodel.CommentListViewModel
 import org.agorahq.agora.core.api.extensions.htmlContent
-import org.agorahq.agora.core.api.template.template
 
-val COMMENT_LIST = template<CommentListViewModel> { model ->
+fun FlowContent.renderCommentList(model: CommentListViewModel) {
     h3 { +"Comments" }
     dl {
         model.comments.forEach { comment ->
@@ -17,3 +13,4 @@ val COMMENT_LIST = template<CommentListViewModel> { model ->
         }
     }
 }
+

@@ -1,38 +1,28 @@
 package org.agorahq.agora.core.api.shared.templates
 
 import kotlinx.html.*
-import org.agorahq.agora.core.api.extensions.include
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.template.template
+import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 
-val DEFAULT_HOMEPAGE = template<OperationContext> { ctx ->
+fun HTML.renderDefaultHomepage(ctx: OperationContext) = withDefaultLayout(ctx, "Home") {
     val (site, _, _, message) = ctx
-    html {
-        include(DEFAULT_HEAD, site.title)
-        body {
-            include(DEFAULT_NAVIGATION, ctx)
-            div("container") {
-                message?.let {
-                    div("alert alert-${it.type.name.toLowerCase()} alert-dismissable fade show mt-3") {
-                        attributes["role"] = "alert"
-                        + it.text
-                        button(type = ButtonType.button, classes = "close") {
-                            attributes["data-dismiss"] = "alert"
-                            attributes["aria-label"] = "Close"
-                            span {
-                                attributes["aria-hidden"] = "true"
-                                unsafe {
-                                    +"&times"
-                                }
-                            }
-                        }
+    message?.let {
+        div("alert alert-${it.type.name.toLowerCase()} alert-dismissable fade show mt-3") {
+            attributes["role"] = "alert"
+            +it.text
+            button(type = ButtonType.button, classes = "close") {
+                attributes["data-dismiss"] = "alert"
+                attributes["aria-label"] = "Close"
+                span {
+                    attributes["aria-hidden"] = "true"
+                    unsafe {
+                        +"&times"
                     }
                 }
-                h1 {
-                    +site.title
-                }
-                include(DEFAULT_FOOTER, site)
             }
         }
+    }
+    h1 {
+        +site.title
     }
 }

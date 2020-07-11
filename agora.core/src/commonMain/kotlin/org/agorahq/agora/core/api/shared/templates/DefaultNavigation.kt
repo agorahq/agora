@@ -1,19 +1,13 @@
 package org.agorahq.agora.core.api.shared.templates
 
-import kotlinx.html.a
-import kotlinx.html.div
-import kotlinx.html.li
-import kotlinx.html.nav
-import kotlinx.html.span
-import kotlinx.html.ul
+import kotlinx.html.*
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.forEachModuleHavingOperationWithType
 import org.agorahq.agora.core.api.extensions.isAnonymous
-import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.OperationType.PageListRenderer
-import org.agorahq.agora.core.api.template.template
+import org.agorahq.agora.core.api.operation.context.OperationContext
 
-val DEFAULT_NAVIGATION = template<OperationContext> { ctx ->
+fun FlowContent.renderDefaultNavigation(ctx: OperationContext) {
     val (site, user) = ctx
     nav("navbar navbar-expand-lg navbar-dark bg-dark") {
         div("container") {

@@ -1,14 +1,10 @@
 package org.agorahq.agora.comment.templates
 
-import kotlinx.html.FormMethod
-import kotlinx.html.InputType
-import kotlinx.html.form
-import kotlinx.html.input
+import kotlinx.html.*
 import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
-import org.agorahq.agora.core.api.template.template
 
-val COMMENT_FORM = template<CommentViewModel> { model ->
+fun FlowContent.renderCommentForm(model: CommentViewModel) {
     form(action = CommentURL.root, method = FormMethod.post) {
         input(type = InputType.text, name = CommentViewModel::content.name)
         input(type = InputType.hidden, name = CommentViewModel::parentId.name) {

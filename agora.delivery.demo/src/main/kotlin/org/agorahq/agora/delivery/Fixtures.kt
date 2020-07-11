@@ -1,5 +1,6 @@
 package org.agorahq.agora.delivery
 
+import com.soywiz.klock.DateTime
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.operations.CreateComment
 import org.agorahq.agora.comment.operations.DeleteComment
@@ -13,7 +14,6 @@ import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import org.agorahq.agora.delivery.extensions.commentIsNotHidden
 import org.agorahq.agora.delivery.extensions.postIsPublished
-import org.agorahq.agora.delivery.extensions.toTimestamp
 import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
 import org.agorahq.agora.delivery.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.post.domain.Post
@@ -22,7 +22,6 @@ import org.agorahq.agora.post.operations.DeletePost
 import org.agorahq.agora.post.operations.ListPosts
 import org.agorahq.agora.post.operations.ShowPost
 import org.hexworks.cobalt.core.api.UUID
-import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap
 
 val POST_A_ID = UUID.randomUUID()
@@ -34,7 +33,7 @@ val AUTHORIZATION = authorization {
         val anonymousRole = ANONYMOUS {
 
             Post::class {
-                ListPosts allow forAll
+                ListPosts withPolicy postIsPublished
                 ShowPost withPolicy postIsPublished
             }
 
@@ -91,14 +90,20 @@ val OGABI = User.create(
         username = "ogabi",
         roles = setOf(ADMIN))
 
+val ADDAMSSON = User.create(
+        email = "adam.arold@gmail.com",
+        username = "addamsson",
+        roles = setOf(ADMIN))
+
 
 val POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
         owner = OGABI,
         tags = setOf("agora", "post"),
-        createdAt = LocalDate.of(2019, 12, 28).toTimestamp(),
+        createdAt = DateTime.nowUnixLong(),
         shortDescription = "Agora is planned to launch in early Q2.",
+        excerpt = "After half a year of active development Agora is planned to launch in closed beta.",
         content = """
             After half a year of active development Agora is planned to launch in closed beta.
             
@@ -111,8 +116,9 @@ val POST_B = Post(
         title = "Agora is using Ktor",
         tags = setOf("agora", "ktor"),
         owner = OGABI,
-        createdAt = LocalDate.of(2019, 12, 29).toTimestamp(),
+        createdAt = DateTime.nowUnixLong(),
         shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
+        excerpt = "After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.",
         content = """
             After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.
             
@@ -149,6 +155,7 @@ val USERS = ConcurrentHashMap<UUID, User>().apply {
     put(JENNA.id, JENNA)
     put(FRANK.id, FRANK)
     put(OGABI.id, OGABI)
+    put(ADDAMSSON.id, ADDAMSSON)
 }
 
 val GOOGLE_CLIENT_ID = System.getenv("GOOGLE_OAUTH_CLIENT_ID")

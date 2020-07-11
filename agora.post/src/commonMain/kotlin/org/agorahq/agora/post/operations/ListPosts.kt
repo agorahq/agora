@@ -8,10 +8,11 @@ import org.agorahq.agora.core.api.operation.RenderPageList
 import org.agorahq.agora.core.api.operation.RenderPageListDescriptor
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.service.PageQueryService
+import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.domain.PostURL
-import org.agorahq.agora.post.templates.POST_LIST
+import org.agorahq.agora.post.templates.renderPostList
 import org.agorahq.agora.post.viewmodel.PostListViewModel
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
@@ -25,11 +26,15 @@ class ListPosts(
     }
 
     override fun OperationContext.createCommand(data: ElementSource<Post>) = {
-        POST_LIST.render(PostListViewModel(
-                posts = data.asSequence().map {
-                    converterService.convertToView<PostViewModel>(it, this).get()
-                },
-                context = this))
+        val ctx = this
+        Templates.htmlTemplate {
+            renderPostList(PostListViewModel(
+                    posts = data.asSequence().sortedByDescending { it.publishedAt }.map {
+                        converterService.convertToView<PostViewModel>(it, ctx).get()
+                    },
+                    context = ctx
+            ))
+        }
     }.toCommand()
 
     override fun toString() = OperationDescriptor.toString(this)

@@ -36,8 +36,9 @@ import org.agorahq.agora.core.api.extensions.isAuthenticated
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.ModuleRegistry
-import org.agorahq.agora.core.api.shared.templates.DEFAULT_LOGIN_PAGE
-import org.agorahq.agora.core.api.shared.templates.DEFAULT_REGISTRATION_PAGE
+import org.agorahq.agora.core.api.shared.templates.Templates
+import org.agorahq.agora.core.api.shared.templates.renderDefaultLoginPage
+import org.agorahq.agora.core.api.shared.templates.renderDefaultRegistrationPage
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
@@ -64,30 +65,12 @@ fun main(args: Array<String>) {
             port = PORT
             host = "0.0.0.0"
         }
-//        addSSLConnector()
+        if ((System.getenv("HEROKU")?.toBoolean() == true).not()) {
+            addSSLConnector()
+        }
     }
     embeddedServer(Netty, env).apply {
         start(wait = true)
-    }
-}
-
-private fun ApplicationEngineEnvironmentBuilder.addSSLConnector() {
-    val keyStoreFile = File.createTempFile("cert-", ".jks")
-    generateCertificate(
-            file = keyStoreFile,
-            keyAlias = keyAlias,
-            keyPassword = PASSWORD
-    )
-    val keyStore = KeyStore.getInstance("JKS")
-    keyStore.load(keyStoreFile.inputStream(), PASSWORD_ARR)
-    sslConnector(
-            keyStore = keyStore,
-            keyAlias = keyAlias,
-            keyStorePassword = { PASSWORD_ARR },
-            privateKeyPassword = { PASSWORD_ARR }
-    ) {
-        port = 8443
-        keyStorePath = keyStoreFile.absoluteFile
     }
 }
 
@@ -152,7 +135,9 @@ fun Application.main() {
         get("/login") {
             whenNotAuthenticated { ctx ->
                 call.respondText(
-                        text = DEFAULT_LOGIN_PAGE.render(ctx),
+                        text = Templates.htmlTemplate {
+                            renderDefaultLoginPage(ctx)
+                        },
                         contentType = ContentType.Text.Html)
             }
         }
@@ -177,8 +162,9 @@ fun Application.main() {
                     is RegisteringState -> {
                         logger.info("Rendering registration form...")
                         call.respondText(
-                                text = DEFAULT_REGISTRATION_PAGE.render(
-                                        state.toUserRegistrationModel(ctx)),
+                                text = Templates.htmlTemplate {
+                                    renderDefaultRegistrationPage(state.toUserRegistrationModel(ctx))
+                                },
                                 contentType = ContentType.Text.Html)
                     }
                 }
@@ -213,7 +199,9 @@ fun Application.main() {
                         } else {
                             logger.info("Model is not valid, re-rendering registration page.")
                             call.respondText(
-                                    text = DEFAULT_REGISTRATION_PAGE.render(model),
+                                    text = Templates.htmlTemplate {
+                                        renderDefaultRegistrationPage(model)
+                                    },
                                     contentType = ContentType.Text.Html)
                         }
                     }
@@ -305,3 +293,23 @@ private fun RegisteringState.toUserRegistrationModel(
         firstName = oauthUser.firstName,
         lastName = oauthUser.lastName
 )
+
+private fun ApplicationEngineEnvironmentBuilder.addSSLConnector() {
+    val keyStoreFile = File.createTempFile("cert-", ".jks")
+    generateCertificate(
+            file = keyStoreFile,
+            keyAlias = keyAlias,
+            keyPassword = PASSWORD
+    )
+    val keyStore = KeyStore.getInstance("JKS")
+    keyStore.load(keyStoreFile.inputStream(), PASSWORD_ARR)
+    sslConnector(
+            keyStore = keyStore,
+            keyAlias = keyAlias,
+            keyStorePassword = { PASSWORD_ARR },
+            privateKeyPassword = { PASSWORD_ARR }
+    ) {
+        port = 8443
+        keyStorePath = keyStoreFile.absoluteFile
+    }
+}

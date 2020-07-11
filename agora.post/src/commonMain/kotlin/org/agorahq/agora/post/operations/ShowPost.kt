@@ -9,10 +9,11 @@ import org.agorahq.agora.core.api.operation.RenderResource
 import org.agorahq.agora.core.api.operation.RenderResourceDescriptor
 import org.agorahq.agora.core.api.operation.context.PageURLContext
 import org.agorahq.agora.core.api.service.PageQueryService
+import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.domain.PostURL
-import org.agorahq.agora.post.templates.POST_DETAILS
+import org.agorahq.agora.post.templates.renderPostDetails
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
 @Suppress("UNCHECKED_CAST")
@@ -26,12 +27,18 @@ class ShowPost(
     }
 
     override fun PageURLContext<Post>.createCommand(data: ElementSource<Post>) = {
+        val ctx = this
         val post = data.asSingle()
         val model = converterService.convertToView<PostViewModel>(post, this).get()
         val renderedPageElements = StringBuilder()
         renderedPageElements.append(renderPageElementListsFor(post))
         renderedPageElements.append(renderPageElementFormsFor(post))
-        POST_DETAILS.render(model.copy(renderedPageElements = renderedPageElements.toString()))
+        Templates.htmlTemplate {
+            renderPostDetails(
+                    model = model.copy(renderedPageElements = renderedPageElements.toString()),
+                    ctx = ctx
+            )
+        }
     }.toCommand()
 
     companion object : RenderResourceDescriptor<Post> {
