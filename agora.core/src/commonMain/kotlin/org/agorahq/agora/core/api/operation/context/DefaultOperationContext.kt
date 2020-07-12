@@ -10,4 +10,4 @@ data class DefaultOperationContext(
         override val user: User,
         override val authorization: Authorization,
         override val message: Message? = null
-) : OperationContext
+) : BaseOperationContext()

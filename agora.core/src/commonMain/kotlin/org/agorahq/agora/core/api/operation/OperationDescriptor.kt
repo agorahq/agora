@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api.operation
 
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.internal.security.DefaultOperationDescriptor
 import kotlin.reflect.KClass
 
@@ -38,13 +38,7 @@ interface OperationDescriptor<R : Resource, C : OperationContext, T : Any> {
                 urlClass = urlClass)
 
         fun <R : Resource, C : OperationContext, T : Any> toString(descriptor: OperationDescriptor<R, C, T>): String {
-            with(descriptor) {
-                return "OperationDescriptor(name=$name, " +
-                        "resourceClass=${resourceClass.simpleName}, " +
-                        "type=$type, " +
-                        "route=$route, " +
-                        "urlClass=$urlClass)"
-            }
+            return descriptor.name
         }
 
     }

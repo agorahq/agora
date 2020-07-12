@@ -1,15 +1,9 @@
 package org.agorahq.agora.core.api.template
 
-import kotlinx.html.body
-import kotlinx.html.div
-import kotlinx.html.footer
-import kotlinx.html.h1
-import kotlinx.html.head
-import kotlinx.html.html
-import kotlinx.html.title
+import kotlinx.html.*
 import org.agorahq.agora.core.api.extensions.documentContent
-import org.agorahq.agora.core.api.extensions.include
 import org.agorahq.agora.core.api.security.User
+import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import kotlin.test.Test
@@ -19,7 +13,9 @@ class TemplateTest {
 
     @Test
     fun should_properly_render_simple_layout() {
-        val actualRenderedLayout = POST_TEMPLATE.render(PostData(POST, SITE))
+        val actualRenderedLayout = Templates.htmlTemplate(prettyPrint = false) {
+            renderPostTemplate(PostData(POST, SITE))
+        }
 
         assertEquals(EXPECTED_RENDERED_POST_TEMPLATE, actualRenderedLayout)
     }
@@ -44,27 +40,26 @@ class TemplateTest {
                 content = "Better get prepared.",
                 owner = TEST_USER)
 
-        private val HEAD = template<String> { title ->
+        private fun HTML.renderHead(title: String) {
             head {
                 title(title)
             }
         }
 
-        private val POST_TEMPLATE = template<PostData> { (post, site) ->
-            html {
-                include(HEAD, post.title)
-                body {
-                    div("container") {
-                        h1 {
-                            +post.title
-                        }
-                        div {
-                            documentContent(post)
-                        }
+        private fun HTML.renderPostTemplate(postData: PostData) {
+            val (post, site) = postData
+            renderHead(post.title)
+            body {
+                div("container") {
+                    h1 {
+                        +post.title
                     }
-                    footer {
-                        text("Copyright ${site.title}. Contact: ${site.email}")
+                    div {
+                        documentContent(post)
                     }
+                }
+                footer {
+                    text("Copyright ${site.title}. Contact: ${site.email}")
                 }
             }
         }

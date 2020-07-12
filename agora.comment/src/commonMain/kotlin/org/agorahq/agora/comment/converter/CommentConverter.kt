@@ -1,5 +1,6 @@
 package org.agorahq.agora.comment.converter
 
+import com.soywiz.klock.DateTime
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.exception.EntityNotFoundException
@@ -9,7 +10,6 @@ import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.view.ResourceConverter
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
-import org.agorahq.agora.core.platform.SystemUtils
 import org.hexworks.cobalt.core.api.UUID
 
 class CommentConverter(
@@ -22,9 +22,7 @@ class CommentConverter(
     override fun CommentViewModel.toResource() = Comment(
             owner = userService.findById(userId.toUUID()).orElseThrow { EntityNotFoundException(User::class, userId) },
             parentId = parentId.toUUID(),
-            createdAt = SystemUtils.currentTimeMillis(),
-            updatedAt = SystemUtils.currentTimeMillis(),
-            publishedAt = SystemUtils.currentTimeMillis(),
+            createdAt = DateTime.now(),
             content = content,
             id = id?.toUUID() ?: UUID.randomUUID())
 

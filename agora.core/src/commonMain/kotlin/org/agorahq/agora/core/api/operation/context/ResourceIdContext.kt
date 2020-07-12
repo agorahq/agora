@@ -12,4 +12,4 @@ data class ResourceIdContext(
         override val authorization: Authorization,
         override val message: Message? = null,
         val id: UUID
-) : OperationContext
+) : BaseOperationContext()

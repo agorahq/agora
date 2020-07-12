@@ -13,7 +13,7 @@ import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.domain.PostURL
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
-class CreatePost(
+class EditPost(
         private val postStorage: StorageService<Post>,
         private val converterService: ConverterService
 ) : SaveResource<Post, PostViewModel>, SaveResourceDescriptor<Post, PostViewModel> by Companion {
@@ -30,10 +30,10 @@ class CreatePost(
 
     companion object : SaveResourceDescriptor<Post, PostViewModel> {
 
-        override val name = "Create Post"
+        override val name = "Edit Post"
         override val resourceClass = Post::class
         override val type = ResourceSaver(Post::class, PostViewModel::class)
-        override val route = PostURL.root
+        override val route = "${PostURL.root}/edit"
         override val urlClass = PostURL::class
 
         override fun toString() = OperationDescriptor.toString(this)

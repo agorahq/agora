@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package org.agorahq.agora.core.api.shared.templates
 
 import kotlinx.html.HTML

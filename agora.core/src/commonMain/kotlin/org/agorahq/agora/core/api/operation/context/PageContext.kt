@@ -12,4 +12,4 @@ data class PageContext<P : Page>(
         override val authorization: Authorization,
         override val message: Message? = null,
         val page: P
-) : OperationContext
+) : BaseOperationContext()

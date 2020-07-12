@@ -26,11 +26,11 @@ class RoleBuilder(private val descriptor: RoleDescriptor) {
     }
 
     fun build(): Role {
-        val finalPermissions = parents.map { it.permissions }
-                .map { permissions -> permissions.groupBy { it.operationDescriptor } }
-                .plus(permissions.groupBy { it.operationDescriptor })
-                .fold(mapOf<AnyOperationDescriptor, List<Permission<out Resource>>>()) { acc, next -> acc + next }
-                .flatMap { it.value }
+        val finalPermissions = parents.map { parent -> parent.permissions }
+                .map { parentPermissions -> parentPermissions.groupBy { it.operationDescriptor.name } }
+                .plus(permissions.groupBy { it.operationDescriptor.name })
+                .fold(mapOf<String, List<Permission<out Resource>>>()) { acc, next -> acc + next }
+                .flatMap { permission -> permission.value }
 
         return DefaultRole(
                 name = descriptor.name,

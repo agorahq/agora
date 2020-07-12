@@ -3,6 +3,7 @@ package org.agorahq.agora.core.api.security
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.exception.AuthorizationException
+import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.OperationContext
@@ -14,6 +15,14 @@ import org.agorahq.agora.core.api.security.builder.AuthorizationBuilder
  * a new [Authorization] object.
  */
 interface Authorization {
+
+    /**
+     * Tells whether the given [operationDescriptor] can be executed in the given [context]
+     */
+    fun <C : OperationContext> canExecute(
+            context: C,
+            operationDescriptor: AnyOperationDescriptor
+    ): Boolean
 
     /**
      * Tries to authorize the given [operation] within the given [context]. If successful a [Command]

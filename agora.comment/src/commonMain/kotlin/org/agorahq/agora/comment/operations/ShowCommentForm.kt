@@ -24,7 +24,6 @@ class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementF
 
     override fun PageContext<Page>.createCommand(data: ElementSource<Comment>) = {
         val comment = data.asSingle()
-        val context = this
         Templates.htmlPartial {
             renderCommentForm(CommentViewModel(
                     parentId = comment.parentId.toString(),

@@ -1,5 +1,6 @@
 package org.agorahq.agora.core.api.data
 
+import com.soywiz.klock.DateTime
 import org.agorahq.agora.core.api.security.User
 
 /**
@@ -14,9 +15,9 @@ interface Resource : Entity {
     val format: ContentFormat
     val content: String
 
-    val createdAt: Long
-    val updatedAt: Long
-    val publishedAt: Long
+    val createdAt: DateTime
+    val updatedAt: DateTime
+    val publishedAt: DateTime
 
     companion object
 }

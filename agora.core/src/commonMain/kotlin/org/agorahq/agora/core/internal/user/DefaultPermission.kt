@@ -10,4 +10,10 @@ data class DefaultPermission<R : Resource>(
         override val name: String,
         override val operationDescriptor: OperationDescriptor<out R, out OperationContext, out Any>,
         override val policies: Iterable<Policy<out R>>
-) : Permission<R>
+) : Permission<R> {
+
+    override fun toString() =
+            "Permission '$name' enables '$operationDescriptor' operation" +
+                    if (policies.toList().isEmpty()) "" else " with policies: ${policies.joinToString()}."
+
+}

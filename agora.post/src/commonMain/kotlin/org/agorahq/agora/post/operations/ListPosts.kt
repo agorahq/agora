@@ -40,10 +40,13 @@ class ListPosts(
     override fun toString() = OperationDescriptor.toString(this)
 
     companion object : RenderPageListDescriptor<Post> {
+
         override val name = "List Posts"
         override val resourceClass = Post::class
         override val type = PageListRenderer(Post::class)
         override val route = PostURL.root
         override val urlClass = PostURL::class
+
+        override fun toString() = OperationDescriptor.toString(this)
     }
 }

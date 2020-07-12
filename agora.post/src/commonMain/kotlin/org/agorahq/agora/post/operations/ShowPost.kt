@@ -4,6 +4,7 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
 import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.PageRenderer
 import org.agorahq.agora.core.api.operation.RenderResource
 import org.agorahq.agora.core.api.operation.RenderResourceDescriptor
@@ -41,11 +42,16 @@ class ShowPost(
         }
     }.toCommand()
 
+    override fun toString() = OperationDescriptor.toString(this)
+
     companion object : RenderResourceDescriptor<Post> {
+
         override val name = "Show Post"
         override val resourceClass = Post::class
         override val type = PageRenderer(Post::class)
         override val route = PostURL.route
         override val urlClass = PostURL::class
+
+        override fun toString() = OperationDescriptor.toString(this)
     }
 }

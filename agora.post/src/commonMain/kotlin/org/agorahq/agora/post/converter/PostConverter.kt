@@ -5,8 +5,7 @@ import org.agorahq.agora.core.api.extensions.toUUID
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
-import org.agorahq.agora.core.api.shared.date.Dates
-import org.agorahq.agora.core.api.shared.date.Dates.simpleDateFormat
+import org.agorahq.agora.core.api.shared.date.Dates.humanReadableFormat
 import org.agorahq.agora.core.api.view.ResourceConverter
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
 import org.agorahq.agora.post.domain.Post
@@ -36,5 +35,8 @@ class PostConverter(
             context = context,
             renderedPageElements = "",
             excerpt = excerpt,
-            publicationDate = DateTime.fromUnix(publishedAt).format(simpleDateFormat))
+            publicationDate = publishedAt.format(humanReadableFormat),
+            isPublished = publishedAt.unixMillisLong < DateTime.nowUnixLong(),
+            id = id.toString()
+    )
 }

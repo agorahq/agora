@@ -42,7 +42,7 @@ import org.agorahq.agora.core.api.shared.templates.renderDefaultRegistrationPage
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
-import org.agorahq.agora.delivery.security.BuiltInRoles
+import org.agorahq.agora.core.api.shared.security.BuiltInRoles
 import org.hexworks.cobalt.logging.api.LoggerFactory
 import java.io.File
 import java.security.KeyStore
@@ -207,7 +207,6 @@ fun Application.main() {
                     }
                     else -> call.respondRedirect(SITE.baseUrl)
                 }
-                call.respondRedirect(SITE.baseUrl)
             }
         }
 

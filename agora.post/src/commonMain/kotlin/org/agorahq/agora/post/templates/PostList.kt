@@ -9,7 +9,7 @@ fun HTML.renderPostList(model: PostListViewModel) = withDefaultLayout(
         ctx = model.context,
         pageTitle = "${model.context.site.title} | Posts"
 ) {
-    h1 {
+    h1("mt-3 mb-3") {
         +"Posts"
     }
     model.posts.forEach(::renderPostCard)

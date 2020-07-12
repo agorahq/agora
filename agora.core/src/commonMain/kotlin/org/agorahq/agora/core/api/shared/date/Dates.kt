@@ -5,7 +5,9 @@ import com.soywiz.klock.DateTime
 
 object Dates {
 
-    val simpleDateFormat = DateFormat("yyyy-mm-dd")
+    val simpleDateFormat = DateFormat("yyyy-MM-dd")
+
+    val humanReadableFormat = DateFormat("MMM d, yyyy")
 
     fun renderCurrentDate() = DateTime.now().format(simpleDateFormat)
 }

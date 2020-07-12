@@ -13,6 +13,8 @@ fun HTML.withDefaultLayout(
 ) {
     renderDefaultHead(ctx.site, pageTitle)
     body {
+        style {
+        }
         renderDefaultNavigation(ctx)
         div("container") {
             fn()

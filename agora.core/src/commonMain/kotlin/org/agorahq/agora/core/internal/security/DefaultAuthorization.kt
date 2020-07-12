@@ -4,12 +4,17 @@ import org.agorahq.agora.core.api.data.*
 import org.agorahq.agora.core.api.exception.AuthorizationException
 import org.agorahq.agora.core.api.exception.MissingPermissionException
 import org.agorahq.agora.core.api.exception.ResourceAccessNotPermittedException
+import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.security.*
+import org.agorahq.agora.core.api.security.Authorization
+import org.agorahq.agora.core.api.security.Permission
+import org.agorahq.agora.core.api.security.Role
+import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.security.policy.Policy
 
+@Suppress("UNCHECKED_CAST")
 data class DefaultAuthorization(
         private val roles: Iterable<Role>
 ) : Authorization {
@@ -17,6 +22,14 @@ data class DefaultAuthorization(
     private val roleLookup: Map<String, List<Permission<out Resource>>> = roles.map { role ->
         role.name to role.permissions.toList()
     }.toMap()
+
+
+    override fun <C : OperationContext> canExecute(
+            context: C,
+            operationDescriptor: AnyOperationDescriptor
+    ) = context.user.permissions.any {
+        it.operationDescriptor.name == operationDescriptor.name
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <R : Resource, C : OperationContext, T : Any> authorize(

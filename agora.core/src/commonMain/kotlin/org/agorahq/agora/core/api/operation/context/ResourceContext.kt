@@ -12,4 +12,4 @@ data class ResourceContext<R : Resource>(
         override val authorization: Authorization,
         override val message: Message? = null,
         val resource: R
-) : OperationContext
+) : BaseOperationContext()

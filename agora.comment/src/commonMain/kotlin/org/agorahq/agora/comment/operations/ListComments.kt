@@ -8,6 +8,7 @@ import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.PageElementListRenderer
 import org.agorahq.agora.core.api.operation.RenderPageElementList
 import org.agorahq.agora.core.api.operation.RenderPageElementListDescriptor
@@ -37,10 +38,13 @@ class ListComments(
     }.toCommand()
 
     companion object : RenderPageElementListDescriptor<Comment, Page> {
+
         override val name = "List Comments"
         override val resourceClass = Comment::class
         override val type = PageElementListRenderer(Comment::class, Page::class)
         override val route = CommentURL.root
         override val urlClass = CommentURL::class
+
+        override fun toString() = OperationDescriptor.toString(this)
     }
 }

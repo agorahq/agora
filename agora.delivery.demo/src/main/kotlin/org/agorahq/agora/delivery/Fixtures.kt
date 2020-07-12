@@ -10,22 +10,17 @@ import org.agorahq.agora.core.api.security.Role.Companion.ANONYMOUS
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.security.builder.authorization
 import org.agorahq.agora.core.api.security.policy.forAll
+import org.agorahq.agora.core.api.shared.security.BuiltInRoles.ADMIN
+import org.agorahq.agora.core.api.shared.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
 import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
 import org.agorahq.agora.delivery.extensions.commentIsNotHidden
+import org.agorahq.agora.delivery.extensions.ownCommentOnly
 import org.agorahq.agora.delivery.extensions.postIsPublished
-import org.agorahq.agora.delivery.security.BuiltInRoles.ADMIN
-import org.agorahq.agora.delivery.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.post.domain.Post
-import org.agorahq.agora.post.operations.CreatePost
-import org.agorahq.agora.post.operations.DeletePost
-import org.agorahq.agora.post.operations.ListPosts
-import org.agorahq.agora.post.operations.ShowPost
+import org.agorahq.agora.post.operations.*
 import org.hexworks.cobalt.core.api.UUID
 import java.util.concurrent.ConcurrentHashMap
-
-val POST_A_ID = UUID.randomUUID()
-val POST_B_ID = UUID.randomUUID()
 
 val AUTHORIZATION = authorization {
 
@@ -49,7 +44,7 @@ val AUTHORIZATION = authorization {
             Comment::class {
                 CreateComment allow forAll
                 ShowCommentForm allow forAll
-                DeleteComment allow forAll
+                DeleteComment withPolicy ownCommentOnly
             }
         }
         ADMIN {
@@ -60,6 +55,7 @@ val AUTHORIZATION = authorization {
                 ListPosts allow forAll
                 ShowPost allow forAll
                 CreatePost allow forAll
+                EditPost allow forAll
                 DeletePost allow forAll
             }
 
@@ -91,17 +87,20 @@ val OGABI = User.create(
         roles = setOf(ADMIN))
 
 val ADDAMSSON = User.create(
-        email = "adam.arold@gmail.com",
+        email = "arold.adam@gmail.com",
         username = "addamsson",
         roles = setOf(ADMIN))
 
+val POST_A_ID = UUID.randomUUID()
+val POST_B_ID = UUID.randomUUID()
+val POST_C_ID = UUID.randomUUID()
 
-val POST_A = Post(
+val PUBLISHED_POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
         owner = OGABI,
         tags = setOf("agora", "post"),
-        createdAt = DateTime.nowUnixLong(),
+        createdAt = DateTime.createClamped(2020, 7, 5),
         shortDescription = "Agora is planned to launch in early Q2.",
         excerpt = "After half a year of active development Agora is planned to launch in closed beta.",
         content = """
@@ -109,20 +108,44 @@ val POST_A = Post(
             
             A few groups will be chosen to participate in it and the devs will use the feedback to
             make the product even better.
+            
+            As a 
         """.trimIndent())
 
-val POST_B = Post(
+val PUBLISHED_POST_B = Post(
         id = POST_B_ID,
         title = "Agora is using Ktor",
         tags = setOf("agora", "ktor"),
         owner = OGABI,
-        createdAt = DateTime.nowUnixLong(),
+        createdAt = DateTime.createAdjusted(2020, 6, 8),
         shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
         excerpt = "After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.",
         content = """
             After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.
             
             We've checked a lot of other tools like *Spring* and *vert.x* but in the end this looked the most promising.
+            
+            So going forward we'll use *Ktor*.
+        """.trimIndent())
+
+val NOT_PUBLISHED_POST_C = Post(
+        id = POST_C_ID,
+        title = "New Permission System is Online",
+        tags = setOf("agora", "authorization"),
+        owner = ADDAMSSON,
+        createdAt = DateTime.createAdjusted(2020, 6, 15),
+        publishedAt = DateTime.createAdjusted(2061, 12, 21),
+        shortDescription = "The permission system for Agora received a long-awaited overhaul.",
+        excerpt = "The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.",
+        content = """
+            The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.
+            
+            The groups feature was removed, because it was made redundant by the new ABAC system.
+            
+            ABAC stands for Attribute Based Access Control. This means that each resource can be filtered for any
+            property it has enabling us to create fine-grained access control rules.
+            
+            This article for example won't be visible for *attendees*, only *admins* because it is not published yet!
         """.trimIndent())
 
 val COMMENT_A_0 = Comment(
@@ -141,8 +164,9 @@ val COMMENT_B_1 = Comment(
         parentId = POST_B_ID)
 
 val POSTS = ConcurrentHashMap<UUID, Post>().apply {
-    put(POST_A_ID, POST_A)
-    put(POST_B_ID, POST_B)
+    put(POST_A_ID, PUBLISHED_POST_A)
+    put(POST_B_ID, PUBLISHED_POST_B)
+    put(POST_C_ID, NOT_PUBLISHED_POST_C)
 }
 val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_A_0.id, COMMENT_A_0)

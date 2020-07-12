@@ -1,6 +1,7 @@
 package org.agorahq.agora.core.api.operation.context
 
 import org.agorahq.agora.core.api.data.*
+import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
@@ -61,6 +62,16 @@ interface OperationContext {
             message = message,
             authorization = authorization,
             page = page)
+
+    /**
+     * Tells whether the [User] can execute the given [operation] in [this] context.
+     */
+    fun User.canDo(operation: AnyOperationDescriptor): Boolean
+
+    /**
+     * Tells whether the [User] can execute any of the given [operations] in [this] context.
+     */
+    fun User.canDoAnyOf(vararg operations: AnyOperationDescriptor): Boolean
 
     companion object {
 

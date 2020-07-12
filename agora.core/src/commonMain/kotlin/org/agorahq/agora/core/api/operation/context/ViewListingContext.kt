@@ -12,4 +12,4 @@ data class ViewListingContext<M : ViewModel>(
         override val authorization: Authorization,
         override val message: Message? = null,
         val items: Sequence<M>
-) : OperationContext
+) : BaseOperationContext()

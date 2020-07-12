@@ -12,4 +12,4 @@ data class ViewModelContext<M : ViewModel>(
         override val authorization: Authorization,
         override val message: Message? = null,
         val viewModel: M
-) : OperationContext
+) : BaseOperationContext()

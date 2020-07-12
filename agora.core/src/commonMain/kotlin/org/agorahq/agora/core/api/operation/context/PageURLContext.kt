@@ -13,4 +13,4 @@ data class PageURLContext<P : Page>(
         override val authorization: Authorization,
         override val message: Message? = null,
         val url: ResourceURL<P>
-) : OperationContext
+) : BaseOperationContext()

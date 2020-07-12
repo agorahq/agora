@@ -13,8 +13,12 @@ interface Policy<R : Resource> {
     companion object {
 
         fun <R : Resource> create(
+                description: String = "anonymous policy",
                 fn: (context: OperationContext, element: R) -> Boolean
         ) = object : Policy<R> {
+
+            override fun toString() = description
+
             override fun invoke(context: OperationContext, element: R): Boolean {
                 return fn(context, element)
             }

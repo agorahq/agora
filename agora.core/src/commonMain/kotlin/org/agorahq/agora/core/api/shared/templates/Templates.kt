@@ -8,10 +8,13 @@ import kotlinx.html.stream.appendHTML
 
 object Templates {
 
-    fun htmlTemplate(fn: HTML.() -> Unit): String {
+    fun htmlTemplate(
+            prettyPrint: Boolean = false,
+            fn: HTML.() -> Unit
+    ): String {
         val sb = StringBuilder()
         sb.appendHTML(
-                prettyPrint = true,
+                prettyPrint = prettyPrint,
                 xhtmlCompatible = true
         ).html {
             fn()
@@ -19,10 +22,13 @@ object Templates {
         return sb.toString()
     }
 
-    fun htmlPartial(fn: FlowContent.() -> Unit): String {
+    fun htmlPartial(
+            prettyPrint: Boolean = false,
+            fn: FlowContent.() -> Unit
+    ): String {
         val sb = StringBuilder()
         sb.appendHTML(
-                prettyPrint = true,
+                prettyPrint = prettyPrint,
                 xhtmlCompatible = true
         ).div {
             fn()

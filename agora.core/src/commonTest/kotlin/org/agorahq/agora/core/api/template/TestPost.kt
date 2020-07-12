@@ -1,5 +1,6 @@
 package org.agorahq.agora.core.api.template
 
+import com.soywiz.klock.DateTime
 import org.agorahq.agora.core.api.data.ContentFormat
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.security.User
@@ -17,7 +18,7 @@ class TestPost(
         override val content: String,
         override val format: ContentFormat = MARKDOWN,
         override val url: PostResourceURL = PostResourceURL(date, title),
-        override val createdAt: Long = 1,
-        override val updatedAt: Long = createdAt,
-        override val publishedAt: Long = createdAt
+        override val createdAt: DateTime = DateTime.now(),
+        override val updatedAt: DateTime = createdAt,
+        override val publishedAt: DateTime = createdAt
 ) : Page
