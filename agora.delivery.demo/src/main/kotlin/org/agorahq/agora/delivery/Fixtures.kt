@@ -94,13 +94,14 @@ val ADDAMSSON = User.create(
 val POST_A_ID = UUID.randomUUID()
 val POST_B_ID = UUID.randomUUID()
 val POST_C_ID = UUID.randomUUID()
+val POST_D_ID = UUID.randomUUID()
 
 val PUBLISHED_POST_A = Post(
         id = POST_A_ID,
         title = "Agora is launching soon",
         owner = OGABI,
         tags = setOf("agora", "post"),
-        createdAt = DateTime.createClamped(2020, 7, 5),
+        createdAt = DateTime.createClamped(2020, 3, 9),
         shortDescription = "Agora is planned to launch in early Q2.",
         excerpt = "After half a year of active development Agora is planned to launch in closed beta.",
         content = """
@@ -117,7 +118,7 @@ val PUBLISHED_POST_B = Post(
         title = "Agora is using Ktor",
         tags = setOf("agora", "ktor"),
         owner = OGABI,
-        createdAt = DateTime.createAdjusted(2020, 6, 8),
+        createdAt = DateTime.createAdjusted(2020, 5, 17),
         shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
         excerpt = "After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.",
         content = """
@@ -148,6 +149,23 @@ val NOT_PUBLISHED_POST_C = Post(
             This article for example won't be visible for *attendees*, only *admins* because it is not published yet!
         """.trimIndent())
 
+val PUBLISHED_POST_D = Post(
+        id = POST_D_ID,
+        title = "We're considering React to be used on the frontend",
+        tags = setOf("agora", "react"),
+        owner = ADDAMSSON,
+        createdAt = DateTime.createAdjusted(2020, 7, 12),
+        shortDescription = "We started looking for frontend libraries for a while now and it seems that React will be the one we use.",
+        excerpt = "The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.",
+        content = """
+            Most web applications need some kind of frontend library or framework for their development.
+            
+            We've been doing some research for the one which fits Agora and right now it seems that we'll use
+            React.
+            
+            It is a mature frontend library, with a vibrant community, and it is also rather simple compared to the alternatives.
+        """.trimIndent())
+
 val COMMENT_A_0 = Comment(
         content = "**Wow**, that's great!",
         owner = JACK,
@@ -167,6 +185,7 @@ val POSTS = ConcurrentHashMap<UUID, Post>().apply {
     put(POST_A_ID, PUBLISHED_POST_A)
     put(POST_B_ID, PUBLISHED_POST_B)
     put(POST_C_ID, NOT_PUBLISHED_POST_C)
+    put(POST_D_ID, PUBLISHED_POST_D)
 }
 val COMMENTS = ConcurrentHashMap<UUID, Comment>().apply {
     put(COMMENT_A_0.id, COMMENT_A_0)

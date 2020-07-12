@@ -2,11 +2,13 @@
 
 package org.agorahq.agora.delivery.extensions
 
+import com.soywiz.klock.DateTime
 import io.ktor.http.Parameters
 import org.agorahq.agora.core.api.data.FormField
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.data.Result
+import org.agorahq.agora.core.api.shared.date.Dates
 import org.agorahq.agora.core.api.view.ConverterService
 import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
@@ -49,6 +51,7 @@ private fun mapValue(classifier: KClassifier, value: String): Any {
         Boolean::class -> value.toBoolean()
         UUID::class -> UUID.fromString(value)
         FormField::class -> FormField.Dirty(value)
+        DateTime::class -> DateTime.fromString(value)
         else -> {
             throw UnsupportedOperationException("Can't map value '$value' to type $classifier")
         }

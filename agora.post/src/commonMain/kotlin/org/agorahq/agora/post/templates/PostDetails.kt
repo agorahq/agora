@@ -13,7 +13,7 @@ fun HTML.renderPostDetails(
         ctx = ctx,
         pageTitle = "${model.title} | Agora"
 ) {
-    h1 {
+    h1("mt-3") {
         +model.title
     }
     div {

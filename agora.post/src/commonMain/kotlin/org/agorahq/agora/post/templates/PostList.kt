@@ -1,6 +1,7 @@
 package org.agorahq.agora.post.templates
 
 import kotlinx.html.HTML
+import kotlinx.html.div
 import kotlinx.html.h1
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 import org.agorahq.agora.post.viewmodel.PostListViewModel
