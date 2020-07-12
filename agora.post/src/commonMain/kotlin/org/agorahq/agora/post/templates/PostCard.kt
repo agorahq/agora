@@ -36,11 +36,11 @@ fun FlowContent.renderPostCard(post: PostViewModel) {
                     }
                 }
                 with(post.context) {
-                    if (user.canDoAnyOf(DeletePost, EditPost)) {
+                    if (user.canDoAnyOf(EditPost, DeletePost)) {
                         div("card-footer bg-transparent") {
                             if (user.canDo(EditPost)) {
                                 form(EditPost.route, method = FormMethod.post) {
-                                    this.style = "display: inline-block;"
+                                    this.style = "display: inline-block; margin-bottom: 0;"
                                     input(type = InputType.hidden, name = "id") {
                                         value = post.id
                                     }
@@ -51,7 +51,7 @@ fun FlowContent.renderPostCard(post: PostViewModel) {
                             }
                             if (user.canDo(DeletePost)) {
                                 form(DeletePost.route, method = FormMethod.post) {
-                                    this.style = "display: inline-block;"
+                                    this.style = "display: inline-block; margin-bottom: 0;"
                                     input(type = InputType.hidden, name = "id") {
                                         value = post.id
                                     }
