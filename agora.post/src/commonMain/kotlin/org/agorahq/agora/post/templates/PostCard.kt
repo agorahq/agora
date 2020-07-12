@@ -68,6 +68,7 @@ fun FlowContent.renderPostCard(post: PostViewModel) {
                                     }
                                     button(type = ButtonType.submit, classes = "btn btn-warning mr-2") {
                                         +"Edit"
+                                        em("text-muted") { +" (WIP)" }
                                     }
                                 }
                             }
