@@ -22,15 +22,15 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
             other: OperationType<out Resource, out OperationContext, out Any>
     ): Boolean
 
-    protected inline fun <reified K: OperationType<R, C, T>> whenSuperMatches(
+    protected inline fun <reified K : OperationType<R, C, T>> whenSuperMatches(
             other: OperationType<out Resource, out OperationContext, out Any>,
-            fn : (other: K) -> Boolean): Boolean {
-        return if(other is K && isSuperclassOf(contextClass, other.contextClass)) {
+            fn: (other: K) -> Boolean): Boolean {
+        return if (other is K && isSuperclassOf(contextClass, other.contextClass)) {
             fn(other)
         } else false
     }
 
-    data class PageRenderer<P: Page>(
+    data class PageRenderer<P : Page>(
             val pageClass: KClass<P>
     ) : OperationType<P, PageURLContext<P>, String>(
             PageURLContext::class as KClass<out PageURLContext<P>>
@@ -43,7 +43,7 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
         }
     }
 
-    data class PageListRenderer<P: Page>(
+    data class PageListRenderer<P : Page>(
             val pageClass: KClass<P>
     ) : OperationType<P, OperationContext, String>(OperationContext::class) {
 
@@ -65,7 +65,7 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
         }
     }
 
-    data class PageElementFormRenderer<PE: PageElement, P: Page>(
+    data class PageElementFormRenderer<PE : PageElement, P : Page>(
             val pageElementClass: KClass<PE>,
             val parentClass: KClass<P>
     ) : OperationType<PE, PageContext<P>, String>(PageContext::class as KClass<out PageContext<P>>) {
@@ -78,7 +78,7 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
         }
     }
 
-    data class PageElementListRenderer<PE: PageElement, P: Page>(
+    data class PageElementListRenderer<PE : PageElement, P : Page>(
             val pageElementClass: KClass<PE>,
             val parentClass: KClass<P>
     ) : OperationType<PE, PageContext<P>, String>(PageContext::class as KClass<out PageContext<P>>) {
@@ -91,7 +91,7 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
         }
     }
 
-    data class ResourceSaver<R: Resource, V: ViewModel>(
+    data class ResourceSaver<R : Resource, V : ViewModel>(
             val resourceClass: KClass<R>,
             val viewModelClass: KClass<V>
     ) : OperationType<R, ViewModelContext<V>, Unit>(ViewModelContext::class as KClass<out ViewModelContext<V>>) {
@@ -104,13 +104,13 @@ sealed class OperationType<R : Resource, C : OperationContext, T : Any>(
         }
     }
 
-    data class ResourceDeleter<R: Resource>(
+    data class ResourceAlterer<R : Resource>(
             val resourceClass: KClass<R>
     ) : OperationType<R, ResourceIdContext, Unit>(ResourceIdContext::class) {
 
         override fun matches(
                 other: OperationType<out Resource, out OperationContext, out Any>
-        ) = whenSuperMatches<ResourceDeleter<R>>(other) {
+        ) = whenSuperMatches<ResourceAlterer<R>>(other) {
             isSuperclassOf(resourceClass, it.resourceClass)
         }
     }

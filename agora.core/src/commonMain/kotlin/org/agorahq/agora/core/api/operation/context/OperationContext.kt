@@ -66,12 +66,12 @@ interface OperationContext {
     /**
      * Tells whether the [User] can execute the given [operation] in [this] context.
      */
-    fun User.canDo(operation: AnyOperationDescriptor): Boolean
+    infix fun User.can(operation: AnyOperationDescriptor): Boolean
 
     /**
      * Tells whether the [User] can execute any of the given [operations] in [this] context.
      */
-    fun User.canDoAnyOf(vararg operations: AnyOperationDescriptor): Boolean
+    infix fun User.canDoAnyOf(operations: Iterable<AnyOperationDescriptor>): Boolean
 
     companion object {
 

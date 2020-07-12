@@ -20,14 +20,14 @@ class PostConverter(
 
     override fun PostViewModel.toResource() = Post(
             title = title,
-            shortDescription = shortDescription,
+            abstract = abstract,
             tags = setOf(),
             owner = userService.findById(ownerId.toUUID()).get(),
             content = content)
 
     override fun Post.toViewModel(context: OperationContext) = PostViewModel(
             ownerId = owner.id.toString(),
-            shortDescription = shortDescription,
+            abstract = abstract,
             url = url.generate(),
             title = title,
             tags = tags,

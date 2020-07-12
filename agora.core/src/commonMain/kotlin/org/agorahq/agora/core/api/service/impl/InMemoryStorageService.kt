@@ -13,7 +13,7 @@ class InMemoryStorageService<E : Entity>(
     }
 
     override fun update(entity: E) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        objects[entity.id] = entity
     }
 
     override fun delete(entity: E) {

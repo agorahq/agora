@@ -23,8 +23,9 @@ fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
     with(KtorPageListRendererAdapter(Services.listPosts, site, authorization)) { register() }
     with(KtorPageRendererAdapter(Services.renderPost, site, authorization)) { register() }
     with(KtorResourceSaverAdapter(Services.createPost, site, authorization)) { register() }
-    with(KtorResourceDeleterAdapter(Services.deletePost, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Services.deletePost, site, authorization)) { register() }
     with(KtorPageElementFormRendererAdapter(Services.renderCommentForm, site, authorization)) { register() }
     with(KtorResourceSaverAdapter(Services.createComment, site, authorization)) { register() }
-    with(KtorResourceDeleterAdapter(Services.deleteComment, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Services.deleteComment, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Services.togglePostPublished, site, authorization)) { register() }
 }

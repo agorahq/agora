@@ -20,7 +20,7 @@ import org.hexworks.cobalt.core.api.UUID
 import org.hexworks.cobalt.logging.api.LoggerFactory
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class KtorResourceDeleterAdapter<R : Resource>(
+class KtorResourceAltererAdapter<R : Resource>(
         override val operation: Operation<R, ResourceIdContext, Unit>,
         private val site: SiteMetadata,
         private val authorization: Authorization
@@ -31,9 +31,6 @@ class KtorResourceDeleterAdapter<R : Resource>(
     override fun Routing.register() {
         logger.info("Registering module $name at route ${route}.")
         post(route) {
-            perform()
-        }
-        delete(route) {
             perform()
         }
     }

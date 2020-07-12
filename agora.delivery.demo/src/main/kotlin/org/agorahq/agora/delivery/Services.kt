@@ -14,10 +14,7 @@ import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.post.converter.PostConverter
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.module.PostModule
-import org.agorahq.agora.post.operations.CreatePost
-import org.agorahq.agora.post.operations.DeletePost
-import org.agorahq.agora.post.operations.ListPosts
-import org.agorahq.agora.post.operations.ShowPost
+import org.agorahq.agora.post.operations.*
 
 object Services {
 
@@ -41,6 +38,7 @@ object Services {
     val renderCommentForm = ShowCommentForm()
     val createComment = CreateComment(commentStorage, converterService)
     val deleteComment = DeleteComment(commentQueryService, commentStorage)
+    val togglePostPublished = TogglePostPublished(postQueryService, postStorage)
 
     val postModule = PostModule(listOf(listPosts, renderPost, listComments))
     val commentModule = CommentModule(listOf(renderCommentForm, createComment))

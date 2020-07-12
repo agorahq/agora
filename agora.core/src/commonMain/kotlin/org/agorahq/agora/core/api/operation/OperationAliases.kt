@@ -11,9 +11,9 @@ typealias SaveResource<R, M> = Operation<R, ViewModelContext<M>, Unit>
 
 typealias SaveResourceDescriptor<R, M> = OperationDescriptor<R, ViewModelContext<M>, Unit>
 
-typealias DeleteResource<R> = Operation<R, ResourceIdContext, Unit>
+typealias AlterResource<R> = Operation<R, ResourceIdContext, Unit>
 
-typealias DeleteResourceDescriptor<R> = OperationDescriptor<R, ResourceIdContext, Unit>
+typealias AlterResourceDescriptor<R> = OperationDescriptor<R, ResourceIdContext, Unit>
 
 typealias RenderPageList<R> = Operation<R, OperationContext, String>
 

@@ -57,6 +57,7 @@ val AUTHORIZATION = authorization {
                 CreatePost allow forAll
                 EditPost allow forAll
                 DeletePost allow forAll
+                TogglePostPublished allow forAll
             }
 
             Comment::class {
@@ -82,7 +83,7 @@ val FRANK = User.create(
         roles = setOf(ATTENDEE))
 
 val OGABI = User.create(
-        email = "gabor.orosz@me.com",
+        email = "nightgoody@gmail.com",
         username = "ogabi",
         roles = setOf(ADMIN))
 
@@ -102,7 +103,7 @@ val PUBLISHED_POST_A = Post(
         owner = OGABI,
         tags = setOf("agora", "post"),
         createdAt = DateTime.createClamped(2020, 3, 9),
-        shortDescription = "Agora is planned to launch in early Q2.",
+        abstract = "Agora is planned to launch in early Q2.",
         excerpt = "After half a year of active development Agora is planned to launch in closed beta.",
         content = """
             After half a year of active development Agora is planned to launch in closed beta.
@@ -119,7 +120,7 @@ val PUBLISHED_POST_B = Post(
         tags = setOf("agora", "ktor"),
         owner = OGABI,
         createdAt = DateTime.createAdjusted(2020, 5, 17),
-        shortDescription = "Ktor have been chosen to be used as the server technology for Agora",
+        abstract = "Ktor have been chosen to be used as the server technology for Agora",
         excerpt = "After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.",
         content = """
             After careful consideration *Ktor* have been chosen to be used as the server technology for Agora.
@@ -136,7 +137,7 @@ val NOT_PUBLISHED_POST_C = Post(
         owner = ADDAMSSON,
         createdAt = DateTime.createAdjusted(2020, 6, 15),
         publishedAt = DateTime.createAdjusted(2061, 12, 21),
-        shortDescription = "The permission system for Agora received a long-awaited overhaul.",
+        abstract = "The permission system for Agora received a long-awaited overhaul.",
         excerpt = "The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.",
         content = """
             The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.
@@ -155,7 +156,7 @@ val PUBLISHED_POST_D = Post(
         tags = setOf("agora", "react"),
         owner = ADDAMSSON,
         createdAt = DateTime.createAdjusted(2020, 7, 12),
-        shortDescription = "We started looking for frontend libraries for a while now and it seems that React will be the one we use.",
+        abstract = "We started looking for frontend libraries for a while now and it seems that React will be the one we use.",
         excerpt = "The first installment of the permission system for Agora was a bit convoluted. We've fixed this with the new approach.",
         content = """
             Most web applications need some kind of frontend library or framework for their development.

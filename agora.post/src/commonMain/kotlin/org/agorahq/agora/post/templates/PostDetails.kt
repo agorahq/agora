@@ -7,25 +7,29 @@ import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
 fun HTML.renderPostDetails(
-        model: PostViewModel,
+        post: PostViewModel,
         ctx: OperationContext
 ) = withDefaultLayout(
         ctx = ctx,
-        pageTitle = "${model.title} | Agora"
+        pageTitle = "${post.title} | Agora"
 ) {
     h1("mt-3") {
-        +model.title
+        +post.title
+        h6("text-muted text-right") { +post.publicationDate }
     }
     div {
-        htmlContent(model.content)
+        if (post.abstract.isNotBlank()) {
+            p("lead") { +post.abstract }
+        }
+        htmlContent(post.content)
     }
     div {
-        model.tags.forEach { tag ->
+        post.tags.forEach { tag ->
             span("badge badge-secondary mr-1") { +tag }
         }
     }
     hr { }
     div {
-        htmlContent(model.renderedPageElements)
+        htmlContent(post.renderedPageElements)
     }
 }

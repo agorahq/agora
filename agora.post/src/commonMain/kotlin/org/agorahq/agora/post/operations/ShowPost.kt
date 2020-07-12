@@ -36,7 +36,7 @@ class ShowPost(
         renderedPageElements.append(renderPageElementFormsFor(post))
         Templates.htmlTemplate {
             renderPostDetails(
-                    model = model.copy(renderedPageElements = renderedPageElements.toString()),
+                    post = model.copy(renderedPageElements = renderedPageElements.toString()),
                     ctx = ctx
             )
         }
