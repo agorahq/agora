@@ -21,6 +21,7 @@ interface OperationDescriptor<R : Resource, C : OperationContext, T : Any> {
     val type: OperationType<R, C, T>
     val urlClass: KClass<out ResourceURL<R>>
     val route: String
+    val facets: Iterable<Facet>
 
     companion object {
 
@@ -29,13 +30,16 @@ interface OperationDescriptor<R : Resource, C : OperationContext, T : Any> {
                 resourceClass: KClass<R>,
                 type: OperationType<R, C, T>,
                 route: String,
-                urlClass: KClass<ResourceURL<R>>
+                urlClass: KClass<ResourceURL<R>>,
+                facets: Iterable<Facet>
         ): OperationDescriptor<R, C, T> = DefaultOperationDescriptor(
                 name = name,
                 resourceClass = resourceClass,
                 type = type,
                 route = route,
-                urlClass = urlClass)
+                urlClass = urlClass,
+                facets = facets
+        )
 
         fun <R : Resource, C : OperationContext, T : Any> toString(descriptor: OperationDescriptor<R, C, T>): String {
             return descriptor.name

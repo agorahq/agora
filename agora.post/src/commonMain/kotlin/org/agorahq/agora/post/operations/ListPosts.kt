@@ -2,6 +2,7 @@ package org.agorahq.agora.post.operations
 
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.PageListRenderer
 import org.agorahq.agora.core.api.operation.RenderPageList
@@ -21,18 +22,17 @@ class ListPosts(
         private val converterService: ConverterService
 ) : RenderPageList<Post>, RenderPageListDescriptor<Post> by Companion {
 
-    override fun OperationContext.fetchData(): ElementSource<Post> {
+    override fun fetchResource(context: OperationContext): ElementSource<Post> {
         return ElementSource.fromSequence(postQueryService.findAll())
     }
 
-    override fun OperationContext.createCommand(data: ElementSource<Post>) = {
-        val ctx = this
+    override fun createCommand(context: OperationContext, data: ElementSource<Post>) = {
         Templates.htmlTemplate {
             renderPostList(PostListViewModel(
                     posts = data.asSequence().sortedByDescending { it.publishedAt }.map {
-                        converterService.convertToView<PostViewModel>(it, ctx).get()
+                        converterService.convertToView<PostViewModel>(it, context).get()
                     },
-                    context = ctx
+                    context = context
             ))
         }
     }.toCommand()
@@ -46,6 +46,7 @@ class ListPosts(
         override val type = PageListRenderer(Post::class)
         override val route = PostURL.root
         override val urlClass = PostURL::class
+        override val facets = listOf<Facet>()
 
         override fun toString() = OperationDescriptor.toString(this)
     }

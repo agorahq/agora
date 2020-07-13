@@ -17,11 +17,11 @@ import org.agorahq.agora.core.api.security.builder.AuthorizationBuilder
 interface Authorization {
 
     /**
-     * Tells whether the given [operationDescriptor] can be executed in the given [context]
+     * Tells whether the given [operation] can be executed in the given [context]
      */
     fun <C : OperationContext> canExecute(
             context: C,
-            operationDescriptor: AnyOperationDescriptor
+            operation: AnyOperationDescriptor
     ): Boolean
 
     /**

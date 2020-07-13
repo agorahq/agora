@@ -8,6 +8,7 @@ import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.PageElementListRenderer
 import org.agorahq.agora.core.api.operation.RenderPageElementList
@@ -22,18 +23,18 @@ class ListComments(
         private val converterService: ConverterService
 ) : RenderPageElementList<Comment, Page>, RenderPageElementListDescriptor<Comment, Page> by Companion {
 
-    override fun PageContext<Page>.fetchData(): ElementSource<Comment> {
+    override fun fetchResource(context: PageContext<Page>): ElementSource<Comment> {
         return ElementSource.fromSequence(commentService
-                .findByParent(page))
+                .findByParent(context.page))
     }
 
-    override fun PageContext<Page>.createCommand(data: ElementSource<Comment>) = {
-        val ctx = this
+    override fun createCommand(context: PageContext<Page>, data: ElementSource<Comment>) = {
         Templates.htmlPartial {
             renderCommentList(CommentListViewModel(
                     comments = data.asSequence().map {
-                        converterService.convertToView<CommentViewModel>(it, ctx).get()
-                    }))
+                        converterService.convertToView<CommentViewModel>(it, context).get()
+                    },
+                    context = context))
         }
     }.toCommand()
 
@@ -44,6 +45,7 @@ class ListComments(
         override val type = PageElementListRenderer(Comment::class, Page::class)
         override val route = CommentURL.root
         override val urlClass = CommentURL::class
+        override val facets = listOf<Facet>()
 
         override fun toString() = OperationDescriptor.toString(this)
     }

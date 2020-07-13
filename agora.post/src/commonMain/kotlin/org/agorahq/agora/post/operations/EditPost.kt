@@ -2,6 +2,7 @@ package org.agorahq.agora.post.operations
 
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationDescriptor
 import org.agorahq.agora.core.api.operation.OperationType.ResourceSaver
 import org.agorahq.agora.core.api.operation.SaveResource
@@ -18,11 +19,11 @@ class EditPost(
         private val converterService: ConverterService
 ) : SaveResource<Post, PostViewModel>, SaveResourceDescriptor<Post, PostViewModel> by Companion {
 
-    override fun ViewModelContext<PostViewModel>.fetchData(): ElementSource<Post> {
-        return ElementSource.fromElement(converterService.convertToResource<Post>(viewModel).get())
+    override fun fetchResource(context: ViewModelContext<PostViewModel>): ElementSource<Post> {
+        return ElementSource.fromElement(converterService.convertToResource<Post>(context.viewModel).get())
     }
 
-    override fun ViewModelContext<PostViewModel>.createCommand(data: ElementSource<Post>) = {
+    override fun createCommand(context: ViewModelContext<PostViewModel>, data: ElementSource<Post>) = {
         postStorage.create(data.asSingle())
     }.toCommand()
 
@@ -35,7 +36,7 @@ class EditPost(
         override val type = ResourceSaver(Post::class, PostViewModel::class)
         override val route = "${PostURL.root}/edit"
         override val urlClass = PostURL::class
-
+        override val facets = listOf<Facet>()
         override fun toString() = OperationDescriptor.toString(this)
     }
 }

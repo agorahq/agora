@@ -6,6 +6,7 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.AlterResource
 import org.agorahq.agora.core.api.operation.AlterResourceDescriptor
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationType.ResourceAlterer
 import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.service.QueryService
@@ -16,11 +17,11 @@ class DeleteComment(
         private val commentStorage: StorageService<Comment>
 ) : AlterResource<Comment>, AlterResourceDescriptor<Comment> by Companion {
 
-    override fun ResourceIdContext.fetchData(): ElementSource<Comment> {
-        return ElementSource.fromMaybe(commentQueryService.findById(id))
+    override fun fetchResource(context: ResourceIdContext): ElementSource<Comment> {
+        return ElementSource.fromMaybe(commentQueryService.findById(context.id))
     }
 
-    override fun ResourceIdContext.createCommand(data: ElementSource<Comment>) = {
+    override fun createCommand(context: ResourceIdContext, data: ElementSource<Comment>) = {
         commentStorage.delete(data.asSingle())
     }.toCommand()
 
@@ -30,5 +31,6 @@ class DeleteComment(
         override val type = ResourceAlterer(Comment::class)
         override val route = CommentURL.root
         override val urlClass = CommentURL::class
+        override val facets = listOf<Facet>()
     }
 }

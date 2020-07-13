@@ -26,9 +26,13 @@ data class DefaultAuthorization(
 
     override fun <C : OperationContext> canExecute(
             context: C,
-            operationDescriptor: AnyOperationDescriptor
-    ) = context.user.permissions.any {
-        it.operationDescriptor.name == operationDescriptor.name
+            operation: AnyOperationDescriptor
+    ): Boolean {
+        val user = context.user
+        val permissions = user.permissions
+        return permissions.any {
+            it.operationDescriptor.name == operation.name
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -41,21 +45,19 @@ data class DefaultAuthorization(
         return permissions.firstOrNull {
             it.operationDescriptor.name == operation.name
         }?.let { (_, _, policies) ->
-            with(operation) {
-                val data = context.fetchData()
-                val filteredData = policies.fold(data) { remaining, next ->
-                    next as Policy<R>
-                    remaining.filter { next(context, it) }
-                }
-                when (data) {
+            val data = operation.fetchResource(context)
+            val filteredData = policies.fold(data) { remaining, next ->
+                next as Policy<R>
+                remaining.filter { next(context, it) }
+            }
+            when (data) {
+                EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation))
+                is SingleElementSource -> when (filteredData) {
                     EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation))
-                    is SingleElementSource -> when (filteredData) {
-                        EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation))
-                        is SingleElementSource -> Result.Success(context.createCommand(filteredData))
-                        is MultipleElementSource -> Result.Success(context.createCommand(filteredData))
-                    }
-                    is MultipleElementSource -> Result.Success(context.createCommand(filteredData))
+                    is SingleElementSource -> Result.Success(operation.createCommand(context, filteredData))
+                    is MultipleElementSource -> Result.Success(operation.createCommand(context, filteredData))
                 }
+                is MultipleElementSource -> Result.Success(operation.createCommand(context, filteredData))
             }
         } ?: Result.Failure(MissingPermissionException(user, operation))
     }

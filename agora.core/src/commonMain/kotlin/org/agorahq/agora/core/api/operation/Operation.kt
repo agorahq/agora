@@ -5,8 +5,8 @@ import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.context.OperationContext
 
 /**
- * An [Operation] is a procedure which performs some kind of CRUD operation on a [Resource]
- * in a given [OperationContext] and returns a value ([T]).
+ * An [Operation] is a function which alters a [Resource] in some way
+ * in a given [OperationContext] and returns a value (of type [T]).
  *
  * An [Operation] can be **reified** by calling [Operation.createCommand] using the
  * context ([C]) the operation needs.
@@ -16,8 +16,15 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
  */
 interface Operation<R : Resource, C : OperationContext, T : Any> : OperationDescriptor<R, C, T> {
 
-    fun C.fetchData(): ElementSource<R>
+    /**
+     * Returns the resource (s) that will be used for the resulting [Command].
+     */
+    fun fetchResource(context: C): ElementSource<R>
 
-    fun C.createCommand(data: ElementSource<R>): Command<T>
+    /**
+     * Creates a standalone [Command] from the given [context] and [data] that can be
+     * executed.
+     */
+    fun createCommand(context: C, data: ElementSource<R>): Command<T>
 
 }

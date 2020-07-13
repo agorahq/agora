@@ -5,6 +5,7 @@ import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationType.ResourceSaver
 import org.agorahq.agora.core.api.operation.SaveResource
 import org.agorahq.agora.core.api.operation.SaveResourceDescriptor
@@ -17,14 +18,14 @@ class CreateComment(
         private val converterService: ConverterService
 ) : SaveResource<Comment, CommentViewModel>, SaveResourceDescriptor<Comment, CommentViewModel> by Companion {
 
-    override fun ViewModelContext<CommentViewModel>.fetchData(): ElementSource<Comment> {
-        val enrichedModel = viewModel.copy(
-                userId = user.id.toString(),
-                username = user.username)
+    override fun fetchResource(context: ViewModelContext<CommentViewModel>): ElementSource<Comment> {
+        val enrichedModel = context.viewModel.copy(
+                userId = context.user.id.toString(),
+                username = context.user.username)
         return ElementSource.fromElement(converterService.convertToResource<Comment>(enrichedModel).get())
     }
 
-    override fun ViewModelContext<CommentViewModel>.createCommand(data: ElementSource<Comment>) = {
+    override fun createCommand(context: ViewModelContext<CommentViewModel>, data: ElementSource<Comment>) = {
         commentStorage.create(data.asSingle())
     }.toCommand()
 
@@ -34,5 +35,6 @@ class CreateComment(
         override val type = ResourceSaver(Comment::class, CommentViewModel::class)
         override val route = CommentURL.root
         override val urlClass = CommentURL::class
+        override val facets = listOf<Facet>()
     }
 }

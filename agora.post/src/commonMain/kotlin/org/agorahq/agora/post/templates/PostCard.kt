@@ -36,6 +36,7 @@ fun FlowContent.renderPostCard(post: PostViewModel) {
                     }
                 }
                 with(post.context) {
+                    post.context.site.moduleRegistry
                     if (user canDoAnyOf operations(EditPost, DeletePost)) {
                         div("card-footer bg-transparent") {
                             if (user can TogglePostPublished) {

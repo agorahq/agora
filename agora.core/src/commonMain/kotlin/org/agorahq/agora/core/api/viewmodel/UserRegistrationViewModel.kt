@@ -6,7 +6,7 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.view.ViewModel
 
 data class UserRegistrationViewModel(
-        val context: OperationContext,
+        override val context: OperationContext,
         val email: String,
         val firstName: String,
         val lastName: String,

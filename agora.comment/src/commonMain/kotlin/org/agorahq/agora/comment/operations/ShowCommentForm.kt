@@ -7,6 +7,7 @@ import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.extensions.toCommand
+import org.agorahq.agora.core.api.operation.Facet
 import org.agorahq.agora.core.api.operation.OperationType.PageElementFormRenderer
 import org.agorahq.agora.core.api.operation.RenderPageElementForm
 import org.agorahq.agora.core.api.operation.RenderPageElementFormDescriptor
@@ -15,21 +16,22 @@ import org.agorahq.agora.core.api.shared.templates.Templates
 
 class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementFormDescriptor<Comment, Page> by Companion {
 
-    override fun PageContext<Page>.fetchData(): ElementSource<Comment> {
+    override fun fetchResource(context: PageContext<Page>): ElementSource<Comment> {
         return ElementSource.fromElement(Comment(
-                owner = user,
+                owner = context.user,
                 content = "",
-                parentId = page.id))
+                parentId = context.page.id))
     }
 
-    override fun PageContext<Page>.createCommand(data: ElementSource<Comment>) = {
+    override fun createCommand(context: PageContext<Page>, data: ElementSource<Comment>) = {
         val comment = data.asSingle()
         Templates.htmlPartial {
             renderCommentForm(CommentViewModel(
                     parentId = comment.parentId.toString(),
                     content = comment.content,
                     username = comment.owner.username,
-                    userId = comment.owner.id.toString()
+                    userId = comment.owner.id.toString(),
+                    context = context
             ))
         }
     }.toCommand()
@@ -40,5 +42,6 @@ class ShowCommentForm : RenderPageElementForm<Comment, Page>, RenderPageElementF
         override val type = PageElementFormRenderer(Comment::class, Page::class)
         override val route = CommentURL.root
         override val urlClass = CommentURL::class
+        override val facets = listOf<Facet>()
     }
 }
