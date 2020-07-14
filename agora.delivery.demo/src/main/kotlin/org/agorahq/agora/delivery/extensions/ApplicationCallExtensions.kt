@@ -10,16 +10,14 @@ import io.ktor.response.respondText
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import org.agorahq.agora.core.api.data.*
+import org.agorahq.agora.core.api.data.Message
+import org.agorahq.agora.core.api.data.Result
+import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.context.PageURLContext
-import org.agorahq.agora.core.api.operation.context.ResourceIdContext
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.delivery.data.AgoraSession
 import org.agorahq.agora.delivery.data.AuthenticatedUserState
-import org.hexworks.cobalt.core.api.UUID
-import kotlin.reflect.KClass
 
 suspend fun ApplicationCall.tryRedirectToReferrer(site: SiteMetadata) {
     request.headers["Referer"]?.let { referer ->
@@ -46,24 +44,10 @@ val ApplicationCall.agoraSession: AgoraSession
     }
 
 
-fun <P : Page> ApplicationCall.toPageURLContext(
-        site: SiteMetadata,
-        authorization: Authorization,
-        urlClass: KClass<out ResourceURL<P>>
-): PageURLContext<P> = toOperationContext(site, authorization)
-        .toPageURLContext(parameters.toResourceURL(urlClass))
-
-fun ApplicationCall.toResourceIdContext(
-        site: SiteMetadata,
-        authorization: Authorization,
-        id: UUID
-): ResourceIdContext = toOperationContext(site, authorization)
-        .toResourceIdContext(id)
-
 fun ApplicationCall.toOperationContext(
         site: SiteMetadata,
         authorization: Authorization
-): OperationContext {
+): OperationContext<out Unit> {
     val user = when (val state = agoraSession.state) {
         is AuthenticatedUserState -> state.principal.toUser()
         else -> User.ANONYMOUS
@@ -76,7 +60,8 @@ fun ApplicationCall.toOperationContext(
             site = site,
             user = user,
             authorization = authorization,
-            message = msg
+            message = msg,
+            input = Unit
     )
 }
 

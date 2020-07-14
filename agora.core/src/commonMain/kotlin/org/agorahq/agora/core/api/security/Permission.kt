@@ -3,7 +3,6 @@ package org.agorahq.agora.core.api.security
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.operation.OperationDescriptor
-import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.policy.Policy
 
 /**
@@ -12,8 +11,8 @@ import org.agorahq.agora.core.api.security.policy.Policy
  */
 interface Permission<R : Resource> : PermissionDescriptor {
 
-    val operationDescriptor: OperationDescriptor<out R, out OperationContext, out Any>
-    val policies: Iterable<Policy<out R>>
+    val operationDescriptor: OperationDescriptor<out R, out Any, out Any>
+    val policies: Iterable<Policy<out R, out Any>>
 
     operator fun component2() = operationDescriptor
 

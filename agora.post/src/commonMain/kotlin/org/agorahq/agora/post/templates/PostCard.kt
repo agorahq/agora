@@ -2,13 +2,17 @@ package org.agorahq.agora.post.templates
 
 import kotlinx.html.*
 import org.agorahq.agora.core.api.extensions.operations
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.post.operations.DeletePost
 import org.agorahq.agora.post.operations.EditPost
 import org.agorahq.agora.post.operations.TogglePostPublished
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
-fun FlowContent.renderPostCard(post: PostViewModel) {
-    val user = post.context.user
+fun FlowContent.renderPostCard(
+        context: OperationContext<out Any>,
+        post: PostViewModel
+) {
+    val user = context.user
     val isPublished = post.isPublished
     div("row mb-3") {
         div("col") {
@@ -35,8 +39,8 @@ fun FlowContent.renderPostCard(post: PostViewModel) {
                         a(href = post.url) { +"Read more" }
                     }
                 }
-                with(post.context) {
-                    post.context.site.moduleRegistry
+                with(context) {
+                    context.site.moduleRegistry
                     if (user canDoAnyOf operations(EditPost, DeletePost)) {
                         div("card-footer bg-transparent") {
                             if (user can TogglePostPublished) {

@@ -8,7 +8,7 @@ import org.agorahq.agora.post.viewmodel.PostViewModel
 
 fun HTML.renderPostDetails(
         post: PostViewModel,
-        ctx: OperationContext
+        ctx: OperationContext<out Any>
 ) = withDefaultLayout(
         ctx = ctx,
         pageTitle = "${post.title} | Agora"

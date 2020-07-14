@@ -36,14 +36,14 @@ import org.agorahq.agora.core.api.extensions.isAuthenticated
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.ModuleRegistry
+import org.agorahq.agora.core.api.shared.security.BuiltInRoles
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.shared.templates.renderDefaultLoginPage
-import org.agorahq.agora.core.api.shared.templates.renderDefaultRegistrationPage
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 import org.agorahq.agora.delivery.data.*
 import org.agorahq.agora.delivery.extensions.*
-import org.agorahq.agora.core.api.shared.security.BuiltInRoles
 import org.hexworks.cobalt.logging.api.LoggerFactory
+import renderDefaultRegistrationPage
 import java.io.File
 import java.security.KeyStore
 
@@ -163,7 +163,7 @@ fun Application.main() {
                         logger.info("Rendering registration form...")
                         call.respondText(
                                 text = Templates.htmlTemplate {
-                                    renderDefaultRegistrationPage(state.toUserRegistrationModel(ctx))
+                                    renderDefaultRegistrationPage(ctx, state.toUserRegistrationModel())
                                 },
                                 contentType = ContentType.Text.Html)
                     }
@@ -179,7 +179,6 @@ fun Application.main() {
                 when (val state = session.state) {
                     is RegisteringState -> {
                         val model = UserRegistrationViewModel(
-                                context = ctx,
                                 email = state.oauthUser.email,
                                 firstName = state.oauthUser.firstName,
                                 lastName = state.oauthUser.lastName,
@@ -200,7 +199,7 @@ fun Application.main() {
                             logger.info("Model is not valid, re-rendering registration page.")
                             call.respondText(
                                     text = Templates.htmlTemplate {
-                                        renderDefaultRegistrationPage(model)
+                                        renderDefaultRegistrationPage(ctx, model)
                                     },
                                     contentType = ContentType.Text.Html)
                         }
@@ -243,7 +242,7 @@ fun Application.main() {
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.whenNotAuthenticated(
-        fn: suspend (OperationContext) -> Unit
+        fn: suspend (OperationContext<out Any>) -> Unit
 ) {
     val ctx = call.toOperationContext(SITE, AUTHORIZATION)
     if (ctx.user.isAuthenticated) {
@@ -284,10 +283,7 @@ private fun createModules(site: SiteMetadata): ModuleRegistry {
     return moduleRegistry
 }
 
-private fun RegisteringState.toUserRegistrationModel(
-        ctx: OperationContext
-) = UserRegistrationViewModel(
-        context = ctx,
+private fun RegisteringState.toUserRegistrationModel() = UserRegistrationViewModel(
         email = oauthUser.email,
         firstName = oauthUser.firstName,
         lastName = oauthUser.lastName

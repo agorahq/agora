@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package org.agorahq.agora.core.api.security
 
 import org.agorahq.agora.core.api.data.Resource
@@ -19,8 +21,8 @@ interface Authorization {
     /**
      * Tells whether the given [operation] can be executed in the given [context]
      */
-    fun <C : OperationContext> canExecute(
-            context: C,
+    fun canExecute(
+            context: OperationContext<Any>,
             operation: AnyOperationDescriptor
     ): Boolean
 
@@ -29,9 +31,21 @@ interface Authorization {
      * is returned which can be called to execute the - now authorized - [operation].
      * Otherwise an [AuthorizationException] is returned with a detailed error message.
      */
-    fun <R : Resource, C : OperationContext, T : Any> authorize(
-            context: C,
-            operation: Operation<R, C, T>
-    ): Result<out Command<T>, out AuthorizationException>
-
+    fun <O : Any> authorizeAny(
+            context: OperationContext<out Any>,
+            operation: Operation<Resource, Any, O>
+    ): Result<out Command<O>, out AuthorizationException>
 }
+
+/**
+ * Tries to authorize the given [operation] within the given [context]. If successful a [Command]
+ * is returned which can be called to execute the - now authorized - [operation].
+ * Otherwise an [AuthorizationException] is returned with a detailed error message.
+ */
+fun <R: Resource, I: Any, O : Any> Authorization.authorize(
+        context: OperationContext<I>,
+        operation: Operation<R, I, O>
+): Result<out Command<O>, out AuthorizationException> {
+    return authorizeAny(context as OperationContext<out Any>, operation as Operation<Resource, Any, O>)
+}
+

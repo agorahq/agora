@@ -1,13 +1,12 @@
 package org.agorahq.agora.core.api.shared.templates
 
 import kotlinx.html.*
-import org.agorahq.agora.core.api.data.Page
-import org.agorahq.agora.core.api.extensions.forEachModuleHavingOperationWithType
+import org.agorahq.agora.core.api.extensions.forEachModuleHavingOperationWithFacet
 import org.agorahq.agora.core.api.extensions.isAnonymous
-import org.agorahq.agora.core.api.operation.OperationType.PageListRenderer
 import org.agorahq.agora.core.api.operation.context.OperationContext
+import org.agorahq.agora.core.api.operation.facets.PageListRenderer
 
-fun FlowContent.renderDefaultNavigation(ctx: OperationContext) {
+fun FlowContent.renderDefaultNavigation(ctx: OperationContext<out Any>) {
     val (site, user) = ctx
     nav("navbar navbar-expand-lg navbar-dark bg-dark") {
         div("container") {
@@ -16,11 +15,10 @@ fun FlowContent.renderDefaultNavigation(ctx: OperationContext) {
                     li("nav-item") {
                         a(href = "/", classes = "nav-link") { +"Home" }
                     }
-                    site.forEachModuleHavingOperationWithType(PageListRenderer(Page::class)) { (module, renderer) ->
+                    site.forEachModuleHavingOperationWithFacet(PageListRenderer) { (module, renderer) ->
                         li("nav-item") {
-                            val classes = if (module.supportsContext(ctx)) {
-                                "nav-link active"
-                            } else "nav-link"
+                            // TODO: check for active
+                            val classes ="nav-link"
                             a(href = renderer.route, classes = classes) { +module.name }
                         }
                     }

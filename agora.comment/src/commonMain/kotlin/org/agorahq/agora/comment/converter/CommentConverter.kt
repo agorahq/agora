@@ -27,12 +27,11 @@ class CommentConverter(
             id = id?.toUUID() ?: UUID.randomUUID())
 
 
-    override fun Comment.toViewModel(context: OperationContext) = CommentViewModel(
+    override fun Comment.toViewModel(context: OperationContext<out Any>) = CommentViewModel(
             id = id.toString(),
             parentId = parentId.toString(),
             content = MarkdownRendererFactory.createRenderer().render(content),
             userId = owner.id.toString(),
-            username = owner.username,
-            context = context
+            username = owner.username
     )
 }

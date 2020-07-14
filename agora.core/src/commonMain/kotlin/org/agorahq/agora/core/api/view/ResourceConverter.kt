@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.view
 
-import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import kotlin.reflect.KClass
 
 interface ResourceConverter<M : ViewModel, R : Resource> {
@@ -11,6 +11,6 @@ interface ResourceConverter<M : ViewModel, R : Resource> {
 
     fun M.toResource(): R
 
-    fun R.toViewModel(context: OperationContext): M
+    fun R.toViewModel(context: OperationContext<out Any>): M
 
 }

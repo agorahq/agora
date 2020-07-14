@@ -25,14 +25,13 @@ class PostConverter(
             owner = userService.findById(ownerId.toUUID()).get(),
             content = content)
 
-    override fun Post.toViewModel(context: OperationContext) = PostViewModel(
+    override fun Post.toViewModel(context: OperationContext<out Any>) = PostViewModel(
             ownerId = owner.id.toString(),
             abstract = abstract,
             url = url.generate(),
             title = title,
             tags = tags,
             content = MarkdownRendererFactory.createRenderer().render(content),
-            context = context,
             renderedPageElements = "",
             excerpt = excerpt,
             publicationDate = publishedAt.format(humanReadableFormat),

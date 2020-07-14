@@ -4,7 +4,7 @@ import kotlinx.html.*
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 
-fun HTML.renderDefaultHomepage(ctx: OperationContext) = withDefaultLayout(ctx, "Home") {
+fun HTML.renderDefaultHomepage(ctx: OperationContext<out Any>) = withDefaultLayout(ctx, "Home") {
     val (site, _, _, message) = ctx
     message?.let {
         div("alert alert-${it.type.name.toLowerCase()} alert-dismissable fade show mt-3") {

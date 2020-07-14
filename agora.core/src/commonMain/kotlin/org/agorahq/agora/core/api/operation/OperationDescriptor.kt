@@ -2,48 +2,59 @@ package org.agorahq.agora.core.api.operation
 
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.ResourceURL
-import org.agorahq.agora.core.api.operation.context.OperationContext
+import org.agorahq.agora.core.api.operation.facets.OperationMetadata
 import org.agorahq.agora.core.internal.security.DefaultOperationDescriptor
 import kotlin.reflect.KClass
 
 /**
- * Contains the metadata for an [Operation]. Each operation must have:
- * - an unique [name]
- * - a [resourceClass] representing the [Resource] the [Operation] is working on
- * - a [type] which contains information about how the [Operation] is performed
- * - an [urlClass] which contains information about how the [Operation] can be accessed from the web
- * - and a [route].
+ * An [OperationDescriptor] contains metadata which is necessary to perform
+ * an [Operation]. each [OperationDescriptor] must have an unique [name].
+ *
+ * [OperationDescriptor]s can have arbitrary metadata in them (called [Facet]s),
+ * but each [OperationDescriptor] must have an [OperationMetadata] [Facet] which
+ * contains the mandatory information.
+ * @param R the [Resource] this operation works on
+ * @param I the input of the [Operation]
+ * @param O the output of the [Operation]
  */
-interface OperationDescriptor<R : Resource, C : OperationContext, T : Any> {
+interface OperationDescriptor<R : Resource, I : Any, O : Any> {
 
     val name: String
-    val resourceClass: KClass<R>
-    val type: OperationType<R, C, T>
-    val urlClass: KClass<out ResourceURL<R>>
-    val route: String
-    val facets: Iterable<Facet>
+    val facets: Facets<R, I, O>
 
+    val resourceClass: KClass<R>
+        get() = facets.resourceClass
+    val parametersClass: KClass<I>
+        get() = facets.parametersClass
+    val outputClass: KClass<O>
+        get() = facets.outputClass
+    val urlClass: KClass<ResourceURL<R>>
+        get() = facets.urlClass
+    val route: String
+        get() = facets.route
+
+    @Suppress("UNCHECKED_CAST")
     companion object {
 
-        fun <R : Resource, C : OperationContext, T : Any> create(
+        inline fun <reified R : Resource, reified I : Any, reified O : Any> create(
                 name: String,
-                resourceClass: KClass<R>,
-                type: OperationType<R, C, T>,
                 route: String,
-                urlClass: KClass<ResourceURL<R>>,
+                urlClass: KClass<out ResourceURL<R>>,
                 facets: Iterable<Facet>
-        ): OperationDescriptor<R, C, T> = DefaultOperationDescriptor(
+        ): OperationDescriptor<R, I, O> = DefaultOperationDescriptor(
                 name = name,
-                resourceClass = resourceClass,
-                type = type,
-                route = route,
-                urlClass = urlClass,
-                facets = facets
+                facets = Facets(OperationMetadata(
+                        resourceClass = R::class,
+                        inputClass = I::class,
+                        outputClass = O::class,
+                        urlClass = urlClass as KClass<ResourceURL<R>>,
+                        route = route
+                ), facets.toList())
         )
 
-        fun <R : Resource, C : OperationContext, T : Any> toString(descriptor: OperationDescriptor<R, C, T>): String {
-            return descriptor.name
-        }
+        fun <R : Resource, I : Any, O : Any> toString(
+                descriptor: OperationDescriptor<R, I, O>
+        ) = descriptor.name
 
     }
 

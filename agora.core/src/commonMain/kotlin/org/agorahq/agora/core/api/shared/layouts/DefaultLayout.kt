@@ -7,7 +7,7 @@ import org.agorahq.agora.core.api.shared.templates.renderDefaultHead
 import org.agorahq.agora.core.api.shared.templates.renderDefaultNavigation
 
 fun HTML.withDefaultLayout(
-        ctx: OperationContext,
+        ctx: OperationContext<out Any>,
         pageTitle: String,
         fn: DIV.() -> Unit
 ) {

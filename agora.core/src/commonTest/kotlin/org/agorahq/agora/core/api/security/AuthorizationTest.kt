@@ -27,11 +27,9 @@ class AuthorizationTest {
                         inStock = true,
                         owner = USER_JOE)))
 
-        val ctx = OperationContext.create(SITE, User.ANONYMOUS, AUTH)
+        val ctx = OperationContext.create(SITE, User.ANONYMOUS, AUTH, null, Unit)
 
-        val result = AUTH.authorize(ctx, listItems)
-
-        when (result) {
+        when (val result = AUTH.authorize(ctx, listItems)) {
             is Success -> fail("This operation was not supposed to be successful.")
             is Failure -> assertEquals(result.exception.message, MissingPermissionException(User.ANONYMOUS, listItems).message)
         }
@@ -50,7 +48,7 @@ class AuthorizationTest {
         val USER = RoleDescriptor.create("user")
         val ADMIN = RoleDescriptor.create("admin")
 
-        private val IN_STOCK_ONLY = Policy.create<Item> { ctx, item ->
+        private val IN_STOCK_ONLY = Policy.create<Item> { _, item ->
             item.inStock
         }
 
@@ -58,16 +56,12 @@ class AuthorizationTest {
                 email = "joe@user.com",
                 username = "user_joe")
 
-        val ADMIN_SAM = User.create(
-                email = "sam@admin.com",
-                username = "admin_sam")
-
         val AUTH = authorization {
             roles {
                 val userRole = USER {
                     Item::class {
-                        ListItems withPolicy  IN_STOCK_ONLY
-                        ShowItem withPolicy  IN_STOCK_ONLY
+                        ListItems withPolicy IN_STOCK_ONLY
+                        ShowItem withPolicy IN_STOCK_ONLY
                     }
                 }
                 ADMIN {

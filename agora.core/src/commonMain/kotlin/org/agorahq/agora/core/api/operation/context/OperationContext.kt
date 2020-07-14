@@ -1,24 +1,24 @@
 package org.agorahq.agora.core.api.operation.context
 
-import org.agorahq.agora.core.api.data.*
+import org.agorahq.agora.core.api.data.Message
+import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.operation.AnyOperationDescriptor
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User
-import org.agorahq.agora.core.api.view.ViewModel
-import org.hexworks.cobalt.core.api.UUID
 import kotlin.jvm.JvmStatic
 
 /**
- * Contains the necessary metadata (context) for an [Operation].
+ * Contains the necessary parameters (input) for an [Operation].
  * This interface can be specialized with additional information.
  */
-interface OperationContext {
+interface OperationContext<I : Any> {
 
     val site: SiteMetadata
     val user: User
     val authorization: Authorization
     val message: Message?
+    val input: I
 
     operator fun component1() = site
 
@@ -28,40 +28,15 @@ interface OperationContext {
 
     operator fun component4() = message
 
-    fun <P : Page> toPageURLContext(url: ResourceURL<P>): PageURLContext<P> = PageURLContext(
-            site = site,
-            user = user,
-            authorization = authorization,
-            message = message,
-            url = url)
+    operator fun component5() = input
 
-    fun toResourceIdContext(id: UUID): ResourceIdContext = ResourceIdContext(
+    fun <I : Any> withInput(input: I): OperationContext<I> = create(
             site = site,
             user = user,
             authorization = authorization,
             message = message,
-            id = id)
-
-    fun <M : ViewModel> toViewModelContext(viewModel: M): ViewModelContext<M> = ViewModelContext(
-            site = site,
-            user = user,
-            authorization = authorization,
-            message = message,
-            viewModel = viewModel)
-
-    fun <R : Resource> toResourceContext(resource: R): ResourceContext<R> = ResourceContext(
-            site = site,
-            user = user,
-            authorization = authorization,
-            message = message,
-            resource = resource)
-
-    fun <P : Page> toPageContext(page: P): PageContext<P> = PageContext(
-            site = site,
-            user = user,
-            message = message,
-            authorization = authorization,
-            page = page)
+            input = input
+    )
 
     /**
      * Tells whether the [User] can execute the given [operation] in [this] context.
@@ -76,16 +51,18 @@ interface OperationContext {
     companion object {
 
         @JvmStatic
-        fun create(
+        fun <I : Any> create(
                 site: SiteMetadata,
                 user: User,
                 authorization: Authorization,
-                message: Message? = null
+                message: Message? = null,
+                input: I
         ) = DefaultOperationContext(
                 site = site,
                 user = user,
                 authorization = authorization,
-                message = message
+                message = message,
+                input = input
         )
 
     }

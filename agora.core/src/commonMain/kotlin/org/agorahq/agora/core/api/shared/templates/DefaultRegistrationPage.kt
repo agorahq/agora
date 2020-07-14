@@ -1,11 +1,13 @@
-package org.agorahq.agora.core.api.shared.templates
-
 import kotlinx.html.*
+import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 
-fun HTML.renderDefaultRegistrationPage(model: UserRegistrationViewModel) = withDefaultLayout(
-        ctx = model.context,
+fun HTML.renderDefaultRegistrationPage(
+        ctx: OperationContext<out Any>,
+        model: UserRegistrationViewModel
+) = withDefaultLayout(
+        ctx = ctx,
         pageTitle = "Register"
 ) {
     div("card mt-2") {

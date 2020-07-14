@@ -38,7 +38,7 @@ class DefaultConverterService(
         } ?: Failure(MissingConverterException(view))
     }
 
-    override fun <V : ViewModel> convertToView(resource: Resource, context: OperationContext): Result<out V, out Exception> {
+    override fun <V : ViewModel> convertToView(resource: Resource, context: OperationContext<out Any>): Result<out V, out Exception> {
         return resourceLookup[resource::class as KClass<Resource>]?.let { converter ->
             try {
                 Result.Success(with(converter) { resource.toViewModel(context) } as V)
