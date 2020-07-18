@@ -9,6 +9,7 @@ import io.ktor.util.getOrFail
 import io.ktor.util.pipeline.PipelineContext
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.authorize

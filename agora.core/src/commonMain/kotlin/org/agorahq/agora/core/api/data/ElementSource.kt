@@ -22,15 +22,17 @@ sealed class ElementSource<out T : Any> {
 
     companion object {
 
-        fun <T : Any> fromMaybe(maybe: Maybe<T>): ElementSource<T> = maybe.map {
-            fromElement(it)
+        fun <T : Any> empty(): ElementSource<T> = EmptyElementSource
+
+        fun <T : Any> ofMaybe(maybe: Maybe<T>): ElementSource<T> = maybe.map {
+            of(it)
         }.orElse(EmptyElementSource)
 
-        fun <T : Any> fromElement(element: T): ElementSource<T> = SingleElementSource(element)
+        fun <T : Any> of(element: T): ElementSource<T> = SingleElementSource(element)
 
-        fun <T : Any> fromIterable(elements: Iterable<T>) = MultipleElementSource(elements)
+        fun <T : Any> ofIterable(elements: Iterable<T>) = MultipleElementSource(elements)
 
-        fun <T : Any> fromSequence(elements: Sequence<T>) = MultipleElementSource(elements.asIterable())
+        fun <T : Any> ofSequence(elements: Sequence<T>) = MultipleElementSource(elements.asIterable())
     }
 }
 
@@ -66,7 +68,7 @@ data class MultipleElementSource<T : Any>(val elements: Iterable<T>) : ElementSo
     override fun asSingle(): T = elements.firstOrNull() ?: throw NoSuchElementException("There are no elements.")
 
     override fun filter(fn: (element: T) -> Boolean): ElementSource<T> {
-        return fromIterable(elements.filter(fn))
+        return ofIterable(elements.filter(fn))
     }
 
     override fun <R : Any> map(fn: (element: T) -> R) = MultipleElementSource(elements.map(fn))

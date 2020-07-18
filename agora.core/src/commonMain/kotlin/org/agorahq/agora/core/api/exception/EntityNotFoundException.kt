@@ -5,5 +5,8 @@ import kotlin.reflect.KClass
 
 class EntityNotFoundException(
         type: KClass<out Entity>,
-        key: String
-) : RuntimeException("The entity ${type.simpleName} with the given key $key was not found.")
+        key: String,
+        private val msg: String = "The entity ${type.simpleName} with the given key $key was not found."
+) : RuntimeException(msg) {
+    override fun toString() = msg
+}

@@ -7,6 +7,9 @@ package org.agorahq.agora.core.api.data
  */
 interface ResourceURL<R : Resource> {
 
+    val redirectTo: String?
+    val pageElementsToEdit: Iterable<String>
+
     /**
      * Generates the textual representation of this [ResourceURL].
      */

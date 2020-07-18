@@ -1,5 +1,5 @@
 package org.agorahq.agora.core.api.operation.facets
 
-import org.agorahq.agora.core.api.operation.Facet
+import org.agorahq.agora.core.api.operation.Attribute
 
-object PageElementListRenderer : Facet
+object PageElementListRenderer : Attribute

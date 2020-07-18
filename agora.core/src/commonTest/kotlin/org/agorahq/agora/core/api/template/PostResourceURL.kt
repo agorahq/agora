@@ -5,7 +5,9 @@ import org.agorahq.agora.core.api.extensions.toSlug
 
 data class PostResourceURL(
         val date: String,
-        val titleSlug: String
+        val titleSlug: String,
+        override val redirectTo: String? = null,
+        override val pageElementsToEdit: Iterable<String> = listOf()
 ) : ResourceURL<TestPost> {
 
     override fun generate() = "/posts/$date/$titleSlug.html"

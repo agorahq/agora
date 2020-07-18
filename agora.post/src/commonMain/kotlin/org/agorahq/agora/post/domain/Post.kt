@@ -18,7 +18,19 @@ data class Post(
         override val format: ContentFormat = MARKDOWN,
         override val createdAt: DateTime = DateTime.now(),
         override val updatedAt: DateTime = createdAt,
-        override val publishedAt: DateTime = createdAt,
-        override val url: PostURL = PostURL(createdAt.format(simpleDateFormat), title),
+        override val publishedAt: DateTime = DateTime.fromUnix(Long.MAX_VALUE),
+        override val url: ShowPostURL = ShowPostURL(createdAt.format(simpleDateFormat), title),
         override val id: UUID = UUID.randomUUID()
-) : Page
+) : Page {
+
+    companion object {
+
+        fun empty(owner: User) = Post(
+                title = "",
+                abstract = "",
+                tags = setOf(),
+                content = "",
+                owner = owner
+        )
+    }
+}

@@ -1,11 +1,9 @@
 package org.agorahq.agora.post.templates
 
 import kotlinx.html.*
-import org.agorahq.agora.core.api.extensions.operations
+import org.agorahq.agora.core.api.extensions.renderResourceLinksFor
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.post.operations.DeletePost
-import org.agorahq.agora.post.operations.EditPost
-import org.agorahq.agora.post.operations.TogglePostPublished
+import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
 fun FlowContent.renderPostCard(
@@ -39,55 +37,11 @@ fun FlowContent.renderPostCard(
                         a(href = post.url) { +"Read more" }
                     }
                 }
-                with(context) {
-                    context.site.moduleRegistry
-                    if (user canDoAnyOf operations(EditPost, DeletePost)) {
-                        div("card-footer bg-transparent") {
-                            if (user can TogglePostPublished) {
-                                form(TogglePostPublished.route, method = FormMethod.post) {
-                                    this.style = "display: inline-block; margin-bottom: 0;"
-                                    input(type = InputType.hidden, name = "id") {
-                                        value = post.id
-                                    }
-                                    div("btn-group-toggle mr-2") {
-                                        button(
-                                                type = ButtonType.submit,
-                                                classes = "btn btn-primary ${if (isPublished) "active" else ""}"
-                                        ) {
-                                            attributes["data-toggle"] = "button"
-                                            attributes["aria-pressed"] = isPublished.toString()
-                                            if (isPublished) {
-                                                +"Hide"
-                                            } else {
-                                                +"Publish"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if (user can EditPost) {
-                                form(EditPost.route, method = FormMethod.post) {
-                                    this.style = "display: inline-block; margin-bottom: 0;"
-                                    input(type = InputType.hidden, name = "id") {
-                                        value = post.id
-                                    }
-                                    button(type = ButtonType.submit, classes = "btn btn-warning mr-2") {
-                                        +"Edit"
-                                        em("text-muted") { +" (WIP)" }
-                                    }
-                                }
-                            }
-                            if (user can DeletePost) {
-                                form(DeletePost.route, method = FormMethod.post) {
-                                    this.style = "display: inline-block; margin-bottom: 0;"
-                                    input(type = InputType.hidden, name = "id") {
-                                        value = post.id
-                                    }
-                                    button(type = ButtonType.submit, classes = "btn btn-danger") {
-                                        +"Delete"
-                                    }
-                                }
-                            }
+                val alterers = context.renderResourceLinksFor(Post::class, post.id)
+                if (alterers.isNotBlank()) {
+                    div("card-footer bg-transparent") {
+                        unsafe {
+                            +alterers
                         }
                     }
                 }

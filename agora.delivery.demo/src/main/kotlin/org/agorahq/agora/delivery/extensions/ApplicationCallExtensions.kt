@@ -11,8 +11,10 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
 import org.agorahq.agora.core.api.data.Message
+import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.Result
 import org.agorahq.agora.core.api.data.SiteMetadata
+import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.User

@@ -4,9 +4,11 @@ import org.agorahq.agora.core.api.data.ResourceURL
 import org.agorahq.agora.core.api.extensions.toSlug
 import org.agorahq.agora.core.api.shared.date.Dates
 
-data class PostURL(
+data class ShowPostURL(
         val date: String,
-        val titleSlug: String
+        val titleSlug: String,
+        override val redirectTo: String? = null,
+        override val pageElementsToEdit: Iterable<String> = listOf()
 ) : ResourceURL<Post> {
 
     override fun generate() = "$root/$date/${titleSlug.toSlug()}.html"
@@ -17,7 +19,7 @@ data class PostURL(
 
     companion object {
         const val root = "/posts"
-        val route = "$root/{${PostURL::date.name}}/{${PostURL::titleSlug.name}}.html"
+        val route = "$root/{${ShowPostURL::date.name}}/{${ShowPostURL::titleSlug.name}}.html"
     }
 
 }

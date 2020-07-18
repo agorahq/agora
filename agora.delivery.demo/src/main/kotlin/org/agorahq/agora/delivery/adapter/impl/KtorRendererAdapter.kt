@@ -14,7 +14,7 @@ import org.agorahq.agora.delivery.adapter.KtorOperationAdapter
 import org.agorahq.agora.delivery.extensions.toOperationContext
 import org.hexworks.cobalt.logging.api.LoggerFactory
 
-class KtorPageListRendererAdapter<P : Page>(
+class KtorRendererAdapter<P : Page>(
         override val operation: Operation<P, Unit, String>,
         private val site: SiteMetadata,
         private val authorization: Authorization
@@ -27,10 +27,9 @@ class KtorPageListRendererAdapter<P : Page>(
         get(operation.route) {
             call.respondText(
                     contentType = ContentType.Text.Html,
-                    text = authorization.authorize(call.toOperationContext(
-                            site = site,
-                            authorization = authorization
-                    ).withInput(Unit), operation).get().execute().get()
+                    text = authorization.authorize(call
+                            .toOperationContext(site, authorization)
+                            .withInput(Unit), operation).get().execute().get()
             )
         }
     }

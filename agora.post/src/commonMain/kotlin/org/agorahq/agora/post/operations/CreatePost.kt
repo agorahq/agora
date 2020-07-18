@@ -1,16 +1,16 @@
 package org.agorahq.agora.post.operations
 
 import org.agorahq.agora.core.api.data.ElementSource
-import org.agorahq.agora.core.api.extensions.toCommand
-import org.agorahq.agora.core.api.operation.OperationDescriptor
-import org.agorahq.agora.core.api.operation.Procedure
-import org.agorahq.agora.core.api.operation.ProcedureDescriptor
+import org.agorahq.agora.core.api.operation.Attributes
+import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.ResourceSaver
+import org.agorahq.agora.core.api.operation.facets.SavesResource
+import org.agorahq.agora.core.api.operation.types.Procedure
+import org.agorahq.agora.core.api.operation.types.ProcedureDescriptor
 import org.agorahq.agora.core.api.service.StorageService
 import org.agorahq.agora.core.api.view.ConverterService
 import org.agorahq.agora.post.domain.Post
-import org.agorahq.agora.post.domain.PostURL
+import org.agorahq.agora.post.domain.ShowPostURL
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
 class CreatePost(
@@ -19,19 +19,25 @@ class CreatePost(
 ) : Procedure<Post, PostViewModel>, ProcedureDescriptor<Post, PostViewModel> by Companion {
 
     override fun fetchResource(context: OperationContext<out PostViewModel>): ElementSource<Post> {
-        return ElementSource.fromElement(converterService.convertToResource<Post>(context.input).get())
+        return ElementSource.of(converterService.convertToResource<Post>(context.input).get())
     }
 
-    override fun createCommand(context: OperationContext<out PostViewModel>, data: ElementSource<Post>) = {
+    override fun createCommand(
+            context: OperationContext<out PostViewModel>,
+            data: ElementSource<Post>
+    ) = Command.of {
         postStorage.create(data.asSingle())
-    }.toCommand()
+    }
 
-    override fun toString() = OperationDescriptor.toString(this)
+    override fun toString() = name
 
-    companion object : ProcedureDescriptor<Post, PostViewModel> by OperationDescriptor.create(
-            name = "Create Post",
-            route = PostURL.root,
-            urlClass = PostURL::class,
-            facets = listOf(ResourceSaver)
-    )
+    companion object : ProcedureDescriptor<Post, PostViewModel> {
+        override val name = "Create post"
+        override val attributes = Attributes.create<Post, PostViewModel, Unit>(
+                route = ShowPostURL.root,
+                urlClass = ShowPostURL::class,
+                additionalAttributes = listOf(SavesResource)
+        )
+    }
+
 }

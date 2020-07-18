@@ -1,10 +1,10 @@
 package org.agorahq.agora.core.api.shared.templates
 
-import kotlinx.html.FlowContent
+import kotlinx.html.TagConsumer
 import kotlinx.html.span
 import kotlinx.html.unsafe
 
-fun FlowContent.renderTrashIcon(classes: String = "") = span {
+fun TagConsumer<Appendable>.renderTrashIcon(classes: String = "") = span {
     unsafe {
         +"""
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash $classes" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -15,7 +15,7 @@ fun FlowContent.renderTrashIcon(classes: String = "") = span {
     }
 }
 
-fun FlowContent.renderPencilIcon(classes: String = "") = span {
+fun TagConsumer<Appendable>.renderPencilIcon(classes: String = "") = span {
     unsafe {
         +"""
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil $classes" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

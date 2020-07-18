@@ -5,5 +5,8 @@ import org.agorahq.agora.core.api.security.User
 
 class ResourceAccessNotPermittedException(
         user: User,
-        operation: AnyOperation
-) : AuthorizationException("User $user has no access to the resource(s) handled by $operation.")
+        operation: AnyOperation,
+        private val msg: String = "User $user has no access to the resource(s) handled by $operation."
+) : AuthorizationException(msg) {
+    override fun toString() = msg
+}

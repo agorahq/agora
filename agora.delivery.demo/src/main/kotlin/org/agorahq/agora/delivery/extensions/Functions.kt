@@ -3,7 +3,6 @@ package org.agorahq.agora.delivery.extensions
 import com.soywiz.klock.DateTime
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.core.api.security.policy.Policy
-import org.agorahq.agora.core.platform.SystemUtils
 import org.agorahq.agora.post.domain.Post
 
 val postIsPublished = Policy.create<Post>(
@@ -14,9 +13,15 @@ val postIsPublished = Policy.create<Post>(
 
 val commentIsNotHidden = Policy.create<Comment>(
         description = "Comment is not hidden"
+) { _, comment ->
+    comment.hiddenSince > DateTime.now()
+}
+
+val commentIsOwnOrNotHidden = Policy.create<Comment>(
+        description = "Comment is not hidden"
 ) { ctx, comment ->
     comment.owner.email == ctx.user.email ||
-            comment.hiddenSince > SystemUtils.currentTimeMillis()
+            comment.hiddenSince > DateTime.now()
 }
 
 val ownCommentOnly = Policy.create<Comment>(

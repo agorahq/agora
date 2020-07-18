@@ -10,4 +10,22 @@ import org.agorahq.agora.core.api.data.Result
 interface Command<T : Any> {
 
     fun execute(): Result<out T, out Exception>
+
+    companion object {
+
+        fun <T : Any> of(fn: () -> T): Command<T> = CommandImpl(fn)
+    }
+}
+
+private class CommandImpl<T : Any>(private val fn: () -> T) : Command<T> {
+
+    override fun toString() = "Command"
+
+    override fun execute(): Result<out T, out Exception> {
+        return try {
+            Result.Success(fn())
+        } catch (e: Exception) {
+            Result.Failure(e)
+        }
+    }
 }

@@ -1,8 +1,7 @@
 package org.agorahq.agora.core.api.shared.templates
 
-import kotlinx.html.FlowContent
 import kotlinx.html.HTML
-import kotlinx.html.div
+import kotlinx.html.TagConsumer
 import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
 
@@ -24,13 +23,13 @@ object Templates {
 
     fun htmlPartial(
             prettyPrint: Boolean = false,
-            fn: FlowContent.() -> Unit
+            fn: TagConsumer<StringBuilder>.() -> Unit
     ): String {
         val sb = StringBuilder()
-        sb.appendHTML(
+        with(sb.appendHTML(
                 prettyPrint = prettyPrint,
                 xhtmlCompatible = true
-        ).div {
+        )) {
             fn()
         }
         return sb.toString()

@@ -7,27 +7,18 @@ import org.agorahq.agora.core.api.shared.templates.renderDefaultHead
 import org.agorahq.agora.core.api.shared.templates.renderDefaultNavigation
 
 fun HTML.withDefaultLayout(
-        ctx: OperationContext<out Any>,
+        context: OperationContext<out Any>,
         pageTitle: String,
         fn: DIV.() -> Unit
 ) {
-    renderDefaultHead(ctx.site, pageTitle)
+    renderDefaultHead(context.site, pageTitle)
     body {
         style {
         }
-        renderDefaultNavigation(ctx)
+        renderDefaultNavigation(context)
         div("container") {
             fn()
-            renderDefaultFooter(ctx.site)
-        }
-        script {
-            src = "static/jquery-3.2.1.slim.min.js"
-        }
-        script {
-            src = "static/popper.min.js"
-        }
-        script {
-            src = "static/bootstrap.min.js"
+            renderDefaultFooter(context.site)
         }
     }
 }

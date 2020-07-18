@@ -4,10 +4,10 @@ import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 import org.agorahq.agora.core.api.viewmodel.UserRegistrationViewModel
 
 fun HTML.renderDefaultRegistrationPage(
-        ctx: OperationContext<out Any>,
+        context: OperationContext<out Any>,
         model: UserRegistrationViewModel
 ) = withDefaultLayout(
-        ctx = ctx,
+        context = context,
         pageTitle = "Register"
 ) {
     div("card mt-2") {

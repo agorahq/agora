@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 
 fun HTML.renderDefaultLoginPage(ctx: OperationContext<out Any>) = withDefaultLayout(ctx, "Log In") {
-    div("card mt-2") {
+    div("card mt-3") {
         div("card-header") {
             h3 { +"Log In" }
         }

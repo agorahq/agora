@@ -16,14 +16,10 @@ import kotlin.reflect.KClassifier
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.primaryConstructor
 
-fun <R : Resource> Parameters.toResourceURL(
-        urlClass: KClass<out ResourceURL<R>>
-): ResourceURL<R> = mapTo(urlClass)
-
 fun <T : Any> Parameters.mapTo(type: KClass<T>): T {
 
     require(type.isData) {
-        "Creating an instance from Parameters is only supported for data classes."
+        "Creating an instance from Parameters is only supported for data classes. $type is not a data class."
     }
 
     val parameters = this

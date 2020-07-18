@@ -6,40 +6,48 @@ import org.agorahq.agora.comment.templates.renderCommentList
 import org.agorahq.agora.comment.viewmodel.CommentListViewModel
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
-import org.agorahq.agora.core.api.data.Page
-import org.agorahq.agora.core.api.extensions.toCommand
-import org.agorahq.agora.core.api.operation.OperationDescriptor
-import org.agorahq.agora.core.api.operation.ParameterizedRenderer
-import org.agorahq.agora.core.api.operation.ParameterizedRendererDescriptor
+import org.agorahq.agora.core.api.operation.Attributes
+import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.facets.PageElementListRenderer
+import org.agorahq.agora.core.api.operation.types.ParameterizedRenderer
+import org.agorahq.agora.core.api.operation.types.ParameterizedRendererDescriptor
 import org.agorahq.agora.core.api.service.PageElementQueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.view.ConverterService
+import org.hexworks.cobalt.core.api.UUID
 
 class ListComments(
         private val commentService: PageElementQueryService<Comment>,
         private val converterService: ConverterService
-) : ParameterizedRenderer<Comment, Page>, ParameterizedRendererDescriptor<Comment, Page> by Companion {
+) : ParameterizedRenderer<Comment, UUID>, ParameterizedRendererDescriptor<Comment, UUID> by Companion {
 
-    override fun fetchResource(context: OperationContext<out Page>): ElementSource<Comment> {
-        return ElementSource.fromSequence(commentService
-                .findByParent(context.input))
+    override fun fetchResource(context: OperationContext<out UUID>): ElementSource<Comment> {
+        return ElementSource.ofSequence(commentService
+                .findByParentId(context.input))
     }
 
-    override fun createCommand(context: OperationContext<out Page>, data: ElementSource<Comment>) = {
+    override fun createCommand(
+            context: OperationContext<out UUID>,
+            data: ElementSource<Comment>
+    ) = Command.of {
         Templates.htmlPartial {
-            renderCommentList(CommentListViewModel(
-                    comments = data.asSequence().map {
-                        converterService.convertToView<CommentViewModel>(it, context).get()
-                    }))
+            renderCommentList(
+                    context = context,
+                    model = CommentListViewModel(
+                            comments = data.asSequence().map {
+                                converterService.convertToView<CommentViewModel>(it, context).get()
+                            })
+            )
         }
-    }.toCommand()
+    }
 
-    companion object : ParameterizedRendererDescriptor<Comment, Page> by OperationDescriptor.create(
-            name = "List Comments",
-            route = CommentURL.root,
-            urlClass = CommentURL::class,
-            facets = listOf(PageElementListRenderer)
-    )
+    companion object : ParameterizedRendererDescriptor<Comment, UUID> {
+        override val name = "List comments"
+        override val attributes = Attributes.create<Comment, UUID, String>(
+                route = CommentURL.root,
+                urlClass = CommentURL::class,
+                additionalAttributes = listOf(PageElementListRenderer)
+        )
+    }
 }

@@ -14,11 +14,14 @@ import org.agorahq.agora.core.api.security.Permission
 import org.agorahq.agora.core.api.security.Role
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.security.policy.Policy
+import org.hexworks.cobalt.logging.api.LoggerFactory
 
 @Suppress("UNCHECKED_CAST")
 data class DefaultAuthorization(
         private val roles: Iterable<Role>
 ) : Authorization {
+
+    private val logger = LoggerFactory.getLogger(Authorization::class)
 
     private val roleLookup: Map<String, List<Permission<out Resource>>> = roles.map { role ->
         role.name to role.permissions.toList()
@@ -39,6 +42,7 @@ data class DefaultAuthorization(
             context: OperationContext<out Any>,
             operation: Operation<Resource, Any, O>
     ): Result<out Command<O>, out AuthorizationException> {
+        logger.info("Trying to authorize $operation for ${context.user}")
         val user = context.user
         val permissions = user.permissions
         return permissions.firstOrNull {
@@ -49,7 +53,7 @@ data class DefaultAuthorization(
             val filteredData = policies.fold(data) { remaining, next ->
                 remaining.filter { next(context as OperationContext<Any>, it) }
             }
-            when (data) {
+            val result = when (data) {
                 EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation as AnyOperation))
                 is SingleElementSource -> when (filteredData) {
                     EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation as AnyOperation))
@@ -58,7 +62,13 @@ data class DefaultAuthorization(
                 }
                 is MultipleElementSource -> Result.Success(operation.createCommand(context, filteredData))
             }
-        } ?: Result.Failure(MissingPermissionException(user, operation as AnyOperation))
+            logger.info("Authorization result is: $result")
+            result
+        } ?: run {
+            val e = MissingPermissionException(user, operation as AnyOperation)
+            logger.info("Authorization failed: $e")
+            Result.Failure(e)
+        }
     }
 
 

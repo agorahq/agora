@@ -10,7 +10,6 @@ import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.view.ResourceConverter
 import org.agorahq.agora.core.platform.MarkdownRendererFactory
-import org.hexworks.cobalt.core.api.UUID
 
 class CommentConverter(
         private val userService: QueryService<User>
@@ -24,7 +23,8 @@ class CommentConverter(
             parentId = parentId.toUUID(),
             createdAt = DateTime.now(),
             content = content,
-            id = id?.toUUID() ?: UUID.randomUUID())
+            id = id.toUUID()
+    )
 
 
     override fun Comment.toViewModel(context: OperationContext<out Any>) = CommentViewModel(
@@ -32,6 +32,7 @@ class CommentConverter(
             parentId = parentId.toString(),
             content = MarkdownRendererFactory.createRenderer().render(content),
             userId = owner.id.toString(),
-            username = owner.username
+            username = owner.username,
+            isHidden = hiddenSince < DateTime.now()
     )
 }

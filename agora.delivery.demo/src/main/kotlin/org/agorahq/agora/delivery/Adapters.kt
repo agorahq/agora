@@ -20,12 +20,17 @@ fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
         }, ContentType.Text.Html)
     }
 
-    with(KtorPageListRendererAdapter(Services.listPosts, site, authorization)) { register() }
-    with(KtorPageRendererAdapter(Services.renderPost, site, authorization)) { register() }
+    with(KtorRendererAdapter(Services.listPosts, site, authorization)) { register() }
+    with(KtorParameterizedRendererAdapter(Services.showPost, site, authorization)) { register() }
     with(KtorResourceSaverAdapter(Services.createPost, site, authorization)) { register() }
-    with(KtorResourceAltererAdapter(Services.deletePost, site, authorization)) { register() }
-    with(KtorPageElementFormRendererAdapter(Services.renderCommentForm, site, authorization)) { register() }
+
+    with(KtorParameterizedRendererAdapter(Services.showCommentEditor, site, authorization)) { register() }
     with(KtorResourceSaverAdapter(Services.createComment, site, authorization)) { register() }
     with(KtorResourceAltererAdapter(Services.deleteComment, site, authorization)) { register() }
+
+    with(KtorRendererAdapter(Services.createAndEditNewPost, site, authorization)) { register() }
+    with(KtorParameterizedRendererAdapter(Services.showPostEditor, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Services.deletePost, site, authorization)) { register() }
     with(KtorResourceAltererAdapter(Services.togglePostPublished, site, authorization)) { register() }
+
 }

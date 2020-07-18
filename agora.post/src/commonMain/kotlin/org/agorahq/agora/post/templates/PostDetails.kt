@@ -10,7 +10,7 @@ fun HTML.renderPostDetails(
         post: PostViewModel,
         ctx: OperationContext<out Any>
 ) = withDefaultLayout(
-        ctx = ctx,
+        context = ctx,
         pageTitle = "${post.title} | Agora"
 ) {
     h1("mt-3") {
@@ -19,7 +19,9 @@ fun HTML.renderPostDetails(
     }
     div {
         if (post.abstract.isNotBlank()) {
-            p("lead") { +post.abstract }
+            div("card my-3") {
+                div("card-body text-secondary") { +post.abstract }
+            }
         }
         htmlContent(post.content)
     }
