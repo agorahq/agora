@@ -11,7 +11,7 @@ import org.agorahq.agora.core.api.security.builder.authorization
 import org.agorahq.agora.core.api.security.policy.Policy
 import org.agorahq.agora.core.api.security.policy.forAll
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
-import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
+import org.agorahq.agora.core.internal.service.DefaultOperationRegistry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -43,7 +43,7 @@ class AuthorizationTest {
                 email = "test@test.com",
                 description = "test site",
                 baseUrl = "/",
-                moduleRegistry = DefaultModuleRegistry())
+                operationRegistry = DefaultOperationRegistry())
 
         val USER = RoleDescriptor.create("user")
         val ADMIN = RoleDescriptor.create("admin")

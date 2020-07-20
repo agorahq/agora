@@ -10,7 +10,7 @@ import org.agorahq.agora.core.api.security.policy.forAll
 import org.agorahq.agora.core.api.shared.security.BuiltInRoles.ADMIN
 import org.agorahq.agora.core.api.shared.security.BuiltInRoles.ATTENDEE
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
-import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
+import org.agorahq.agora.core.internal.service.DefaultOperationRegistry
 import org.agorahq.agora.delivery.extensions.commentIsNotHidden
 import org.agorahq.agora.delivery.extensions.commentIsOwnOrNotHidden
 import org.agorahq.agora.delivery.extensions.ownCommentOnly
@@ -286,4 +286,4 @@ val SITE = DefaultSiteMetadata(
         email = "info@agorahq.org",
         description = "Agora Site",
         baseUrl = "/",
-        moduleRegistry = DefaultModuleRegistry())
+        operationRegistry = DefaultOperationRegistry())

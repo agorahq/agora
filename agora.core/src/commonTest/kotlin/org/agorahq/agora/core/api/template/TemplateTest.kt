@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.extensions.documentContent
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.internal.data.DefaultSiteMetadata
-import org.agorahq.agora.core.internal.service.DefaultModuleRegistry
+import org.agorahq.agora.core.internal.service.DefaultOperationRegistry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -69,7 +69,7 @@ class TemplateTest {
                 email = "test@test.com",
                 description = "description",
                 baseUrl = "/",
-                moduleRegistry = DefaultModuleRegistry())
+                operationRegistry = DefaultOperationRegistry())
 
     }
 

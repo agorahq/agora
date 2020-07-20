@@ -7,22 +7,22 @@ import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
 class Attributes<R : Resource, P : Any, O : Any>(
-        private val operationMetadata: OperationMetadata<R, P, O>,
+        val metadata: OperationMetadata<R, P, O>,
         rest: Iterable<Attribute>
 ) : Iterable<Attribute> {
 
     val resourceClass: KClass<R>
-        get() = operationMetadata.resourceClass
+        get() = metadata.resourceClass
     val inputClass: KClass<P>
-        get() = operationMetadata.inputClass
+        get() = metadata.inputClass
     val outputClass: KClass<O>
-        get() = operationMetadata.outputClass
+        get() = metadata.outputClass
     val urlClass: KClass<ResourceURL<R>>
-        get() = operationMetadata.urlClass
+        get() = metadata.urlClass
     val route: String
-        get() = operationMetadata.route
+        get() = metadata.route
 
-    private val facets = listOf<Attribute>(operationMetadata) + rest.toList()
+    private val facets = listOf<Attribute>(metadata) + rest.toList()
 
     override fun iterator() = facets.iterator()
 

@@ -31,11 +31,10 @@ import kotlinx.serialization.json.JsonConfiguration
 import org.agorahq.agora.core.api.data.FormField
 import org.agorahq.agora.core.api.data.Message
 import org.agorahq.agora.core.api.data.MessageType
-import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.extensions.isAuthenticated
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
-import org.agorahq.agora.core.api.service.ModuleRegistry
+import org.agorahq.agora.core.api.service.OperationRegistry
 import org.agorahq.agora.core.api.shared.security.BuiltInRoles
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.shared.templates.renderDefaultLoginPage
@@ -236,7 +235,7 @@ fun Application.main() {
                 }
             }
         }
-        createModules(SITE)
+        registerOperations(SITE.operationRegistry)
         registerAdapters(SITE, AUTHORIZATION)
     }
 }
@@ -273,14 +272,28 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleOauth(
     }
 }
 
-private fun createModules(site: SiteMetadata): ModuleRegistry {
+private fun registerOperations(operationRegistry: OperationRegistry): OperationRegistry {
 
-    val moduleRegistry = site.moduleRegistry
+    operationRegistry.register(Operations.listPosts)
+    operationRegistry.register(Operations.showPost)
+    operationRegistry.register(Operations.createPost)
+    operationRegistry.register(Operations.showPostEditor)
+    operationRegistry.register(Operations.createAndEditNewPost)
+    operationRegistry.register(Operations.deletePost)
 
-    moduleRegistry.register(Services.postModule)
-    moduleRegistry.register(Services.commentModule)
+    operationRegistry.register(Operations.showCreatePostLink)
+    operationRegistry.register(Operations.showTogglePostPublished)
+    operationRegistry.register(Operations.showEditPost)
+    operationRegistry.register(Operations.showDeletePost)
 
-    return moduleRegistry
+    operationRegistry.register(Operations.listComments)
+    operationRegistry.register(Operations.showCommentEditor)
+    operationRegistry.register(Operations.showEditCommentLink)
+    operationRegistry.register(Operations.createComment)
+    operationRegistry.register(Operations.deleteComment)
+    operationRegistry.register(Operations.togglePostPublished)
+
+    return operationRegistry
 }
 
 private fun RegisteringState.toUserRegistrationModel() = UserRegistrationViewModel(

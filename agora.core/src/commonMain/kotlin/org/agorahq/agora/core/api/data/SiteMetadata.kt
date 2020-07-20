@@ -1,11 +1,11 @@
 package org.agorahq.agora.core.api.data
 
-import org.agorahq.agora.core.api.service.ModuleRegistry
+import org.agorahq.agora.core.api.service.OperationRegistry
 
 interface SiteMetadata {
     val title: String
     val email: String
     val description: String
     val baseUrl: String
-    val moduleRegistry: ModuleRegistry
+    val operationRegistry: OperationRegistry
 }

@@ -4,7 +4,6 @@ package org.agorahq.agora.delivery.adapter
 
 import io.ktor.routing.Routing
 import org.agorahq.agora.core.api.data.Resource
-import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.Operation
 
 interface KtorOperationAdapter<R : Resource, I : Any, O : Any> : Operation<R, I, O> {

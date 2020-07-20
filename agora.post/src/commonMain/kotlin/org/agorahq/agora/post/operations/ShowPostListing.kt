@@ -1,10 +1,10 @@
 package org.agorahq.agora.post.operations
 
+import org.agorahq.agora.core.api.attributes.HasNavigationLink
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.ListsResources
 import org.agorahq.agora.core.api.operation.types.Renderer
 import org.agorahq.agora.core.api.operation.types.RendererDescriptor
 import org.agorahq.agora.core.api.service.PageQueryService
@@ -47,7 +47,10 @@ class ShowPostListing(
         override val attributes = Attributes.create<Post, Unit, String>(
                 route = ShowPostURL.root,
                 urlClass = ShowPostURL::class,
-                additionalAttributes = listOf(ListsResources)
+                additionalAttributes = listOf(HasNavigationLink(
+                        link = ShowPostURL.root,
+                        label = "Posts"
+                ))
         )
     }
 }

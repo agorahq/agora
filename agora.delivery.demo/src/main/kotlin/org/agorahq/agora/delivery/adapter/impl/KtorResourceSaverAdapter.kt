@@ -6,7 +6,6 @@ import io.ktor.routing.Routing
 import io.ktor.routing.post
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.security.authorize

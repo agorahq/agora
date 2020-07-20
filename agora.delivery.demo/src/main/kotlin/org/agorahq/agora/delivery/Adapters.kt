@@ -9,7 +9,10 @@ import org.agorahq.agora.core.api.data.SiteMetadata
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.shared.templates.renderDefaultHomepage
-import org.agorahq.agora.delivery.adapter.impl.*
+import org.agorahq.agora.delivery.adapter.impl.KtorParameterizedRendererAdapter
+import org.agorahq.agora.delivery.adapter.impl.KtorRendererAdapter
+import org.agorahq.agora.delivery.adapter.impl.KtorResourceAltererAdapter
+import org.agorahq.agora.delivery.adapter.impl.KtorResourceSaverAdapter
 import org.agorahq.agora.delivery.extensions.toOperationContext
 
 fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
@@ -20,17 +23,17 @@ fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
         }, ContentType.Text.Html)
     }
 
-    with(KtorRendererAdapter(Services.listPosts, site, authorization)) { register() }
-    with(KtorParameterizedRendererAdapter(Services.showPost, site, authorization)) { register() }
-    with(KtorResourceSaverAdapter(Services.createPost, site, authorization)) { register() }
+    with(KtorRendererAdapter(Operations.listPosts, site, authorization)) { register() }
+    with(KtorParameterizedRendererAdapter(Operations.showPost, site, authorization)) { register() }
+    with(KtorResourceSaverAdapter(Operations.createPost, site, authorization)) { register() }
 
-    with(KtorParameterizedRendererAdapter(Services.showCommentEditor, site, authorization)) { register() }
-    with(KtorResourceSaverAdapter(Services.createComment, site, authorization)) { register() }
-    with(KtorResourceAltererAdapter(Services.deleteComment, site, authorization)) { register() }
+    with(KtorParameterizedRendererAdapter(Operations.showCommentEditor, site, authorization)) { register() }
+    with(KtorResourceSaverAdapter(Operations.createComment, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Operations.deleteComment, site, authorization)) { register() }
 
-    with(KtorRendererAdapter(Services.createAndEditNewPost, site, authorization)) { register() }
-    with(KtorParameterizedRendererAdapter(Services.showPostEditor, site, authorization)) { register() }
-    with(KtorResourceAltererAdapter(Services.deletePost, site, authorization)) { register() }
-    with(KtorResourceAltererAdapter(Services.togglePostPublished, site, authorization)) { register() }
+    with(KtorRendererAdapter(Operations.createAndEditNewPost, site, authorization)) { register() }
+    with(KtorParameterizedRendererAdapter(Operations.showPostEditor, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Operations.deletePost, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Operations.togglePostPublished, site, authorization)) { register() }
 
 }

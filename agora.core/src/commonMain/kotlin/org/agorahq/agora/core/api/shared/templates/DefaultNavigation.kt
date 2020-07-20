@@ -1,6 +1,8 @@
 package org.agorahq.agora.core.api.shared.templates
 
 import kotlinx.html.*
+import org.agorahq.agora.core.api.attributes.HasNavigationLink
+import org.agorahq.agora.core.api.extensions.findOperationsWithAttribute
 import org.agorahq.agora.core.api.extensions.isAnonymous
 import org.agorahq.agora.core.api.operation.context.OperationContext
 
@@ -13,14 +15,13 @@ fun FlowContent.renderDefaultNavigation(ctx: OperationContext<out Any>) {
                     li("nav-item") {
                         a(href = "/", classes = "nav-link") { +"Home" }
                     }
-                    // TODO: fix this
-//                    site.forEachMatchingOperation<Resource, Any, Any>(ListsResources) { (module, renderers) ->
-//                        li("nav-item") {
-//                            // TODO: check for active
-//                            val classes = "nav-link"
-//                            a(href = renderer.route, classes = classes) { +module.name }
-//                        }
-//                    }
+                    site.findOperationsWithAttribute<HasNavigationLink>().flatMap { it.second }.forEach { (link, label) ->
+                        li("nav-item") {
+                            // TODO: check for active
+                            val classes = "nav-link"
+                            a(href = link, classes = classes) { +label }
+                        }
+                    }
                 }
             }
             div("nav navbar-nav navbar-right") {

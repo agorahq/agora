@@ -4,7 +4,6 @@ import io.ktor.routing.Routing
 import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.data.PageElement
 import org.agorahq.agora.core.api.data.SiteMetadata
-import org.agorahq.agora.core.api.module.Module
 import org.agorahq.agora.core.api.operation.Operation
 import org.agorahq.agora.core.api.security.Authorization
 import org.agorahq.agora.delivery.adapter.KtorOperationAdapter
