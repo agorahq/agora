@@ -1,8 +1,8 @@
 package org.agorahq.agora.core.api.security
 
-import org.agorahq.agora.core.api.Item
-import org.agorahq.agora.core.api.ListItems
-import org.agorahq.agora.core.api.ShowItem
+import org.agorahq.agora.core.api.fixture.Item
+import org.agorahq.agora.core.api.fixture.ListItems
+import org.agorahq.agora.core.api.fixture.ShowItem
 import org.agorahq.agora.core.api.data.Result.Failure
 import org.agorahq.agora.core.api.data.Result.Success
 import org.agorahq.agora.core.api.exception.MissingPermissionException

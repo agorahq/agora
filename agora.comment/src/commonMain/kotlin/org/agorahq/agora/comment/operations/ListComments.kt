@@ -9,7 +9,7 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.PageElementListRenderer
+import org.agorahq.agora.core.api.operation.facets.ShowsPageElements
 import org.agorahq.agora.core.api.operation.types.ParameterizedRenderer
 import org.agorahq.agora.core.api.operation.types.ParameterizedRendererDescriptor
 import org.agorahq.agora.core.api.service.PageElementQueryService
@@ -47,7 +47,7 @@ class ListComments(
         override val attributes = Attributes.create<Comment, UUID, String>(
                 route = CommentURL.root,
                 urlClass = CommentURL::class,
-                additionalAttributes = listOf(PageElementListRenderer)
+                additionalAttributes = listOf(ShowsPageElements)
         )
     }
 }

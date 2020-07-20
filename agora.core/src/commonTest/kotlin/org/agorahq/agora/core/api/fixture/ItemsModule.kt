@@ -1,17 +1,15 @@
-package org.agorahq.agora.comment.module
+package org.agorahq.agora.core.api.fixture
 
-import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.module.base.BaseModule
 import org.agorahq.agora.core.api.operation.Operation
 
-// TODO: I'm not sure we need dedicated module implementations
-class CommentModule(
+class ItemsModule(
         initialOperations: Iterable<Operation<out Resource, out Any, out Any>> = listOf()
 ) : BaseModule<Comment>(
         initialOperations = initialOperations,
         resourceClass = Comment::class
 ) {
 
-    override val name = "Comments"
+    override val name = "Items"
 }

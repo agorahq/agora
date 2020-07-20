@@ -31,7 +31,7 @@ class Attributes<R : Resource, P : Any, O : Any>(
         inline fun <reified R : Resource, reified I : Any, reified O : Any> create(
                 route: String,
                 urlClass: KClass<out ResourceURL<R>>,
-                additionalAttributes: Iterable<Attribute>
+                additionalAttributes: Iterable<Attribute> = listOf()
         ) = Attributes(OperationMetadata(
                 resourceClass = R::class,
                 inputClass = I::class,
