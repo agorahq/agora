@@ -27,7 +27,12 @@ class AuthorizationTest {
                         inStock = true,
                         owner = USER_JOE)))
 
-        val ctx = OperationContext.create(SITE, User.ANONYMOUS, AUTH, null, Unit)
+        val ctx = OperationContext.create(
+                site = SITE,
+                user = User.ANONYMOUS,
+                authorization = AUTH,
+                input = Unit,
+                currentPath = "/")
 
         when (val result = AUTH.authorize(ctx, listItems)) {
             is Success -> fail("This operation was not supposed to be successful.")

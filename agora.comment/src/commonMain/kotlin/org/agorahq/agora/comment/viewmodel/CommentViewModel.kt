@@ -8,5 +8,6 @@ data class CommentViewModel(
         val content: String,
         val userId: String = "",
         val username: String = "",
-        val isHidden: Boolean = false
+        val isHidden: Boolean = false,
+        val editing: Boolean = false
 ) : ViewModel

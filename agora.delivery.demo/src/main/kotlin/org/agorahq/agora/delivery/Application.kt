@@ -74,6 +74,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.main() {
+
     val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
             name = "google",
             authorizeUrl = "https://accounts.google.com/o/oauth2/auth",

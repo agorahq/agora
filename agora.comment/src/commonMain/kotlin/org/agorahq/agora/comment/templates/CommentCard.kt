@@ -18,24 +18,30 @@ fun TagConsumer<Appendable>.renderCommentCard(
     } else {
         "card bg-light mb-3"
     }
+    val editing = comment.editing
     div(classes) {
         div("card-body") {
             h6("card-title") { +comment.username }
-            div("card-text") {
-                unsafe {
-                    +comment.content
+            if (editing) {
+                renderCommentForm(comment)
+            } else {
+                div("card-text") {
+                    unsafe {
+                        +comment.content
+                    }
                 }
             }
         }
-        val alterers = context.renderResourceLinksFor(Comment::class, comment.id)
-        if (alterers.isNotBlank()) {
-            div("card-footer bg-transparent") {
-                unsafe {
-                    +alterers
+        if (editing.not()) {
+            val alterers = context.renderResourceLinksFor(Comment::class, comment.id)
+            if (alterers.isNotBlank()) {
+                div("card-footer bg-transparent") {
+                    unsafe {
+                        +alterers
+                    }
                 }
             }
         }
-
     }
 }
 

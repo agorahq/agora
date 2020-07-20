@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("maven-publish")
     id("signing")
+    kotlin("plugin.serialization") version "1.3.71"
 }
 
 kotlin {

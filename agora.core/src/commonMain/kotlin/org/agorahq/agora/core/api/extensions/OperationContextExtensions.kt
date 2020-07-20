@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.api.extensions
 
-import org.agorahq.agora.core.api.data.Page
 import org.agorahq.agora.core.api.data.Resource
+import org.agorahq.agora.core.api.operation.Attribute
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.facets.PageElementFormRenderer
 import org.agorahq.agora.core.api.operation.facets.ShowsPageElements
@@ -11,8 +11,14 @@ import org.agorahq.agora.core.api.security.authorize
 import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
 
+inline fun <reified R : Resource, reified I : Any, reified O : Any> OperationContext<out Any>.findMatchingOperations(
+        vararg attributes: Attribute
+) = site.findMatchingOperations<R, I, O>(*attributes)
 
-fun OperationContext<out Any>.renderPageElementListsFor(parentId: String): String {
+inline fun <reified A : Attribute> OperationContext<out Any>.findOperationsWithAttribute() =
+        site.findOperationsWithAttribute<A>()
+
+fun OperationContext<out Any>.renderPageElementsFor(parentId: String): String {
     val renderedPageElements = StringBuilder()
     site.findMatchingOperations<Resource, UUID, String>(ShowsPageElements).forEach { renderer ->
         val ctx: OperationContext<UUID> = withInput(parentId.toUUID())
@@ -22,17 +28,15 @@ fun OperationContext<out Any>.renderPageElementListsFor(parentId: String): Strin
     return renderedPageElements.toString()
 }
 
-fun OperationContext<out Any>.renderPageElementFormsFor(page: Page): String {
+fun OperationContext<out Any>.renderPageElementFormsFor(parentId: String): String {
     val renderedPageElements = StringBuilder()
-    if (user.isAuthenticated) {
-        site.findMatchingOperations<Resource, UUID, String>(PageElementFormRenderer).forEach { renderer ->
-            val ctx: OperationContext<UUID> = withInput(page.id)
-            val result = StringBuilder()
-            ctx.authorization.authorize(ctx, renderer)
-                    .flatMap { it.execute() }
-                    .map { result.append(it) }
-            renderedPageElements.append(result.toString())
-        }
+    site.findMatchingOperations<Resource, UUID, String>(PageElementFormRenderer).forEach { renderer ->
+        val ctx: OperationContext<UUID> = withInput(parentId.toUUID())
+        val result = StringBuilder()
+        ctx.authorization.authorize(ctx, renderer)
+                .flatMap { it.execute() }
+                .map { result.append(it) }
+        renderedPageElements.append(result.toString())
     }
     return renderedPageElements.toString()
 }

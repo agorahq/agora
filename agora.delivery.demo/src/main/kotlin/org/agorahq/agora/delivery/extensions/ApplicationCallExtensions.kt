@@ -4,6 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.features.origin
 import io.ktor.http.ContentType
 import io.ktor.request.host
+import io.ktor.request.path
 import io.ktor.request.port
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
@@ -19,8 +20,10 @@ import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.delivery.data.AgoraSession
 import org.agorahq.agora.delivery.data.AuthenticatedUserState
 
-suspend fun ApplicationCall.tryRedirectToReferrer(site: SiteMetadata) {
-    request.headers["Referer"]?.let { referer ->
+suspend fun ApplicationCall.tryRedirectToReferrer(
+        site: SiteMetadata
+) {
+    request.refererPath?.let { referer ->
         respondRedirect(referer)
     } ?: respondRedirect(site.baseUrl)
 }
@@ -61,7 +64,9 @@ fun ApplicationCall.toOperationContext(
             user = user,
             authorization = authorization,
             message = msg,
-            input = Unit
+            input = Unit,
+            currentPath = request.path(),
+            pageElementToEdit = parameters[OperationContext<out Any>::pageElementToEdit.name]
     )
 }
 

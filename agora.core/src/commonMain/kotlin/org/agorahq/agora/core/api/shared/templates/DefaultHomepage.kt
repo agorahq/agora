@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 
 fun HTML.renderDefaultHomepage(ctx: OperationContext<out Any>) = withDefaultLayout(ctx, "Home") {
-    val (_, _, _, message) = ctx
+    val message = ctx.message
     renderDefaultMessage(message)
     h1("mt-3") {
         +"Welcome to Agora!"

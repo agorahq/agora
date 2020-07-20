@@ -6,7 +6,7 @@ import org.hexworks.cobalt.core.api.UUID
 class ItemURL(
         private val itemId: UUID,
         override val redirectTo: String? = null,
-        override val pageElementsToEdit: Iterable<String> = listOf()
+        override val pageElementToEdit: String? = null
 ) : ResourceURL<Item> {
 
     override fun generate() = "$root/${itemId}"

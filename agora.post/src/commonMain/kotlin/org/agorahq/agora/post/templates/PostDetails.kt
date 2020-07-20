@@ -2,6 +2,8 @@ package org.agorahq.agora.post.templates
 
 import kotlinx.html.*
 import org.agorahq.agora.core.api.extensions.htmlContent
+import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
+import org.agorahq.agora.core.api.extensions.renderPageElementsFor
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.shared.layouts.withDefaultLayout
 import org.agorahq.agora.post.viewmodel.PostViewModel
@@ -32,6 +34,9 @@ fun HTML.renderPostDetails(
     }
     hr { }
     div {
-        htmlContent(post.renderedPageElements)
+        unsafe {
+            +ctx.renderPageElementsFor(post.id)
+            +ctx.renderPageElementFormsFor(post.id)
+        }
     }
 }

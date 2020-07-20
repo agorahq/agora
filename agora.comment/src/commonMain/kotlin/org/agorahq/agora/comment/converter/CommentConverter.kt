@@ -33,6 +33,7 @@ class CommentConverter(
             content = MarkdownRendererFactory.createRenderer().render(content),
             userId = owner.id.toString(),
             username = owner.username,
-            isHidden = hiddenSince < DateTime.now()
+            isHidden = hiddenSince < DateTime.now(),
+            editing = id.toString() == context.pageElementToEdit?.trim()
     )
 }

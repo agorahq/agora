@@ -1,8 +1,6 @@
 package org.agorahq.agora.post.operations
 
 import org.agorahq.agora.core.api.data.ElementSource
-import org.agorahq.agora.core.api.extensions.renderPageElementFormsFor
-import org.agorahq.agora.core.api.extensions.renderPageElementListsFor
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
@@ -33,12 +31,9 @@ class ShowPost(
     ) = Command.of {
         val post = data.asSingle()
         val model = converterService.convertToView<PostViewModel>(post, context).get()
-        val renderedPageElements = StringBuilder()
-        renderedPageElements.append(context.renderPageElementListsFor(post.id.toString()))
-        renderedPageElements.append(context.renderPageElementFormsFor(post))
         Templates.htmlTemplate {
             renderPostDetails(
-                    post = model.copy(renderedPageElements = renderedPageElements.toString()),
+                    post = model,
                     ctx = context
             )
         }

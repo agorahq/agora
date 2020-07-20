@@ -18,25 +18,22 @@ interface OperationContext<I : Any> {
     val user: User
     val authorization: Authorization
     val message: Message?
+    val pageElementToEdit: String?
     val input: I
+    val currentPath: String
 
     operator fun component1() = site
-
     operator fun component2() = user
-
     operator fun component3() = authorization
-
-    operator fun component4() = message
-
-    operator fun component5() = input
-
 
     fun <I : Any> withInput(input: I): OperationContext<I> = create(
             site = site,
             user = user,
             authorization = authorization,
             message = message,
-            input = input
+            input = input,
+            currentPath = currentPath,
+            pageElementToEdit = pageElementToEdit
     )
 
     /**
@@ -56,14 +53,18 @@ interface OperationContext<I : Any> {
                 site: SiteMetadata,
                 user: User,
                 authorization: Authorization,
+                input: I,
+                currentPath: String,
                 message: Message? = null,
-                input: I
+                pageElementToEdit: String? = null
         ) = DefaultOperationContext(
                 site = site,
                 user = user,
                 authorization = authorization,
                 message = message,
-                input = input
+                input = input,
+                currentPath = currentPath,
+                pageElementToEdit = pageElementToEdit
         )
 
     }

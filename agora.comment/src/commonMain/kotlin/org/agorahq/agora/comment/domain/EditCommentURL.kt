@@ -5,7 +5,7 @@ import org.agorahq.agora.core.api.data.ResourceURL
 data class EditCommentURL(
         val id: String,
         override val redirectTo: String? = null,
-        override val pageElementsToEdit: Iterable<String> = listOf()
+        override val pageElementToEdit: String? = null
 ) : ResourceURL<Comment> {
 
     override fun generate() = route.replace("{${EditCommentURL::id.name}}", id)

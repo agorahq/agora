@@ -3,13 +3,21 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
+    application
     kotlin("jvm")
     id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("plugin.serialization") version "1.3.71"
 }
 
-val mainClassName = "org.agorahq.agora.delivery.ApplicationKt"
+application {
+    mainClassName = "org.agorahq.agora.delivery.ApplicationKt"
+}
 
+tasks.withType<Jar> {
+    manifest {
+        attributes(mapOf("Main-Class" to application.mainClassName))
+    }
+}
 
 kotlin {
     target {
@@ -55,9 +63,6 @@ tasks {
     named<ShadowJar>("shadowJar") {
         archiveFileName.set("agora.delivery.jar")
         mergeServiceFiles()
-        manifest {
-            attributes(mapOf("Main-Class" to mainClassName))
-        }
     }
     build {
         dependsOn(shadowJar)

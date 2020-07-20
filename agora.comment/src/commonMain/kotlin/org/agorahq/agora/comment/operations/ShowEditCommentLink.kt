@@ -29,7 +29,10 @@ class ShowEditCommentLink(
             data: ElementSource<Comment>
     ) = data.map { comment ->
         Templates.htmlPartial {
-            a(href = EditCommentURL(comment.id.toString()).generate(), classes = "btn btn-warning mr-2") {
+            a(
+                    href = "${context.currentPath}?pageElementToEdit=${comment.id}",
+                    classes = "btn btn-warning mr-2"
+            ) {
                 this.style = "display: inline-block; margin-bottom: 0;"
                 +"Edit"
             }

@@ -11,8 +11,10 @@ data class DefaultOperationContext<I : Any>(
         override val site: SiteMetadata,
         override val user: User,
         override val authorization: Authorization,
+        override val input: I,
+        override val currentPath: String,
         override val message: Message? = null,
-        override val input: I
+        override val pageElementToEdit: String? = null
 ) : OperationContext<I> {
 
     private val context: OperationContext<I>
