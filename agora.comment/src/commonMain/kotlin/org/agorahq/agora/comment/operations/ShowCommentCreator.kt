@@ -1,7 +1,7 @@
 package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.domain.CreateCommentURL
+import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.templates.renderCommentCreator
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
@@ -45,8 +45,8 @@ class ShowCommentCreator(
     companion object : ParameterizedRendererDescriptor<Comment, UUID> {
         override val name = "Show comment editor"
         override val attributes = Attributes.create<Comment, UUID, String>(
-                route = CreateCommentURL.route, // TODO: no good!
-                urlClass = CreateCommentURL::class,
+                route = CommentURL.route, // TODO: no good!
+                urlClass = CommentURL::class,
                 additionalAttributes = listOf(RendersPageElementForm(Comment::class))
         )
 

@@ -1,7 +1,7 @@
 package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.domain.CreateCommentURL
+import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.templates.renderCommentList
 import org.agorahq.agora.comment.viewmodel.CommentListViewModel
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
@@ -49,8 +49,8 @@ class ShowCommentListing(
     companion object : ParameterizedRendererDescriptor<Comment, UUID> {
         override val name = "Show comment listing"
         override val attributes = Attributes.create<Comment, UUID, String>(
-                route = CreateCommentURL.root,
-                urlClass = CreateCommentURL::class,
+                route = CommentURL.root,
+                urlClass = CommentURL::class,
                 additionalAttributes = listOf(ShowsPageElements)
         )
     }

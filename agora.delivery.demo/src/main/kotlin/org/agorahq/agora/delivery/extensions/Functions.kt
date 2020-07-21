@@ -14,14 +14,14 @@ val postIsPublished = Policy.create<Post>(
 val commentIsNotHidden = Policy.create<Comment>(
         description = "Comment is not hidden"
 ) { _, comment ->
-    comment.hiddenSince > DateTime.now()
+    comment.publishedAt < DateTime.now()
 }
 
 val commentIsOwnOrNotHidden = Policy.create<Comment>(
         description = "Comment is not hidden"
 ) { ctx, comment ->
     comment.owner.email == ctx.user.email ||
-            comment.hiddenSince > DateTime.now()
+            comment.publishedAt < DateTime.now()
 }
 
 val ownCommentOnly = Policy.create<Comment>(

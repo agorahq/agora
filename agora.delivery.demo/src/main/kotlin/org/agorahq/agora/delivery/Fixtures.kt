@@ -40,11 +40,13 @@ val AUTHORIZATION = authorization {
             inherit from anonymousRole
 
             Comment::class {
-                CreateComment allow forAll
                 ShowCommentListing withPolicy commentIsOwnOrNotHidden
                 ShowEditCommentLink withPolicy ownCommentOnly
                 ShowCommentEditor withPolicy ownCommentOnly
-                UpdateComment withPolicy  ownCommentOnly
+                ShowDeleteCommentLink withPolicy ownCommentOnly
+
+                CreateComment allow forAll
+                UpdateComment withPolicy ownCommentOnly
                 DeleteComment withPolicy ownCommentOnly
             }
         }
@@ -70,11 +72,14 @@ val AUTHORIZATION = authorization {
 
             Comment::class {
                 ShowCommentListing allow forAll
-                DeleteComment allow forAll
-                UpdateComment allow forAll
-
                 ShowEditCommentLink allow forAll
                 ShowCommentEditor allow forAll
+                ShowDeleteCommentLink allow forAll
+                ShowHideCommentLink allow forAll
+
+                DeleteComment allow forAll
+                UpdateComment allow forAll
+                ToggleCommentPublished allow forAll
             }
         }
     }
@@ -226,7 +231,7 @@ val COMMENT_A_1 = Comment(
         owner = JACK,
         parentId = POST_A_ID,
         createdAt = DateTime.createClamped(2020, 6, 5),
-        hiddenSince = DateTime.createClamped(2020, 6, 6)
+        publishedAt = DateTime.createClamped(2061, 6, 6)
 )
 
 val COMMENT_A_2 = Comment(

@@ -1,7 +1,7 @@
 package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.domain.CreateCommentURL
+import org.agorahq.agora.comment.domain.DeleteCommentURL
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
@@ -31,8 +31,8 @@ class DeleteComment(
     companion object : ProcedureDescriptor<Comment, UUID> {
         override val name = "Delete comment"
         override val attributes = Attributes.create<Comment, UUID, Unit>(
-                route = CreateCommentURL.root,
-                urlClass = CreateCommentURL::class
+                route = DeleteCommentURL.route,
+                urlClass = DeleteCommentURL::class
         )
     }
 }

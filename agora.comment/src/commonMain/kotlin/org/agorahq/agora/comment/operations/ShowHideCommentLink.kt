@@ -3,7 +3,7 @@ package org.agorahq.agora.comment.operations
 import kotlinx.html.*
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.domain.CommentURL
-import org.agorahq.agora.comment.domain.DeleteCommentURL
+import org.agorahq.agora.comment.extensions.isPublished
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.extensions.toCommand
 import org.agorahq.agora.core.api.operation.Attributes
@@ -15,7 +15,7 @@ import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.hexworks.cobalt.core.api.UUID
 
-class ShowDeleteCommentLink(
+class ShowHideCommentLink(
         private val commentQueryService: QueryService<Comment>
 ) : ParameterizedRenderer<Comment, UUID>, ParameterizedRendererDescriptor<Comment, UUID> by Companion {
 
@@ -27,14 +27,26 @@ class ShowDeleteCommentLink(
             context: OperationContext<out UUID>,
             data: ElementSource<Comment>
     ) = data.map { comment ->
+        val isPublished = comment.isPublished
         Templates.htmlPartial {
-            form(DeleteCommentURL(comment.id).generate(), method = FormMethod.post, classes = " mr-2") {
+            form(ToggleCommentPublished.route, method = FormMethod.post) {
                 this.style = "display: inline-block; margin-bottom: 0;"
                 input(type = InputType.hidden, name = "id") {
                     value = comment.id.toString()
                 }
-                button(type = ButtonType.submit, classes = "btn btn-danger") {
-                    +"Delete"
+                div("btn-group-toggle mr-2") {
+                    button(
+                            type = ButtonType.submit,
+                            classes = "btn btn-primary ${if (isPublished) "active" else ""}"
+                    ) {
+                        attributes["data-toggle"] = "button"
+                        attributes["aria-pressed"] = isPublished.toString()
+                        if (isPublished) {
+                            +"Hide"
+                        } else {
+                            +"Publish"
+                        }
+                    }
                 }
             }
         }
@@ -44,9 +56,9 @@ class ShowDeleteCommentLink(
     override fun toString() = name
 
     companion object : ParameterizedRendererDescriptor<Comment, UUID> {
-        override val name = "Show delete comment link"
+        override val name = "Show hide comment link"
         override val attributes = Attributes.create<Comment, UUID, String>(
-                route = "", // TODO: this shouldn't be mandatory
+                route = ToggleCommentPublished.route, // TODO: this shouldn't be mandatory
                 urlClass = CommentURL::class, // TODO: this shouldn't be mandatory
                 additionalAttributes = listOf(ShowsResourceLink(Comment::class))
         )

@@ -1,7 +1,7 @@
 package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.domain.CreateCommentURL
+import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
@@ -34,8 +34,8 @@ class CreateComment(
     companion object : ProcedureDescriptor<Comment, CommentViewModel> {
         override val name = "Create comment"
         override val attributes = Attributes.create<Comment, CommentViewModel, Unit>(
-                route = CreateCommentURL.root,
-                urlClass = CreateCommentURL::class
+                route = CommentURL.root,
+                urlClass = CommentURL::class
         )
     }
 }

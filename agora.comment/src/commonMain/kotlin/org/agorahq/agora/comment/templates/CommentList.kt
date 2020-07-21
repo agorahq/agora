@@ -16,13 +16,13 @@ fun TagConsumer<Appendable>.renderCommentList(
         model: CommentListViewModel
 ) {
     val comments = model.comments.toList()
-    if (comments.isNotEmpty()) {
-        h3 { +"Comments" }
-        div {
-            unsafe {
-                +context.renderPageElementFormsFor(parentId, Comment::class)
-            }
+    h3 { +"Comments" }
+    div {
+        unsafe {
+            +context.renderPageElementFormsFor(parentId, Comment::class)
         }
+    }
+    if (comments.isNotEmpty()) {
         model.comments.forEach { comment ->
             renderCommentCard(context, comment)
         }

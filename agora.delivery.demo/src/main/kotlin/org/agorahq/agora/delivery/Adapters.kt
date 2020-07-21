@@ -30,6 +30,7 @@ fun Routing.registerAdapters(site: SiteMetadata, authorization: Authorization) {
     with(KtorResourceSaverAdapter(Operations.createComment, site, authorization)) { register() }
     with(KtorResourceSaverAdapter(Operations.updateComment, site, authorization)) { register() }
     with(KtorResourceAltererAdapter(Operations.deleteComment, site, authorization)) { register() }
+    with(KtorResourceAltererAdapter(Operations.toggleCommentPublished, site, authorization)) { register() }
 
     with(KtorRendererAdapter(Operations.showPostCreator, site, authorization)) { register() }
     with(KtorParameterizedRendererAdapter(Operations.showPostEditor, site, authorization)) { register() }

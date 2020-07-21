@@ -32,7 +32,7 @@ class CommentConverter(
             content = content,
             userId = owner.id.toString(),
             username = owner.username,
-            isHidden = hiddenSince < DateTime.now(),
+            isHidden = publishedAt > DateTime.now(),
             editing = id.toString() == context.pageElementToEdit?.trim()
     )
 }

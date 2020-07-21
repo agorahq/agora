@@ -36,8 +36,12 @@ object Operations {
     val showCommentCreator = ShowCommentCreator(Services.commentQueryService)
     val showCommentEditor = ShowCommentEditor(Services.commentQueryService)
     val showEditCommentLink = ShowEditCommentLink(Services.commentQueryService)
+    val showDeleteCommentLink = ShowDeleteCommentLink(Services.commentQueryService)
+    val showHideCommentLink = ShowHideCommentLink(Services.commentQueryService)
 
     val createComment = CreateComment(Services.commentStorage, Services.converterService)
     val updateComment = UpdateComment(Services.commentQueryService, Services.commentStorage)
     val deleteComment = DeleteComment(Services.commentQueryService, Services.commentStorage)
+    val toggleCommentPublished = ToggleCommentPublished(Services.commentQueryService, Services.commentStorage)
+
 }
