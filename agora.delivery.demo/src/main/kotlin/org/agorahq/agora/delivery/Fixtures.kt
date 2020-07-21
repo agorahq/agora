@@ -89,37 +89,57 @@ val JACK = User.create(
         id = UUID.fromString("315748b2-d569-497c-b031-881e14862103"),
         email = "jack@jack.com",
         username = "jack",
-        roles = setOf(ATTENDEE))
+        roles = setOf(ATTENDEE)
+)
 
 val JENNA = User.create(
         id = UUID.fromString("b7d96ee5-012f-4965-b0cc-01e11047506c"),
         email = "jenna@jenna.com",
         username = "jenna",
-        roles = setOf(ATTENDEE))
+        roles = setOf(ATTENDEE)
+)
 
 val FRANK = User.create(
         id = UUID.fromString("9c402dd4-45cb-474e-a54a-8f109124082a"),
         email = "frank@frank.com",
         username = "frank",
-        roles = setOf(ATTENDEE))
+        roles = setOf(ATTENDEE)
+)
 
 val OGABI = User.create(
         id = UUID.fromString("82a14afe-3372-4320-aebb-9b015137e728"),
         email = "nightgoody@gmail.com",
         username = "ogabi",
-        roles = setOf(ADMIN))
+        roles = setOf(ADMIN)
+)
 
 val ADDAMSSON = User.create(
         id = UUID.fromString("d7473d2e-72c3-4c31-a558-3f3780475ff9"),
         email = "arold.adam@gmail.com",
         username = "addamsson",
-        roles = setOf(ADMIN))
+        roles = setOf(ADMIN)
+)
 
 val EDEM = User.create(
         id = UUID.fromString("8b3673be-41cc-48a0-aab1-66b8f54c01db"),
         email = "adam.arold@gmail.com",
         username = "edem",
-        roles = setOf(ATTENDEE))
+        roles = setOf(ATTENDEE)
+)
+
+val ISEUS = User.create(
+        id = UUID.fromString("6c04d2a5-98a2-406f-9aa8-a3cccf61a119"),
+        email = "iseus0@gmail.com",
+        username = "iseus",
+        roles = setOf(ATTENDEE)
+)
+
+val CYNO = User.create(
+        id = UUID.fromString("15b15e2a-d3c7-40f2-ad38-bd98ea84e978"),
+        email = "itar@speakgeo.com",
+        username = "cyno",
+        roles = setOf(ADMIN)
+)
 
 val POST_A_ID = UUID.fromString("ba14eb7f-7704-4dea-8dc1-60248174eb9b")
 val POST_B_ID = UUID.fromString("128ca860-01f7-4ba4-af7e-8374072ba406")
@@ -277,6 +297,8 @@ val USERS = ConcurrentHashMap<UUID, User>().apply {
     put(OGABI.id, OGABI)
     put(ADDAMSSON.id, ADDAMSSON)
     put(EDEM.id, EDEM)
+    put(ISEUS.id, ISEUS)
+    put(CYNO.id, CYNO)
 }
 
 val GOOGLE_CLIENT_ID = System.getenv("GOOGLE_OAUTH_CLIENT_ID")
