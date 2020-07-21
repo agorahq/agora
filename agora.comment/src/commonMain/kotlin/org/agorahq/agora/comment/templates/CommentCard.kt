@@ -6,6 +6,7 @@ import kotlinx.html.h6
 import kotlinx.html.unsafe
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
+import org.agorahq.agora.core.api.extensions.renderFormsFor
 import org.agorahq.agora.core.api.extensions.renderResourceLinksFor
 import org.agorahq.agora.core.api.operation.context.OperationContext
 
@@ -23,7 +24,9 @@ fun TagConsumer<Appendable>.renderCommentCard(
         div("card-body") {
             h6("card-title") { +comment.username }
             if (editing) {
-                renderCommentForm(comment)
+                unsafe {
+                    +context.renderFormsFor(comment.id, Comment::class)
+                }
             } else {
                 div("card-text") {
                     unsafe {

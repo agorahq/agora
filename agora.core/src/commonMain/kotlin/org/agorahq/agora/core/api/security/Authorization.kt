@@ -34,7 +34,7 @@ interface Authorization {
     fun <O : Any> authorizeAny(
             context: OperationContext<out Any>,
             operation: Operation<Resource, Any, O>
-    ): Result<out Command<O>, out AuthorizationException>
+    ): Result<out Command<O>, out Exception>
 }
 
 /**
@@ -45,7 +45,7 @@ interface Authorization {
 fun <R: Resource, I: Any, O : Any> Authorization.authorize(
         context: OperationContext<I>,
         operation: Operation<R, I, O>
-): Result<out Command<O>, out AuthorizationException> {
+): Result<out Command<O>, out Exception> {
     return authorizeAny(context as OperationContext<out Any>, operation as Operation<Resource, Any, O>)
 }
 

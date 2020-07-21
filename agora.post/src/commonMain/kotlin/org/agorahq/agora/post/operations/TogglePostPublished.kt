@@ -5,7 +5,6 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.DeletesResource
 import org.agorahq.agora.core.api.operation.types.Procedure
 import org.agorahq.agora.core.api.operation.types.ProcedureDescriptor
 import org.agorahq.agora.core.api.service.QueryService
@@ -43,8 +42,7 @@ class TogglePostPublished(
 
         override val attributes = Attributes.create<Post, UUID, Unit>(
                 route = "${ShowPostURL.root}/toggle-post-published",
-                urlClass = ShowPostURL::class,
-                additionalAttributes = listOf(DeletesResource(Post::class))
+                urlClass = ShowPostURL::class
         )
     }
 }

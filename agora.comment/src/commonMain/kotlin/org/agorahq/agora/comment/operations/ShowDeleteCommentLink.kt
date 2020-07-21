@@ -1,7 +1,6 @@
 package org.agorahq.agora.comment.operations
 
-import kotlinx.html.a
-import kotlinx.html.style
+import kotlinx.html.*
 import org.agorahq.agora.comment.domain.Comment
 import org.agorahq.agora.comment.domain.UpdateCommentURL
 import org.agorahq.agora.core.api.data.ElementSource
@@ -15,7 +14,7 @@ import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.hexworks.cobalt.core.api.UUID
 
-class ShowEditCommentLink(
+class ShowDeleteCommentLink(
         private val commentQueryService: QueryService<Comment>
 ) : ParameterizedRenderer<Comment, UUID>, ParameterizedRendererDescriptor<Comment, UUID> by Companion {
 
@@ -29,12 +28,14 @@ class ShowEditCommentLink(
             data: ElementSource<Comment>
     ) = data.map { comment ->
         Templates.htmlPartial {
-            a(
-                    href = "${context.currentPath}?pageElementToEdit=${comment.id}",
-                    classes = "btn btn-warning mr-2"
-            ) {
+            form(DeleteComment.route, method = FormMethod.post) {
                 this.style = "display: inline-block; margin-bottom: 0;"
-                +"Edit"
+                input(type = InputType.hidden, name = "id") {
+                    value = comment.id.toString()
+                }
+                button(type = ButtonType.submit, classes = "btn btn-danger") {
+                    +"Delete"
+                }
             }
         }
     }.toCommand()
@@ -43,7 +44,7 @@ class ShowEditCommentLink(
     override fun toString() = name
 
     companion object : ParameterizedRendererDescriptor<Comment, UUID> {
-        override val name = "Show edit comment link"
+        override val name = "Show delete comment link"
         override val attributes = Attributes.create<Comment, UUID, String>(
                 route = "", // TODO: this shouldn't be mandatory
                 urlClass = UpdateCommentURL::class, // TODO: this shouldn't be mandatory

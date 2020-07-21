@@ -275,19 +275,20 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleOauth(
 
 private fun registerOperations(operationRegistry: OperationRegistry): OperationRegistry {
 
-    operationRegistry.register(Operations.listPosts)
+    operationRegistry.register(Operations.showPostListing)
     operationRegistry.register(Operations.showPost)
     operationRegistry.register(Operations.createPost)
     operationRegistry.register(Operations.showPostEditor)
-    operationRegistry.register(Operations.createAndEditNewPost)
+    operationRegistry.register(Operations.showPostCreator)
     operationRegistry.register(Operations.deletePost)
 
     operationRegistry.register(Operations.showCreatePostLink)
-    operationRegistry.register(Operations.showTogglePostPublished)
-    operationRegistry.register(Operations.showEditPost)
-    operationRegistry.register(Operations.showDeletePost)
+    operationRegistry.register(Operations.showPostPublishedToggle)
+    operationRegistry.register(Operations.showEditPostLink)
+    operationRegistry.register(Operations.showDeletePostLink)
 
-    operationRegistry.register(Operations.listComments)
+    operationRegistry.register(Operations.showCommentListing)
+    operationRegistry.register(Operations.showCommentCreator)
     operationRegistry.register(Operations.showCommentEditor)
     operationRegistry.register(Operations.showEditCommentLink)
     operationRegistry.register(Operations.createComment)

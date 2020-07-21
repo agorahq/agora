@@ -7,6 +7,7 @@ import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.types.Renderer
 import org.agorahq.agora.core.api.operation.types.RendererDescriptor
+import org.agorahq.agora.core.api.service.MarkdownRenderer
 import org.agorahq.agora.core.api.service.PageQueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.view.ConverterService
@@ -18,7 +19,8 @@ import org.agorahq.agora.post.viewmodel.PostViewModel
 
 class ShowPostListing(
         private val postQueryService: PageQueryService<Post>,
-        private val converterService: ConverterService
+        private val converterService: ConverterService,
+        private val markdownRenderer: MarkdownRenderer
 ) : Renderer<Post>, RendererDescriptor<Post> by Companion {
 
     override fun fetchResource(context: OperationContext<out Unit>): ElementSource<Post> {
@@ -32,7 +34,8 @@ class ShowPostListing(
         Templates.htmlTemplate {
             renderPostList(context, PostListViewModel(
                     posts = data.asSequence().sortedByDescending { it.publishedAt }.map {
-                        converterService.convertToView<PostViewModel>(it, context).get()
+                        val view = converterService.convertToView<PostViewModel>(it, context).get()
+                        view.copy(content = markdownRenderer.render(view.content))
                     }
             ))
         }

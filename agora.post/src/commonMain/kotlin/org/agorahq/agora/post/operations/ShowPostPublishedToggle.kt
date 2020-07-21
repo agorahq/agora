@@ -16,7 +16,7 @@ import org.agorahq.agora.post.domain.ShowPostURL
 import org.agorahq.agora.post.viewmodel.PostViewModel
 import org.hexworks.cobalt.core.api.UUID
 
-class ShowTogglePostPublished(
+class ShowPostPublishedToggle(
         private val postQueryService: QueryService<Post>,
         private val converterService: ConverterService
 ) : ParameterizedRenderer<Post, UUID>, ParameterizedRendererDescriptor<Post, UUID> by Companion {

@@ -31,7 +31,7 @@ val AUTHORIZATION = authorization {
             }
 
             Comment::class {
-                ListComments withPolicy commentIsNotHidden
+                ShowCommentListing withPolicy commentIsNotHidden
             }
 
         }
@@ -41,9 +41,10 @@ val AUTHORIZATION = authorization {
 
             Comment::class {
                 CreateComment allow forAll
-                ListComments withPolicy commentIsOwnOrNotHidden
+                ShowCommentListing withPolicy commentIsOwnOrNotHidden
                 ShowEditCommentLink withPolicy ownCommentOnly
                 ShowCommentEditor withPolicy ownCommentOnly
+                UpdateComment withPolicy  ownCommentOnly
                 DeleteComment withPolicy ownCommentOnly
             }
         }
@@ -56,10 +57,10 @@ val AUTHORIZATION = authorization {
                 ShowPost allow forAll
                 CreatePost allow forAll
                 ShowPostEditor allow forAll
-                CreateAndEditNewPost allow forAll
+                ShowPostCreator allow forAll
 
                 ShowCreatePostLink allow forAll
-                ShowTogglePostPublished allow forAll
+                ShowPostPublishedToggle allow forAll
                 ShowEditPostLink allow forAll
                 ShowDeletePostLink allow forAll
 
@@ -68,8 +69,9 @@ val AUTHORIZATION = authorization {
             }
 
             Comment::class {
-                ListComments allow forAll
+                ShowCommentListing allow forAll
                 DeleteComment allow forAll
+                UpdateComment allow forAll
 
                 ShowEditCommentLink allow forAll
                 ShowCommentEditor allow forAll

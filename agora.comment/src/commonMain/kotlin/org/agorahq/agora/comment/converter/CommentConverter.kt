@@ -9,7 +9,6 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.view.ResourceConverter
-import org.agorahq.agora.core.platform.MarkdownRendererFactory
 
 class CommentConverter(
         private val userService: QueryService<User>
@@ -30,7 +29,7 @@ class CommentConverter(
     override fun Comment.toViewModel(context: OperationContext<out Any>) = CommentViewModel(
             id = id.toString(),
             parentId = parentId.toString(),
-            content = MarkdownRendererFactory.createRenderer().render(content),
+            content = content,
             userId = owner.id.toString(),
             username = owner.username,
             isHidden = hiddenSince < DateTime.now(),

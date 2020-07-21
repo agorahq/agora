@@ -1,12 +1,11 @@
 package org.agorahq.agora.comment.operations
 
 import org.agorahq.agora.comment.domain.Comment
-import org.agorahq.agora.comment.domain.CommentURL
+import org.agorahq.agora.comment.domain.CreateCommentURL
 import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.DeletesResource
 import org.agorahq.agora.core.api.operation.types.Procedure
 import org.agorahq.agora.core.api.operation.types.ProcedureDescriptor
 import org.agorahq.agora.core.api.service.QueryService
@@ -32,9 +31,8 @@ class DeleteComment(
     companion object : ProcedureDescriptor<Comment, UUID> {
         override val name = "Delete comment"
         override val attributes = Attributes.create<Comment, UUID, Unit>(
-                route = CommentURL.root,
-                urlClass = CommentURL::class,
-                additionalAttributes = listOf(DeletesResource(Comment::class))
+                route = CreateCommentURL.root,
+                urlClass = CreateCommentURL::class
         )
     }
 }

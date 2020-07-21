@@ -1,12 +1,10 @@
 package org.agorahq.agora.core.api.extensions
 
+import org.agorahq.agora.core.api.data.PageElement
 import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Attribute
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.PageElementFormRenderer
-import org.agorahq.agora.core.api.operation.facets.ShowsPageElements
-import org.agorahq.agora.core.api.operation.facets.ShowsResourceCreatorLink
-import org.agorahq.agora.core.api.operation.facets.ShowsResourceLink
+import org.agorahq.agora.core.api.operation.facets.*
 import org.agorahq.agora.core.api.security.authorize
 import org.hexworks.cobalt.core.api.UUID
 import kotlin.reflect.KClass
@@ -28,10 +26,29 @@ fun OperationContext<out Any>.renderPageElementsFor(parentId: String): String {
     return renderedPageElements.toString()
 }
 
-fun OperationContext<out Any>.renderPageElementFormsFor(parentId: String): String {
+fun OperationContext<out Any>.renderFormsFor(
+        id: String,
+        resourceClass: KClass<out Resource> = Resource::class
+): String {
+    val renderedContent = StringBuilder()
+    site.findMatchingOperations<Resource, UUID, String>(RendersForm(resourceClass)).forEach { renderer ->
+        val ctx: OperationContext<UUID> = withInput(id.toUUID())
+        val result = StringBuilder()
+        ctx.authorization.authorize(ctx, renderer)
+                .flatMap { it.execute() }
+                .map { result.append(it) }
+        renderedContent.append(result.toString())
+    }
+    return renderedContent.toString()
+}
+
+fun OperationContext<out Any>.renderPageElementFormsFor(
+        parentId: UUID,
+        elementClass: KClass<out PageElement> = PageElement::class
+): String {
     val renderedPageElements = StringBuilder()
-    site.findMatchingOperations<Resource, UUID, String>(PageElementFormRenderer).forEach { renderer ->
-        val ctx: OperationContext<UUID> = withInput(parentId.toUUID())
+    site.findMatchingOperations<PageElement, UUID, String>(RendersPageElementForm(elementClass)).forEach { renderer ->
+        val ctx: OperationContext<UUID> = withInput(parentId)
         val result = StringBuilder()
         ctx.authorization.authorize(ctx, renderer)
                 .flatMap { it.execute() }

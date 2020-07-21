@@ -1,11 +1,13 @@
 package org.agorahq.agora.comment.templates
 
 import kotlinx.html.*
-import org.agorahq.agora.comment.domain.CommentURL
 import org.agorahq.agora.comment.viewmodel.CommentViewModel
 
-fun TagConsumer<Appendable>.renderCommentForm(comment: CommentViewModel) {
-    form(action = CommentURL.root, method = FormMethod.post) {
+fun TagConsumer<Appendable>.renderCommentCreator(
+        comment: CommentViewModel,
+        path: String
+) {
+    form(action = path, method = FormMethod.post) {
         div("form-group") {
             p {
                 +"Commenting as "

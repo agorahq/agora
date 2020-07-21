@@ -4,9 +4,9 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.PageRenderer
 import org.agorahq.agora.core.api.operation.types.ParameterizedRenderer
 import org.agorahq.agora.core.api.operation.types.ParameterizedRendererDescriptor
+import org.agorahq.agora.core.api.service.MarkdownRenderer
 import org.agorahq.agora.core.api.service.PageQueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.agorahq.agora.core.api.view.ConverterService
@@ -18,7 +18,8 @@ import org.agorahq.agora.post.viewmodel.PostViewModel
 @Suppress("UNCHECKED_CAST")
 class ShowPost(
         private val postQueryService: PageQueryService<Post>,
-        private val converterService: ConverterService
+        private val converterService: ConverterService,
+        private val markdownRenderer: MarkdownRenderer
 ) : ParameterizedRenderer<Post, ShowPostURL>, ParameterizedRendererDescriptor<Post, ShowPostURL> by Companion {
 
     override fun fetchResource(context: OperationContext<out ShowPostURL>): ElementSource<Post> {
@@ -33,7 +34,7 @@ class ShowPost(
         val model = converterService.convertToView<PostViewModel>(post, context).get()
         Templates.htmlTemplate {
             renderPostDetails(
-                    post = model,
+                    post = model.copy(content = markdownRenderer.render(model.content)),
                     ctx = context
             )
         }
@@ -45,8 +46,7 @@ class ShowPost(
         override val name = "Show post"
         override val attributes = Attributes.create<Post, ShowPostURL, String>(
                 route = ShowPostURL.route,
-                urlClass = ShowPostURL::class,
-                additionalAttributes = listOf(PageRenderer)
+                urlClass = ShowPostURL::class
         )
     }
 }

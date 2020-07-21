@@ -1,7 +1,7 @@
 package org.agorahq.agora.core.internal.security
 
 import org.agorahq.agora.core.api.data.*
-import org.agorahq.agora.core.api.exception.AuthorizationException
+import org.agorahq.agora.core.api.exception.EntityNotFoundException
 import org.agorahq.agora.core.api.exception.MissingPermissionException
 import org.agorahq.agora.core.api.exception.ResourceAccessNotPermittedException
 import org.agorahq.agora.core.api.operation.AnyOperation
@@ -41,7 +41,7 @@ data class DefaultAuthorization(
     override fun <O : Any> authorizeAny(
             context: OperationContext<out Any>,
             operation: Operation<Resource, Any, O>
-    ): Result<out Command<O>, out AuthorizationException> {
+    ): Result<out Command<O>, out Exception> {
         logger.info("Trying to authorize $operation for ${context.user}")
         val user = context.user
         val permissions = user.permissions
@@ -54,7 +54,10 @@ data class DefaultAuthorization(
                 remaining.filter { next(context as OperationContext<Any>, it) }
             }
             val result = when (data) {
-                EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation as AnyOperation))
+                EmptyElementSource -> Result.Failure(EntityNotFoundException(
+                        type = operation.resourceClass,
+                        key = context.input.toString()
+                ))
                 is SingleElementSource -> when (filteredData) {
                     EmptyElementSource -> Result.Failure(ResourceAccessNotPermittedException(user, operation as AnyOperation))
                     is SingleElementSource -> Result.Success(operation.createCommand(context, filteredData))

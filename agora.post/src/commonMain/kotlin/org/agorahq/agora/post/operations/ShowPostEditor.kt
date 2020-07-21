@@ -5,7 +5,6 @@ import org.agorahq.agora.core.api.data.ResourceId
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.SavesResource
 import org.agorahq.agora.core.api.operation.types.ParameterizedRenderer
 import org.agorahq.agora.core.api.operation.types.ParameterizedRendererDescriptor
 import org.agorahq.agora.core.api.service.PageQueryService
@@ -44,8 +43,7 @@ class ShowPostEditor(
         override val name = "Show post editor"
         override val attributes = Attributes.create<Post, ResourceId, String>(
                 route = EditPostURL.route,
-                urlClass = EditPostURL::class,
-                additionalAttributes = listOf(SavesResource)
+                urlClass = EditPostURL::class
         )
     }
 }

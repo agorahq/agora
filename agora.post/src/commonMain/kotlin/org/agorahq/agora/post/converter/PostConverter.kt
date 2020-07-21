@@ -31,7 +31,7 @@ class PostConverter(
             url = url.generate(),
             title = title,
             tags = tags,
-            content = MarkdownRendererFactory.createRenderer().render(content),
+            content = content,
             renderedPageElements = "",
             excerpt = excerpt,
             publicationDate = publishedAt.format(humanReadableFormat),

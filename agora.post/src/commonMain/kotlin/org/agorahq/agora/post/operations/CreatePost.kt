@@ -4,7 +4,6 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.Command
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.SavesResource
 import org.agorahq.agora.core.api.operation.types.Procedure
 import org.agorahq.agora.core.api.operation.types.ProcedureDescriptor
 import org.agorahq.agora.core.api.service.StorageService
@@ -35,8 +34,7 @@ class CreatePost(
         override val name = "Create post"
         override val attributes = Attributes.create<Post, PostViewModel, Unit>(
                 route = ShowPostURL.root,
-                urlClass = ShowPostURL::class,
-                additionalAttributes = listOf(SavesResource)
+                urlClass = ShowPostURL::class
         )
     }
 

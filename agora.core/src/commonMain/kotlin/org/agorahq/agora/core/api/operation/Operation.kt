@@ -14,6 +14,7 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
  * This [Command] then can be executed without parameters which makes it possible to pass
  * [Command]s around in the application without having to worry about their parameters.
  */
+// TODO: make these functions `suspend`!
 interface Operation<R : Resource, I : Any, O : Any> : OperationDescriptor<R, I, O> {
 
     /**

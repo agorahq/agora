@@ -4,13 +4,12 @@ import org.agorahq.agora.core.api.data.ElementSource
 import org.agorahq.agora.core.api.data.ResourceId
 import org.agorahq.agora.core.api.operation.Attributes
 import org.agorahq.agora.core.api.operation.context.OperationContext
-import org.agorahq.agora.core.api.operation.facets.SavesResource
 import org.agorahq.agora.core.api.operation.types.Renderer
 import org.agorahq.agora.core.api.operation.types.RendererDescriptor
 import org.agorahq.agora.post.domain.EditPostURL
 import org.agorahq.agora.post.domain.Post
 
-class CreateAndEditNewPost(
+class ShowPostCreator(
         private val showPostEditor: ShowPostEditor
 ) : Renderer<Post>, RendererDescriptor<Post> by Companion {
 
@@ -28,8 +27,7 @@ class CreateAndEditNewPost(
         override val name = "Create and edit new post"
         override val attributes = Attributes.create<Post, Unit, String>(
                 route = "/post/create",
-                urlClass = EditPostURL::class, // TODO: shouldn't be mandatory!
-                additionalAttributes = listOf(SavesResource)
+                urlClass = EditPostURL::class // TODO: shouldn't be mandatory!
         )
     }
 }

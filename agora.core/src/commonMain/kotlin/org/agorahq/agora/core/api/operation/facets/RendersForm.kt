@@ -4,6 +4,6 @@ import org.agorahq.agora.core.api.data.Resource
 import org.agorahq.agora.core.api.operation.Attribute
 import kotlin.reflect.KClass
 
-data class DeletesResource<R : Resource>(
+data class RendersForm<R : Resource>(
         val resourceClass: KClass<R>
 ) : Attribute

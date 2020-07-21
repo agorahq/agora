@@ -22,7 +22,7 @@ class ShowCreatePostLink : Renderer<Post>, RendererDescriptor<Post> by Companion
             data: ElementSource<Post>
     ) = Command.of {
         Templates.htmlPartial {
-            a(CreateAndEditNewPost.route, classes = "btn btn-primary") {
+            a(ShowPostCreator.route, classes = "btn btn-primary") {
                 +"Create New Post"
             }
         }
@@ -33,7 +33,7 @@ class ShowCreatePostLink : Renderer<Post>, RendererDescriptor<Post> by Companion
     companion object : RendererDescriptor<Post> {
         override val name = "Show create post link"
         override val attributes = Attributes.create<Post, Unit, String>(
-                route = CreateAndEditNewPost.route,
+                route = ShowPostCreator.route,
                 urlClass = ShowPostURL::class, // TODO: this shouldn't be mandatory
                 additionalAttributes = listOf(ShowsResourceCreatorLink(Post::class))
         )
