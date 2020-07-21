@@ -17,13 +17,14 @@ object Operations {
             markdownRenderer = Services.markdownRenderer
     )
     val showPostEditor = ShowPostEditor(Services.postQueryService, Services.converterService)
-    val showPostCreator = ShowPostCreator(showPostEditor)
+    val showPostCreator = ShowPostCreator(Services.converterService)
     val showCreatePostLink = ShowCreatePostLink()
     val showEditPostLink = ShowEditPostLink(Services.postQueryService)
     val showDeletePostLink = ShowDeletePostLink(Services.postQueryService)
     val showPostPublishedToggle = ShowPostPublishedToggle(Services.postQueryService, Services.converterService)
 
     val createPost = CreatePost(Services.postStorage, Services.converterService)
+    val updatePost = UpdatePost(Services.postQueryService, Services.postStorage)
     val deletePost = DeletePost(Services.postQueryService, Services.postStorage)
     val togglePostPublished = TogglePostPublished(Services.postQueryService, Services.postStorage)
 
@@ -33,7 +34,7 @@ object Operations {
             converterService = Services.converterService,
             markdownRenderer = Services.markdownRenderer
     )
-    val showCommentCreator = ShowCommentCreator(Services.commentQueryService)
+    val showCommentCreator = ShowCommentCreator()
     val showCommentEditor = ShowCommentEditor(Services.commentQueryService)
     val showEditCommentLink = ShowEditCommentLink(Services.commentQueryService)
     val showDeleteCommentLink = ShowDeleteCommentLink(Services.commentQueryService)

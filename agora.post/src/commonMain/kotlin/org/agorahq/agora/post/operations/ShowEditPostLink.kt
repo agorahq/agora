@@ -29,7 +29,7 @@ class ShowEditPostLink(
             data: ElementSource<Post>
     ) = data.map { post ->
         Templates.htmlPartial {
-            a(href = EditPostURL(post.id.toString()).generate(), classes = "btn btn-warning mr-2") {
+            a(href = EditPostURL(post.id).generate(), classes = "btn btn-warning mr-2") {
                 this.style = "display: inline-block; margin-bottom: 0;"
                 +"Edit"
             }

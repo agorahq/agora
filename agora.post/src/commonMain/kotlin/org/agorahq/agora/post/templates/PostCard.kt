@@ -19,7 +19,7 @@ fun FlowContent.renderPostCard(
                     h5("card-title") {
                         +post.title
                         span("float-right" + if (isPublished) " text-secondary" else " text-warning") {
-                            +post.publicationDate
+                            post.publicationDate?.let { +it }
                             if (isPublished.not()) {
                                 +" (Not Published)"
                             }
@@ -28,13 +28,15 @@ fun FlowContent.renderPostCard(
                     div("card-text") {
                         p { +post.excerpt }
                         p {
-                            post.tags.forEach { tag ->
+                            post.tags.split(", ").map { it.trim() }.forEach { tag ->
                                 span("badge badge-primary mr-2") {
                                     +tag
                                 }
                             }
                         }
-                        a(href = post.url) { +"Read more" }
+                        post.url?.let { url ->
+                            a(href = url) { +"Read more" }
+                        }
                     }
                 }
                 val alterers = context.renderResourceLinksFor(Post::class, post.id)

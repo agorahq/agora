@@ -7,7 +7,6 @@ import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.shared.date.Dates.humanReadableFormat
 import org.agorahq.agora.core.api.view.ResourceConverter
-import org.agorahq.agora.core.platform.MarkdownRendererFactory
 import org.agorahq.agora.post.domain.Post
 import org.agorahq.agora.post.viewmodel.PostViewModel
 
@@ -19,23 +18,24 @@ class PostConverter(
     override val resourceClass = Post::class
 
     override fun PostViewModel.toResource() = Post(
-            title = title,
-            abstract = abstract,
-            tags = setOf(),
             owner = userService.findById(ownerId.toUUID()).get(),
-            content = content)
+            abstract = abstract,
+            title = title,
+            tags = tags.split(", ").map { it.trim() }.toSet(),
+            content = content,
+            excerpt = excerpt,
+            publishedAt = DateTime.Companion.fromUnix(Long.MAX_VALUE)
+    )
 
     override fun Post.toViewModel(context: OperationContext<out Any>) = PostViewModel(
             ownerId = owner.id.toString(),
             abstract = abstract,
-            url = url.generate(),
             title = title,
-            tags = tags,
+            tags = tags.joinToString(", "),
             content = content,
-            renderedPageElements = "",
             excerpt = excerpt,
             publicationDate = publishedAt.format(humanReadableFormat),
-            isPublished = publishedAt.unixMillisLong < DateTime.nowUnixLong(),
+            isPublished = publishedAt < DateTime.now(),
             id = id.toString()
     )
 }

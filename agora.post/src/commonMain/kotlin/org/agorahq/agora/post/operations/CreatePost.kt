@@ -18,7 +18,10 @@ class CreatePost(
 ) : Procedure<Post, PostViewModel>, ProcedureDescriptor<Post, PostViewModel> by Companion {
 
     override fun fetchResource(context: OperationContext<out PostViewModel>): ElementSource<Post> {
-        return ElementSource.of(converterService.convertToResource<Post>(context.input).get())
+        val enrichedModel = context.input.copy(
+                ownerId = context.user.id.toString()
+        )
+        return ElementSource.of(converterService.convertToResource<Post>(enrichedModel).get())
     }
 
     override fun createCommand(
@@ -34,7 +37,7 @@ class CreatePost(
         override val name = "Create post"
         override val attributes = Attributes.create<Post, PostViewModel, Unit>(
                 route = ShowPostURL.root,
-                urlClass = ShowPostURL::class
+                urlClass = ShowPostURL::class // TODO: no
         )
     }
 

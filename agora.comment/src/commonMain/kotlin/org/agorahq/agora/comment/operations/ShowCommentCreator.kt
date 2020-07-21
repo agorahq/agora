@@ -11,20 +11,17 @@ import org.agorahq.agora.core.api.operation.context.OperationContext
 import org.agorahq.agora.core.api.operation.facets.RendersPageElementForm
 import org.agorahq.agora.core.api.operation.types.ParameterizedRenderer
 import org.agorahq.agora.core.api.operation.types.ParameterizedRendererDescriptor
-import org.agorahq.agora.core.api.service.QueryService
 import org.agorahq.agora.core.api.shared.templates.Templates
 import org.hexworks.cobalt.core.api.UUID
 
-class ShowCommentCreator(
-        private val commentQueryService: QueryService<Comment>
-) : ParameterizedRenderer<Comment, UUID>, ParameterizedRendererDescriptor<Comment, UUID> by Companion {
+class ShowCommentCreator :
+        ParameterizedRenderer<Comment, UUID>, ParameterizedRendererDescriptor<Comment, UUID> by Companion {
 
-    override fun fetchResource(context: OperationContext<out UUID>): ElementSource<Comment> {
-        return ElementSource.of(Comment.empty(
-                owner = context.user,
-                parentId = context.input
-        ))
-    }
+    override fun fetchResource(context: OperationContext<out UUID>) =
+            ElementSource.of(Comment.empty(
+                    owner = context.user,
+                    parentId = context.input
+            ))
 
     override fun createCommand(
             context: OperationContext<out UUID>,
@@ -37,7 +34,7 @@ class ShowCommentCreator(
                     parentId = comment.parentId.toString(),
                     content = comment.content,
                     username = comment.owner.username,
-                    userId = comment.owner.id.toString()
+                    ownerId = comment.owner.id.toString()
             ), path = CreateComment.route)
         }
     }

@@ -19,7 +19,7 @@ class CreateComment(
 
     override fun fetchResource(context: OperationContext<out CommentViewModel>): ElementSource<Comment> {
         val enrichedModel = context.input.copy(
-                userId = context.user.id.toString(),
+                ownerId = context.user.id.toString(),
                 username = context.user.username)
         return ElementSource.of(converterService.convertToResource<Comment>(enrichedModel).get())
     }

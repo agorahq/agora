@@ -24,7 +24,6 @@ class UpdateComment(
         return ElementSource.ofMaybe(commentQueryService.findById(model.id.toUUID()).map {
             it.copy(
                     updatedAt = DateTime.now(),
-                    publishedAt = DateTime.now(),
                     content = model.content
             )
         })

@@ -18,7 +18,7 @@ class CommentConverter(
     override val resourceClass = Comment::class
 
     override fun CommentViewModel.toResource() = Comment(
-            owner = userService.findById(userId.toUUID()).orElseThrow { EntityNotFoundException(User::class, userId) },
+            owner = userService.findById(ownerId.toUUID()).orElseThrow { EntityNotFoundException(User::class, ownerId) },
             parentId = parentId.toUUID(),
             createdAt = DateTime.now(),
             content = content,
@@ -30,7 +30,7 @@ class CommentConverter(
             id = id.toString(),
             parentId = parentId.toString(),
             content = content,
-            userId = owner.id.toString(),
+            ownerId = owner.id.toString(),
             username = owner.username,
             isHidden = publishedAt > DateTime.now(),
             editing = id.toString() == context.pageElementToEdit?.trim()

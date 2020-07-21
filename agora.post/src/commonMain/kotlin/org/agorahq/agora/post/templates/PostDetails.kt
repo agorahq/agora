@@ -16,7 +16,9 @@ fun HTML.renderPostDetails(
 ) {
     h1("mt-3") {
         +post.title
-        h6("text-muted text-right") { +post.publicationDate }
+        post.publicationDate?.let {
+            h6("text-muted text-right") { +it }
+        }
     }
     div {
         if (post.abstract.isNotBlank()) {
@@ -27,7 +29,7 @@ fun HTML.renderPostDetails(
         htmlContent(post.content)
     }
     div {
-        post.tags.forEach { tag ->
+        post.tags.split(", ").map { it.trim() }.forEach { tag ->
             span("badge badge-secondary mr-1") { +tag }
         }
     }

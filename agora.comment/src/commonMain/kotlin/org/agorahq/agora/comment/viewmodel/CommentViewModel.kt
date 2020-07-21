@@ -6,7 +6,7 @@ data class CommentViewModel(
         val id: String,
         val parentId: String,
         val content: String,
-        val userId: String = "",
+        val ownerId: String = "",
         val username: String = "",
         val isHidden: Boolean = false,
         val editing: Boolean = false

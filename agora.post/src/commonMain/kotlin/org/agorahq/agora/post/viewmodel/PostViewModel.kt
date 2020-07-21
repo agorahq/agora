@@ -7,11 +7,10 @@ data class PostViewModel(
         val ownerId: String,
         val abstract: String,
         val excerpt: String,
-        val publicationDate: String,
-        val isPublished: Boolean,
-        val url: String,
         val title: String,
-        val tags: Iterable<String>,
+        val tags: String,
         val content: String,
-        val renderedPageElements: String
+        val publicationDate: String? = null,
+        val isPublished: Boolean = false,
+        val url: String? = null
 ) : ViewModel
