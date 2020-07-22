@@ -3,6 +3,7 @@ package org.agorahq.agora.post.domain
 import com.soywiz.klock.DateTime
 import org.agorahq.agora.core.api.data.ContentFormat
 import org.agorahq.agora.core.api.data.Page
+import org.agorahq.agora.core.api.extensions.toSlug
 import org.agorahq.agora.core.api.security.User
 import org.agorahq.agora.core.api.shared.date.Dates.simpleDateFormat
 import org.agorahq.agora.core.internal.document.BuiltInContentFormat.MARKDOWN
@@ -19,7 +20,7 @@ data class Post(
         override val createdAt: DateTime = DateTime.now(),
         override val updatedAt: DateTime = createdAt,
         override val publishedAt: DateTime = DateTime.fromUnix(Long.MAX_VALUE),
-        override val url: ShowPostURL = ShowPostURL(createdAt.format(simpleDateFormat), title),
+        override val url: ShowPostURL = ShowPostURL(createdAt.format(simpleDateFormat), title.toSlug()),
         override val id: UUID = UUID.randomUUID()
 ) : Page {
 
